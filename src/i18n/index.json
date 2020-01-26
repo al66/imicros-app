@@ -1,0 +1,10 @@
+{
+  "de": {
+    label: "German",
+    value: "de"
+  },
+  "en-us": {
+    label: "US English",
+    value: "en-us"
+  }
+}
