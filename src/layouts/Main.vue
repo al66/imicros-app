@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout view="hHh lpr fFf">
     <q-header elevated>
       <q-toolbar class="bg-black text-white">
         <q-btn
@@ -15,8 +15,8 @@
           <q-btn to="/">
             <img class='toolbar-brand' alt='imicros-logo' src='~assets/imicros-grau.png'>
           </q-btn>
+          <q-chip color="grey-10" text-color="orange" v-if="user.email" >{{ user.email }}</q-chip>
         </q-toolbar-title>
-
         <q-btn to='/login' icon="ion-log-in" :label="$t('Navbar.item.login')" v-if="!isAuthenticated()" />
         <q-btn to='/signin' :label="$t('Navbar.item.signin')" v-if="!isAuthenticated()" />
         <q-btn icon="person" v-if="isAuthenticated()" >
@@ -58,12 +58,22 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
+        <q-btn
+          v-if="isAuthenticated()"
+          flat
+          dense
+          round
+          @click="rightDrawerOpen = !rightDrawerOpen"
+          icon="menu"
+          aria-label="Menu"
+        />
       </q-toolbar>
     </q-header>
 
     <q-drawer
       v-model="leftDrawerOpen"
-      show-if-above
+      side="left"
+      overlay
       bordered
     >
       <q-chip>{{ user.email }}</q-chip>
@@ -126,6 +136,15 @@
       </q-list>
     </q-drawer>
 
+    <q-drawer
+      v-model="rightDrawerOpen"
+      side="right"
+      overlay
+      bordered
+    >
+      <q-chip>{{ user.email }}</q-chip>
+    </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -141,6 +160,7 @@ export default {
   data () {
     return {
       leftDrawerOpen: false,
+      rightDrawerOpen: false,
       langs: [
         { label: 'German', value: 'de' },
         { label: 'US English', value: 'en-us' }
@@ -157,6 +177,11 @@ export default {
   watch: {
     dark: function (val) {
       this.$q.dark.set(val)
+    },
+    rightDrawerOpen: function (val) {
+      if (val) {
+        //
+      }
     }
   },
   methods: {

@@ -24,7 +24,8 @@ export default function (/* { ssrContext } */) {
       user: null,
       token: null,
       nav: [],
-      locale: null
+      locale: null,
+      settings: {}
     },
     getters: {
       isAuthenticated: state => { return state.isAuthenticated },
@@ -32,7 +33,8 @@ export default function (/* { ssrContext } */) {
       token: state => { return state.token || {} },
       email: state => { return state.user ? state.user.email : 'unkown' },
       nav: state => { return state.nav },
-      locale: state => { return state.locale }
+      locale: state => { return state.locale },
+      settings: (state) => (component) => { return state.settings[component] }
     },
     mutations: {
       login (state, user) {
@@ -57,6 +59,9 @@ export default function (/* { ssrContext } */) {
       },
       setLocale (state, val) {
         state.locale = val
+      },
+      setSettings (state, val) {
+        state.settings = Object.assign(state.settings, val)
       }
     },
     actions: {

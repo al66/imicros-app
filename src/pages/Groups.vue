@@ -36,7 +36,24 @@
                 @click="editGroup(props.row.id)"
                 :color="props.row.role === 'admin' ? 'primary' : 'secondary' "
                 text-color="white"
-              >{{ props.row.alias ? props.row.alias : props.row.name }}</q-chip>
+              ><q-tooltip>{{ $t('Action.edit') }}</q-tooltip>
+                {{ props.row.alias ? props.row.alias : props.row.name }}</q-chip>
+              <q-chip
+                clickable
+                v-if="props.row.request === 'revoke'"
+                dense
+                color="red"
+                text-color="white"
+                @click="confirmDialog(props.row)"
+              >{{ $t('Groups.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}</q-chip>
+              <q-chip
+                clickable
+                v-if="props.row.request === 'nominate'"
+                dense
+                color="blue"
+                text-color="white"
+                @click="confirmDialog(props.row)"
+              >{{ $t('Groups.table.chip.nominated') }}</q-chip>
             </q-td>
           </template>
           <template v-slot:top-left>
@@ -52,26 +69,29 @@
             </q-toolbar>
           </template>
           <template v-slot:top-right>
-            <q-toolbar>
-              <q-btn-group>
-                <q-btn no-caps color="primary" :label="$t('Action.refresh')"  icon="ion-refresh" @click="refreshGroups()" />
-                <q-btn no-caps color="primary" :label="$t('Action.add')" icon="ion-add" @click="addGroup()" />
-                <q-btn no-caps color="primary" :label="$t('Action.leave')" icon="ion-log-out" @click="leaveGroups()" :disable="selectedGroups.length < 1" />
-                <q-btn color="primary" icon="ion-settings">
-                  <q-menu>
-                    <q-list>
-                      <q-item dense clickable v-for='(column) in columnsGroups' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns.groups)" >
-                        <q-item-section>
-                          <q-item-label
-                            :class="visibleColumns.groups.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                          >{{ $t('Groups.table.column.' + column.name) }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-              </q-btn-group>
-            </q-toolbar>
+            <q-btn round no-caps size="sm" color="primary" icon="ion-refresh" @click="refreshGroups()" >
+              <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
+            </q-btn>
+            <q-btn round no-caps size="sm" color="primary" icon="ion-add" @click="addGroup()">
+              <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
+            </q-btn>
+            <q-btn round no-caps size="sm" color="primary" icon="ion-log-out" @click="leaveGroups()" :disable="selectedGroups.length < 1" >
+              <q-tooltip>{{ $t('Action.leave') }}</q-tooltip>
+            </q-btn>
+            <q-btn round size="sm" color="primary" icon="ion-settings">
+              <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
+              <q-menu :offset="[0, 20]">
+                <q-list>
+                  <q-item dense clickable v-for='(column) in columnsGroups' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns.groups)" >
+                    <q-item-section>
+                      <q-item-label
+                        :class="visibleColumns.groups.indexOf(column.name) >= 0 ? 'text-primary' : ''"
+                      >{{ $t('Groups.table.column.' + column.name) }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
           </template>
         </q-table>
       </q-tab-panel>
@@ -96,6 +116,14 @@
                 :color="props.row.role === 'admin' ? 'primary' : 'secondary' "
                 text-color="white"
               >{{ props.row.name }}</q-chip>
+              <q-chip
+                v-if="props.row.ttl"
+                dense
+                color="red-11"
+                text-color="white"
+              >{{ $t('Groups.table.chip.delete') }}: {{ new Date(props.row.ttl).toLocaleDateString() }}</q-chip>
+              <q-chip dense removable v-model="props.row.hide" icon="ion-eye-off" v-if="props.row.hide" @remove="unhide(props.row.id)">
+              </q-chip>
             </q-td>
           </template>
           <template v-slot:top-left>
@@ -111,90 +139,59 @@
             </q-toolbar>
           </template>
           <template v-slot:top-right>
-            <q-toolbar>
-              <q-btn-group>
-                <q-btn no-caps color="primary" :label="$t('Action.refresh')" icon="ion-refresh" />
-                <q-btn no-caps color="primary" :label="$t('Action.join')" icon="ion-log-in" @click="joinGroups()" :disable="selectedGroups.length < 1" />
-                <q-btn no-caps color="primary" label="Refuse" icon="ion-thumbs-down" :disable="selectedGroups.length < 1" />
-                <q-btn no-caps color="primary" label="Hide" icon="ion-eye-off" :disable="selectedGroups.length < 1" />
-                <q-btn color="primary" icon="ion-settings">
-                  <q-menu>
-                    <q-list>
-                      <q-item dense clickable v-for='(column) in columnsGroups' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns.join)" >
-                        <q-item-section>
-                          <q-item-label
-                            :class="visibleColumns.join.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                          >{{ $t('Groups.table.column.' + column.name) }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-              </q-btn-group>
-            </q-toolbar>
+            <q-btn round size="sm" color="primary" icon="ion-refresh" @click="refreshGroups()">
+              <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
+            </q-btn>
+            <q-btn round size="sm" color="primary" icon="ion-log-in" @click="joinGroups()" :disable="selectedGroups.length < 1" >
+              <q-tooltip>{{ $t('Action.join') }}</q-tooltip>
+            </q-btn>
+            <q-btn round size="sm" color="primary" icon="ion-thumbs-down" :disable="selectedGroups.length < 1" @click="refuseInvitations()">
+              <q-tooltip>{{ $t('Action.refuse') }}</q-tooltip>
+            </q-btn>
+            <q-btn round size="sm" color="primary" icon="ion-eye-off" :disable="selectedGroups.length < 1" @click="hideInvitations()">
+              <q-tooltip>{{ $t('Action.hide') }}</q-tooltip>
+            </q-btn>
+            <q-btn round size="sm" color="primary" icon="ion-settings">
+              <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
+              <q-menu :offset="[0, 20]">
+                <q-list>
+                  <q-item dense clickable v-for='(column) in columnsGroups' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns.join)" >
+                    <q-item-section>
+                      <q-item-label
+                        :class="visibleColumns.join.indexOf(column.name) >= 0 ? 'text-primary' : ''"
+                      >{{ $t('Groups.table.column.' + column.name) }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
           </template>
         </q-table>
       </q-tab-panel>
 
       <!-- members panel -->
-      <q-tab-panel name="members" v-if="tab === 'members'" >
-        <q-table
-          :columns="columnsMember"
-          :data="dataMember"
-          flat
-          selection="multiple"
-          row-key="email"
-          :filter="filter.member"
-          :visible-columns="visibleColumns.member"
-          dense
-          :selected.sync="selectedMember"
-        >
-          <template v-slot:body-cell-email="props">
-            <q-td dense :props="props">
-              <q-chip dense v-if="props.row.role === 'admin' && props.row.relation !== 'INVITED_BY'" color="primary" text-color="white">{{ props.row.email }}</q-chip>
-              <q-chip dense v-if="props.row.role === 'admin' && props.row.relation === 'INVITED_BY'" color="blue-4" text-color="white">{{ props.row.email }}</q-chip>
-              <q-chip dense v-if="props.row.role === 'member' && props.row.relation !== 'INVITED_BY'" color="secondary" text-color="white">{{ props.row.email }}</q-chip>
-              <q-chip dense v-if="props.row.role === 'member' && props.row.relation === 'INVITED_BY'" >{{ props.row.email }}</q-chip>
-              <q-chip v-if="props.row.relation === 'INVITED_BY'" dense color="orange-3" text-color="white" >{{ $t('Members.table.chip.invited') }}</q-chip>
-            </q-td>
-          </template>
-          <template v-slot:top-left>
-            <q-toolbar>
-              <q-input dense debounce="300" v-model="filter.member" :placeholder="$t('Base.search.placeholder')">
-                <template v-slot:append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-              <q-separator inset/>
-              <q-chip icon="ion-at">{{ selectedGroups[0].alias ? selectedGroups[0].alias : selectedGroups[0].name }}</q-chip>
-            </q-toolbar>
-          </template>
-          <template v-slot:top-right>
-            <q-toolbar>
-              <q-btn-group>
-                <q-btn no-caps color="primary" :label="$t('Action.refresh')" icon="ion-refresh" @click="getMember(selectedGroups[0].id)" />
-                <q-btn no-caps color="primary" :label="$t('Action.add')" icon="ion-person-add" v-if="isAdmin === true" @click="addInvitation()" />
-                <q-btn no-caps color="primary" :label="$t('Action.member.remove')" icon="ion-trash" v-if="isAdmin === true" :disable="selectedMember.length < 1" />
-                <q-btn color="primary" icon="ion-settings">
-                  <q-menu>
-                    <q-list>
-                      <q-item dense clickable v-for='(column) in columnsMember' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns.member)" >
-                        <q-item-section>
-                          <q-item-label
-                            :class="visibleColumns.member.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                          >{{ $t('Members.table.column.' + column.name) }}</q-item-label>
-                        </q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-              </q-btn-group>
-            </q-toolbar>
-          </template>
-        </q-table>
+      <q-tab-panel name="members" v-show="tab === 'members'" >
+        <member-table :group="selectedSingle" :isAdmin="isAdmin" @refreshed="memberRefreshed"></member-table>
       </q-tab-panel>
 
     </q-tab-panels>
+
+    <!-- request confirm dialog -->
+    <q-dialog v-model="confirm" v-if="request.request">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">{{ $t('Groups.dialog.request.title') }}</div>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          {{ $t('Groups.dialog.request.' + request.request) }}
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn :label="$t('Action.accept')" text-color="green" dense flat @click="acceptRequest()"/>
+          <q-btn :label="$t('Action.decline')" text-color="red" dense flat @click="declineRequest()"/>
+          <q-btn :label="$t('Action.cancel')" dense flat @click="()=>{ this.confirm = false }" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
     <!-- edit group dialog -->
     <q-dialog v-model="edit" >
@@ -216,34 +213,17 @@
       </q-card>
     </q-dialog>
 
-    <!-- invite member dialog -->
-    <q-dialog v-model="dialog.invite.show" v-if="selectedGroups.length === 1" >
-      <q-card>
-        <q-card-section>
-          <q-chip icon="ion-at" :label="selectedGroups[0].alias ? selectedGroups[0].alias : selectedGroups[0].name" />
-          <div class="q-pa-md">
-            <div class="q-gutter-y-md column">
-              <q-input ref="email" dense stack-label autofocus label="Email" v-model="dialog.invite.data.email" @keyup.enter="inviteMember()" :rules="validEmail()" lazy-rules />
-              <q-option-group
-                v-model="dialog.invite.data.role"
-                :options="dialog.invite.roleOptions"
-              />
-            </div>
-            {{ dialog.invite.error }}
-          </div>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn :label="$t('Action.invite')" color="primary" dense type="submit" :disable="dialog.invite.error" @click="inviteMember()"/>
-          <q-btn :label="$t('Action.cancel')" dense @click="()=>{ this.dialog.invite.show = false }" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
 <script>
+import MemberTable from '../components/groups/MemberTable.vue'
+
 export default {
   name: 'Groups',
+  components: {
+    MemberTable
+  },
   data () {
     return {
       tab: 'groups',
@@ -271,11 +251,14 @@ export default {
         }
       },
       selectedGroups: [],
+      selectedSingle: {},
       selectedMember: [],
       isAdmin: false,
       edit: false,
       editGroupData: {},
       invite: false,
+      confirm: false,
+      request: {},
       dialog: {
         invite: {
           show: false,
@@ -298,28 +281,20 @@ export default {
         { name: 'name', field: 'name', label: this.$t('Groups.table.column.name'), sortable: true, align: 'left' },
         { name: 'role', field: 'roleName', label: this.$t('Groups.table.column.role'), sortable: true, align: 'left' },
         { name: 'relation', field: 'relation', label: this.$t('Groups.table.column.relation'), align: 'left' },
-        { name: 'id', field: 'id', label: this.$t('Groups.table.column.id'), sortable: true, align: 'left' }
-      ]
-    },
-    columnsMember: function () {
-      return [
-        { name: 'email', field: 'email', label: this.$t('Members.table.column.email'), sortable: true, align: 'left' },
-        { name: 'role', field: 'roleName', label: this.$t('Members.table.column.role'), sortable: true, align: 'left' },
-        { name: 'relation', field: 'relation', label: this.$t('Groups.table.column.relation'), align: 'left' },
-        { name: 'id', field: 'id', label: this.$t('Members.table.column.id'), sortable: true, align: 'left' }
+        { name: 'id', field: 'id', label: this.$t('Groups.table.column.id'), sortable: true, align: 'left' },
+        { name: 'request', field: 'request', label: this.$t('Groups.table.column.request'), sortable: true, align: 'left' }
       ]
     }
   },
   watch: {
     selectedGroups: function (newSelection) {
       if (newSelection.length !== 1) {
-        this.dataMember = []
-        this.counter.member = this.dataMember.length
+        this.selectedSingle = {}
+        this.counter.member = 0
         this.isAdmin = false
         return
       }
-      // get member
-      this.getMember(newSelection[0].id)
+      this.selectedSingle = newSelection[0]
       // set flag admin
       newSelection[0].role === 'admin' && newSelection[0].relation === 'MEMBER_OF' ? this.isAdmin = true : this.isAdmin = false
     },
@@ -361,25 +336,8 @@ export default {
         console.log(err)
       })
     },
-    getMember (id) {
-      let param = {
-        id: id
-      }
-      let instance = this.$axios.create()
-      instance.post('api/groups/members', param).then((response) => {
-        if (response.data) {
-          let members = []
-          if (Array.isArray(response.data)) {
-            for (let i = 0; i < response.data.length; i++) {
-              let member = response.data[i]
-              members.push(member)
-            }
-            this.dataMember = members
-            this.counter.member = members.length
-            this.translateData()
-          }
-        }
-      })
+    memberRefreshed ({ count }) {
+      this.counter.member = count
     },
     translateData () {
       for (let i = 0; i < this.dataGroups.length; i++) {
@@ -387,9 +345,6 @@ export default {
       }
       for (let i = 0; i < this.dataInvitedBy.length; i++) {
         this.dataInvitedBy[i].roleName = this.$t('Groups.roles.' + this.dataInvitedBy[i].role)
-      }
-      for (let i = 0; i < this.dataMember.length; i++) {
-        this.dataMember[i].roleName = this.$t('Groups.roles.' + this.dataMember[i].role)
       }
     },
     addGroup () {
@@ -432,6 +387,45 @@ export default {
         })
       }
     },
+    refuseInvitations () {
+      let instance = this.$axios.create()
+      for (let i = 0; i < this.selectedGroups.length; i++) {
+        let param = {
+          id: this.selectedGroups[i].id
+        }
+        instance.post('api/groups/refuse', param).then((response) => {
+          if (response.data && Array.isArray(response.data) && response.data[0].id) {
+            this.refreshGroups()
+          }
+        })
+      }
+    },
+    hideInvitations (unhide) {
+      let instance = this.$axios.create()
+      for (let i = 0; i < this.selectedGroups.length; i++) {
+        let param = {
+          id: this.selectedGroups[i].id,
+          unhide: unhide
+        }
+        instance.post('api/groups/hide', param).then((response) => {
+          if (response.data && Array.isArray(response.data) && response.data[0].id) {
+            this.refreshGroups()
+          }
+        })
+      }
+    },
+    unhide (id) {
+      let instance = this.$axios.create()
+      let param = {
+        id: id,
+        unhide: true
+      }
+      instance.post('api/groups/hide', param).then((response) => {
+        if (response.data && Array.isArray(response.data) && response.data[0].id) {
+          this.refreshGroups()
+        }
+      })
+    },
     editGroup (id) {
       this.editGroupData = Object.assign({}, this.dataGroups.find((group) => { return group.id === id }))
       this.edit = true
@@ -466,37 +460,38 @@ export default {
       this.edit = false
       this.editGroupData = {}
     },
-    addInvitation () {
-      this.dialog.invite.data.id = this.selectedGroups[0].id
-      this.dialog.invite.show = true
-    },
-    inviteMember () {
-      this.$refs.email.validate()
-      if (this.$refs.email.hasError) return
-
-      let instance = this.$axios.create()
-      let param = {
-        id: this.dialog.invite.data.id,
-        email: this.dialog.invite.data.email,
-        role: this.dialog.invite.data.role
-      }
-      instance.post('api/groups/invite', param).then((response) => {
-        if (response.data && Array.isArray(response.data) && response.data[0].invited) {
-          this.getMember(this.selectedGroups[0].id)
-          this.dialog.invite.show = false
-        }
-      })
-    },
     setVisibleColumns (column, visible) {
       visible.indexOf(column.name) >= 0 ? visible.splice(visible.indexOf(column.name), 1) : visible.push(column.name)
     },
-    validEmail () {
-      let rules = []
-      /* eslint no-useless-escape: "off" */
-      let email = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
-      let message = this.$t('Message.validation.email')
-      rules.push(v => email.test(v) || message)
-      return rules
+    confirmDialog (row) {
+      this.request = row
+      this.confirm = true
+    },
+    acceptRequest () {
+      let instance = this.$axios.create()
+      let param = {
+        groupId: this.request.id,
+        request: this.request.request
+      }
+      instance.post('api/groups/accept', param).then((response) => {
+        if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].userId) {
+          this.refreshGroups()
+        }
+      })
+      this.confirm = false
+    },
+    declineRequest () {
+      let instance = this.$axios.create()
+      let param = {
+        groupId: this.request.id,
+        request: this.request.request
+      }
+      instance.post('api/groups/decline', param).then((response) => {
+        if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].userId) {
+          this.refreshGroups()
+        }
+      })
+      this.confirm = false
     }
   }
 }
