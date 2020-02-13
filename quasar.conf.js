@@ -70,7 +70,12 @@ module.exports = function (ctx) {
       ],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Notify'
+      ],
+      config: {
+        notify: { /* Notify defaults */ }
+      }
     },
 
     // https://quasar.dev/quasar-cli/cli-documentation/supporting-ie
@@ -111,7 +116,7 @@ module.exports = function (ctx) {
           target: 'http://192.168.2.124',
           changeOrigin: true,
           pathRewrite: {
-            '^/api': ''
+            '^/': ''
           }
         }
       },

@@ -23,6 +23,10 @@ export default function (/* { ssrContext } */) {
       isAuthenticated: false,
       user: null,
       token: null,
+      access: {
+        group: {},
+        token: null
+      },
       nav: [],
       locale: null,
       settings: {}
@@ -32,6 +36,7 @@ export default function (/* { ssrContext } */) {
       user: state => { return state.user || {} },
       token: state => { return state.token || {} },
       email: state => { return state.user ? state.user.email : 'unkown' },
+      access: state => { return state.access },
       nav: state => { return state.nav },
       locale: state => { return state.locale },
       settings: (state) => (component) => { return state.settings[component] }
@@ -43,7 +48,12 @@ export default function (/* { ssrContext } */) {
       },
       logout (state) {
         state.isAuthenticated = false
+        state.token = null
         state.user = null
+        state.access = {
+          group: {},
+          token: null
+        }
       },
       syncAuthenticated (state, val) {
         state.isAuthenticated = val
@@ -54,6 +64,9 @@ export default function (/* { ssrContext } */) {
       setToken (state, val) {
         state.token = val
       },
+      setAccess (state, val) {
+        state.access = JSON.parse(JSON.stringify(val))
+      },
       setNav (state, val) {
         state.nav = val || []
       },
@@ -61,7 +74,7 @@ export default function (/* { ssrContext } */) {
         state.locale = val
       },
       setSettings (state, val) {
-        state.settings = Object.assign(state.settings, val)
+        state.settings = Object.assign(state.settings, JSON.parse(JSON.stringify(val)))
       }
     },
     actions: {

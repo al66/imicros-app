@@ -16,9 +16,13 @@
             <img class='toolbar-brand' alt='imicros-logo' src='~assets/imicros-grau.png'>
           </q-btn>
           <q-chip color="grey-10" text-color="orange" v-if="user.email" >{{ user.email }}</q-chip>
+          <q-chip color="grey-10" text-color="orange" icon="ion-at" v-if="access.group.id" >{{ access.group.name }}</q-chip>
         </q-toolbar-title>
+        <q-btn to='/login' icon="ion-log-in" v-if="!isAuthenticated()" />
+        <!--
         <q-btn to='/login' icon="ion-log-in" :label="$t('Navbar.item.login')" v-if="!isAuthenticated()" />
         <q-btn to='/signin' :label="$t('Navbar.item.signin')" v-if="!isAuthenticated()" />
+        -->
         <q-btn icon="person" v-if="isAuthenticated()" >
           <q-menu>
             <q-list>
@@ -64,7 +68,7 @@
           dense
           round
           @click="rightDrawerOpen = !rightDrawerOpen"
-          icon="menu"
+          icon="ion-at"
           aria-label="Menu"
         />
       </q-toolbar>
@@ -77,6 +81,7 @@
       bordered
     >
       <q-chip>{{ user.email }}</q-chip>
+      <q-chip>{{ user.id }}</q-chip>
       <q-list>
         <q-item-label header>Essential Links</q-item-label>
         <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
@@ -142,7 +147,7 @@
       overlay
       bordered
     >
-      <q-chip>{{ user.email }}</q-chip>
+      <access-group v-if="isAuthenticated()" :refresh="rightDrawerOpen" />
     </q-drawer>
 
     <q-page-container>
@@ -153,10 +158,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import AccessGroup from '../components/main/AccessGroup.vue'
 
 export default {
   name: 'MyLayout',
-
+  components: {
+    AccessGroup
+  },
   data () {
     return {
       leftDrawerOpen: false,
@@ -166,12 +174,14 @@ export default {
         { label: 'US English', value: 'en-us' }
       ],
       lang: this.$i18n.locale,
-      dark: false
+      dark: false,
+      groups: []
     }
   },
   computed: {
       ...mapGetters({
-          user: 'user'
+          user: 'user',
+          access: 'access'
       })
   },
   watch: {

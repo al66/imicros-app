@@ -9,6 +9,7 @@ export default {
   'Signin.email.label': 'Email',
   'Signin.password.label': 'Password',
   'Signin.button.submit': 'Sign in',
+  'Confirm.title': 'Confirmation',
   'Login.title': 'Login',
   'Login.email.label': 'Email',
   'Login.email.hint': 'Your valid email address',
@@ -74,8 +75,10 @@ export default {
   'Action.decline': 'Decline',
   'Action.refuse': 'Refuse',
   'Action.hide': 'Hide',
+  'Action.showHidden': 'Show hidden',
   'Action.settings': 'Settings',
   'Message.validation.email': 'Valid email required',
+  'Error.user already exist!': 'User already exist!',
   failed: 'Action failed',
   success: 'Action was successful'
 }

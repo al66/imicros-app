@@ -25,16 +25,39 @@ export default function ({ store }/* { store, ssrContext } */) {
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE
   })
-  Router.beforeEach((to, from, next) => {
-    // secure all routes if not marked as public
+  Router.beforeResolve((to, from, next) => {
     let isAuthenticated = store.getters['isAuthenticated']
-    if (!to.matched.some(record => record.meta.public)) {
-      if (!isAuthenticated) {
-        console.log('redirected to login')
-        return next({ name: 'login' })
+    let user = store.getters['user'] || { verified: false }
+    // secure all routes if not marked as public
+    try {
+      if (!to.matched.some(record => record.meta.public)) {
+        // no public route
+        if (to.name === 'logout' && isAuthenticated) {
+          // never redirect logout
+          next()
+        } else if (!isAuthenticated) {
+          // redirect all non public routes, if not authenticated
+          next({ name: 'login' })
+        } else {
+          if (!user.verified && to.fullPath !== '/verify') {
+            // redirect not verified users to confirm page
+            next({ name: 'verify', replace: true })
+          } else {
+            next()
+          }
+        }
+      } else {
+        next()
       }
+    } catch (error) {
+      console.log(error)
     }
-    return next()
   })
+  Router.onError = (error) => {
+    console.log(error)
+  }
+  // hack due to uncaught exception in vue-router
+  Router.onAbort = null
+
   return Router
 }

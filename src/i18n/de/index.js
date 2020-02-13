@@ -6,6 +6,7 @@ export default {
   'Signin.email.label': 'E-Mail',
   'Signin.password.label': 'Passwort',
   'Signin.button.submit': 'Registrieren',
+  'Confirm.title': 'Bestätigung',
   'Login.title': 'Anmeldung',
   'Login.email.label': 'E-Mail',
   'Login.email.hint': 'E-Mail',
@@ -71,6 +72,8 @@ export default {
   'Action.decline': 'Ablehnen',
   'Action.refuse': 'Ablehnen',
   'Action.hide': 'Ausblenden',
+  'Action.showHidden': 'Ausgblendete anzeigen',
   'Action.settings': 'Einstellungen',
-  'Message.validation.email': 'Gültige E-Mail erforderlich'
+  'Message.validation.email': 'Gültige E-Mail erforderlich',
+  'Error.user already exist!': 'User mit dieser Email bereits registiert'
 }

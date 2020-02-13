@@ -14,31 +14,46 @@
     >
       <template v-slot:body-cell-email="props">
         <q-td dense :props="props">
-          <q-chip dense v-if="props.row.role === 'admin' && props.row.relation !== 'INVITED_BY'" color="primary" text-color="white">{{ props.row.email }}</q-chip>
-          <q-chip dense v-if="props.row.role === 'admin' && props.row.relation === 'INVITED_BY'" color="blue-4" text-color="white">{{ props.row.email }}</q-chip>
-          <q-chip dense v-if="props.row.role === 'member' && props.row.relation !== 'INVITED_BY'" color="secondary" text-color="white">{{ props.row.email }}</q-chip>
-          <q-chip dense v-if="props.row.role === 'member' && props.row.relation === 'INVITED_BY'" >{{ props.row.email }}</q-chip>
-          <q-chip v-if="props.row.relation === 'INVITED_BY'" dense color="orange-3" text-color="white" >{{ $t('Members.table.chip.invited') }}</q-chip>
+          <a :href="'mailto:' + props.row.email">
+            <q-chip
+              dense
+              v-if="props.row.role === 'admin' && props.row.relation !== 'INVITED_BY'"
+              color="primary"
+              text-color="white"
+            >{{ props.row.email }}</q-chip>
+            <q-chip dense v-if="props.row.role === 'admin' && props.row.relation === 'INVITED_BY'" outline color="primary" text-color="white">{{ props.row.email }}</q-chip>
+            <q-chip dense v-if="props.row.role === 'member' && props.row.relation !== 'INVITED_BY'" color="secondary" text-color="white">{{ props.row.email }}</q-chip>
+            <q-chip dense v-if="props.row.role === 'member' && props.row.relation === 'INVITED_BY'" outline color="secondary" text-color="white">{{ props.row.email }}</q-chip>
+          </a>
+          <q-chip
+            :removable="props.row.id !== user.id && isAdmin"
+            v-if="props.row.relation === 'INVITED_BY'"
+            dense
+            :outline="props.row.id !== user.id"
+            color="orange-10"
+            text-color="white"
+            @remove="removeInvitation(props.row)"
+          >{{ $t('Members.table.chip.invited') }}</q-chip>
           <q-chip
             :clickable="props.row.id === user.id"
             v-if="props.row.request === 'revoke'"
             dense
-            :color="props.row.id === user.id ? 'red' : 'red-11'"
-            text-color="white"
+            flat
+            :outline="props.row.id !== user.id"
+            :color="props.row.id === user.id ? 'red' : 'red'"
+            :text-color="props.row.id === user.id ? 'white' : null"
             @click="confirmDialog(props.row)"
           >{{ $t('Members.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}</q-chip>
           <q-chip
             :clickable="props.row.id === user.id"
+            :removable="props.row.id !== user.id  && isAdmin"
             v-if="props.row.request === 'nominate'"
             dense
-            :color="props.row.id === user.id ? 'primary' : 'blue-11'"
+            :outline="props.row.id !== user.id"
+            color="primary"
             text-color="white"
             @click="confirmDialog(props.row)"
           >{{ $t('Members.table.chip.nominated') }}</q-chip>
-          <!--
-          <q-chip v-if="props.row.request === 'nominate'" dense color="blue-4" text-color="white" >{{ $t('Members.table.chip.nominated') }}</q-chip>
-          <q-chip v-if="props.row.request === 'revoke'" dense color="red" text-color="white" >{{ $t('Members.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}</q-chip>
-          -->
         </q-td>
       </template>
       <template v-slot:top-left>
@@ -53,80 +68,83 @@
         </q-toolbar>
       </template>
       <template v-slot:top-right>
-        <q-btn round size="sm" color="primary" icon="ion-refresh" @click="getMember()">
-          <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
-        </q-btn>
-        <q-btn round size="sm" color="primary" icon="ion-person-add" v-if="isAdmin === true" @click="addInvitation()">
-          <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
-        </q-btn>
-        <q-btn round size="sm" color="primary" icon="ion-build" v-if="isAdmin === true" :disable="selected.length < 1" @click="nominateSelected()">
-          <q-tooltip>{{ $t('Action.nominate') }}</q-tooltip>
-        </q-btn>
-        <q-btn round size="sm" color="primary" icon="ion-trash" v-if="isAdmin === true" :disable="selected.length < 1" @click="removeSelected()">
-          <q-tooltip>{{ $t('Action.member.remove') }}</q-tooltip>
-        </q-btn>
-        <q-btn round size="sm" color="primary" icon="ion-settings">
-          <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
-          <q-menu :offset="[0, 20]">
-            <q-list>
-              <q-item dense clickable v-for='(column) in columns' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns)" >
-                <q-item-section>
-                  <q-item-label
-                    :class="visibleColumns.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                  >{{ $t('Members.table.column.' + column.name) }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
+        <div class="q-pa-md q-gutter-sm">
+          <q-btn round size="sm" color="primary" icon="ion-refresh" @click="getMember()">
+            <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
+          </q-btn>
+          <q-btn round size="sm" color="primary" icon="ion-person-add" v-if="isAdmin === true" @click="addInvitation()">
+            <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
+          </q-btn>
+          <q-btn round size="sm" color="primary" icon="ion-build" v-if="isAdmin === true" :disable="selected.length < 1" @click="nominateSelected()">
+            <q-tooltip>{{ $t('Action.nominate') }}</q-tooltip>
+          </q-btn>
+          <q-btn round size="sm" color="primary" icon="ion-trash" v-if="isAdmin === true" :disable="selected.length < 1" @click="removeSelected()">
+            <q-tooltip>{{ $t('Action.member.remove') }}</q-tooltip>
+          </q-btn>
+          <q-btn round size="sm" color="primary" icon="ion-settings">
+            <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
+            <q-menu :offset="[0, 20]">
+              <q-list>
+                <q-item dense clickable v-for='(column) in columns' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns)" >
+                  <q-item-section>
+                    <q-item-label
+                      :class="visibleColumns.indexOf(column.name) >= 0 ? 'text-primary' : ''"
+                    >{{ $t('Members.table.column.' + column.name) }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+        </div>
       </template>
     </q-table>
 
     <!-- invite member dialog -->
     <q-dialog v-model="dialog.invite.show">
       <q-card>
+        <q-card-section align="center" class="bg-black text-white q-pa-xs q-mb-sm">
+          <div class="text-h6">{{ $t('Members.table.chip.invited') }}</div>
+        </q-card-section>
         <q-card-section>
           <q-chip icon="ion-at" :label="group.alias ? group.alias : group.name" />
           <div class="q-pa-md">
             <div class="q-gutter-y-md column">
               <q-input ref="email" dense stack-label autofocus label="Email" v-model="dialog.invite.data.email" @keyup.enter="inviteMember()" :rules="validEmail()" lazy-rules />
-              <q-option-group
-                v-model="dialog.invite.data.role"
-                :options="dialog.invite.roleOptions"
-              />
+              <div class="q-pa-lg">
+                <q-option-group
+                  v-model="dialog.invite.data.role"
+                  :options="dialog.invite.roleOptions"
+                />
+              </div>
             </div>
             {{ dialog.invite.error }}
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn :label="$t('Action.invite')" color="primary" dense type="submit" :disable="dialog.invite.error" @click="inviteMember()"/>
-          <q-btn :label="$t('Action.cancel')" dense @click="()=>{ this.dialog.invite.show = false }" />
+          <q-btn dense flat icon="ion-checkmark" :label="$t('Action.invite')" color="primary" :disable="dialog.invite.error" @click="inviteMember()"/>
+          <q-btn dense flat icon="ion-close-circle" color="grey" @click="()=>{ this.dialog.invite.show = false }">
+            <q-tooltip>{{ $t('Action.cancel') }}</q-tooltip>
+          </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
 
     <!-- request confirm dialog -->
-    <q-dialog v-model="confirm" v-if="request.request">
-      <q-card>
-        <q-card-section>
-          <div class="text-h6">{{ $t('Members.dialog.request.title') }}</div>
-        </q-card-section>
-        <q-card-section class="q-pt-none">
-          {{ $t('Members.dialog.request.' + request.request) }}
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn :label="$t('Action.accept')" text-color="green" dense flat @click="acceptRequest()"/>
-          <q-btn :label="$t('Action.decline')" text-color="red" dense flat @click="declineRequest()"/>
-          <q-btn :label="$t('Action.cancel')" dense flat @click="()=>{ this.confirm = false }" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <confirm-request-dialog
+      :show="dialog.confirm.show"
+      :group="group"
+      :request="dialog.confirm.request"
+      @accept="getMember"
+      @decline="getMember"
+      @close="()=>{ this.dialog.confirm.show = false }"
+    />
 
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import ConfirmRequestDialog from './ConfirmRequestDialog.vue'
 
 export default {
   props: {
@@ -135,6 +153,9 @@ export default {
       required: true
     },
     isAdmin: Boolean
+  },
+  components: {
+    ConfirmRequestDialog
   },
   data: function () {
     return {
@@ -149,9 +170,11 @@ export default {
       },
       selected: [],
       invite: false,
-      confirm: false,
-      request: {},
       dialog: {
+        confirm: {
+          show: false,
+          request: {}
+        },
         invite: {
           show: false,
           data: {
@@ -195,7 +218,7 @@ export default {
     let settings = this.$store.getters.settings('member')
     if (settings) {
       this.visibleColumns = settings.visibleColumns
-      this.pagination.rowsPerPage = settings.pagination.rowsPerPage
+      this.pagination = settings.pagination
     }
   },
   beforeDestroy () {
@@ -203,9 +226,7 @@ export default {
     this.$store.commit('setSettings', {
       member: {
         visibleColumns: this.visibleColumns,
-        pagination: {
-          rowsPerPage: this.pagination.rowsPerPage
-        }
+        pagination: this.pagination
       }
     })
   },
@@ -214,8 +235,8 @@ export default {
       let param = {
         id: this.group.id
       }
-      let instance = this.$axios.create()
-      instance.post('api/groups/members', param).then((response) => {
+      let instance = this.$instance()
+      instance.post('/#groups/members', param).then((response) => {
         if (response.data) {
           let members = []
           if (Array.isArray(response.data)) {
@@ -240,8 +261,24 @@ export default {
       this.dialog.invite.data.id = this.group.id
       this.dialog.invite.show = true
     },
+    removeInvitation (invitation) {
+      let instance = this.$instance()
+      let param = {
+        groupId: this.group.id
+      }
+      if (invitation.id) {
+        param.userId = invitation.id
+      } else {
+        param.email = invitation.email
+      }
+      instance.post('/#groups/remove', param).then((response) => {
+        if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].email) {
+          this.getMember()
+        }
+      })
+    },
     removeSelected () {
-      let instance = this.$axios.create()
+      let instance = this.$instance()
       for (let i = 0; i < this.selected.length; i++) {
         let param = {
           groupId: this.group.id
@@ -249,7 +286,7 @@ export default {
         switch (this.selected[0].role) {
           case 'admin':
             param.userId = this.selected[i].id
-            instance.post('api/groups/revoke', param).then((response) => {
+            instance.post('/#groups/revoke', param).then((response) => {
               if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].tte) {
                 this.getMember()
               }
@@ -261,7 +298,7 @@ export default {
             } else {
               param.email = this.selected[i].email
             }
-            instance.post('api/groups/remove', param).then((response) => {
+            instance.post('/#groups/remove', param).then((response) => {
               if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].email) {
                 this.getMember()
               }
@@ -270,14 +307,14 @@ export default {
       }
     },
     nominateSelected () {
-      let instance = this.$axios.create()
+      let instance = this.$instance()
       for (let i = 0; i < this.selected.length; i++) {
         if (this.selected[0].role === 'member' && this.selected[0].relation === 'MEMBER_OF') {
           let param = {
             groupId: this.group.id,
             userId: this.selected[i].id
           }
-          instance.post('api/groups/nominate', param).then((response) => {
+          instance.post('/#groups/nominate', param).then((response) => {
             if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].request) {
               this.getMember()
             }
@@ -289,13 +326,13 @@ export default {
       this.$refs.email.validate()
       if (this.$refs.email.hasError) return
 
-      let instance = this.$axios.create()
+      let instance = this.$instance()
       let param = {
         id: this.dialog.invite.data.id,
         email: this.dialog.invite.data.email,
         role: this.dialog.invite.data.role
       }
-      instance.post('api/groups/invite', param).then((response) => {
+      instance.post('/#groups/invite', param).then((response) => {
         if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].invited) {
           this.getMember(this.group.id)
           this.dialog.invite.show = false
@@ -314,34 +351,8 @@ export default {
       return rules
     },
     confirmDialog (row) {
-      this.request = row
-      this.confirm = true
-    },
-    acceptRequest () {
-      let instance = this.$axios.create()
-      let param = {
-        groupId: this.group.id,
-        request: this.request.request
-      }
-      instance.post('api/groups/accept', param).then((response) => {
-        if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].userId) {
-          this.getMember()
-        }
-      })
-      this.confirm = false
-    },
-    declineRequest () {
-      let instance = this.$axios.create()
-      let param = {
-        groupId: this.group.id,
-        request: this.request.request
-      }
-      instance.post('api/groups/decline', param).then((response) => {
-        if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].userId) {
-          this.getMember()
-        }
-      })
-      this.confirm = false
+      this.dialog.confirm.request = row
+      this.dialog.confirm.show = !this.dialog.confirm.show
     }
   }
 }
