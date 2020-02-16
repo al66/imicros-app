@@ -9,7 +9,8 @@ const routes = [
       { path: 'verify', name: 'verify', component: () => import('pages/Verify.vue') },
       { path: 'logout', name: 'logout', component: () => import('pages/Logout.vue') },
       { path: 'signin', name: 'signin', component: () => import('pages/Signin.vue'), meta: { public: true } },
-      { path: 'groups', name: 'groups', component: () => import('pages/Groups.vue') }
+      { path: 'groups', name: 'groups', component: () => import('pages/Groups.vue') },
+      { path: 'files', name: 'files', component: () => import('pages/Files.vue') }
     ]
   }
 ]
