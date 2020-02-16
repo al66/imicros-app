@@ -84,8 +84,8 @@ module.exports = function (ctx) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-            baseUrl: JSON.stringify('http://localhost:8080/api/')
-            // baseUrl: JSON.stringify('http://home.server/api/')
+            baseUrl: JSON.stringify('http://localhost:8080')
+            // baseUrl: JSON.stringify('http://192.168.2.124/api')
           },
       scopeHoisting: true,
       vueRouterMode: 'hash', // available values: 'hash', 'history'
@@ -112,16 +112,20 @@ module.exports = function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
+      hot: true,
       https: false,
       port: 8080,
+      clientLogLevel: 'trace',
+      quiet: false,
+      stats: 'normal',
       proxy: {
         // proxy all requests starting with /api to jsonplaceholder
         '/api': {
           target: 'http://192.168.2.124',
+          // target: 'http://home.server/api',
+          // secure: false,
           changeOrigin: true,
-          pathRewrite: {
-            '^/': ''
-          }
+          logLevel: 'debug'
         }
       },
       open: true // opens browser window automatically

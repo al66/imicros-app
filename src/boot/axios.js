@@ -3,13 +3,13 @@ import axios from 'axios'
 // import { Notify } from 'quasar'
 
 // axios.defaults.baseURL = process.env.baseURL
-console.log(process.env.baseUrl)
-axios.defaults.baseUrl = process.env.baseUrl ? process.env.baseUrl : 'http://localhost:8080/api/'
+axios.defaults.baseUrl = process.env.baseUrl
+console.log('Using backend:', axios.defaults.baseUrl)
 
 const services = {
-  auth: 'user',
-  groups: 'groups',
-  acl: 'acl'
+  auth: 'api/user',
+  groups: 'api/groups',
+  acl: 'api/acl'
 }
 
 Vue.prototype.$axios = axios
