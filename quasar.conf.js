@@ -83,10 +83,9 @@ module.exports = function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      env: ctx.dev ? {
+      env: {
             baseUrl: JSON.stringify('http://localhost:8080/api/')
-          } : {
-            baseUrl: JSON.stringify('http://home.server/api/')
+            // baseUrl: JSON.stringify('http://home.server/api/')
           },
       scopeHoisting: true,
       vueRouterMode: 'hash', // available values: 'hash', 'history'

@@ -3,7 +3,8 @@ import axios from 'axios'
 // import { Notify } from 'quasar'
 
 // axios.defaults.baseURL = process.env.baseURL
-axios.defaults.baseURL = process.env.baseURL ? process.env.baseURL : 'http://localhost:8080/api/'
+console.log(process.env.baseUrl)
+axios.defaults.baseUrl = process.env.baseUrl ? process.env.baseUrl : 'http://localhost:8080/api/'
 
 const services = {
   auth: 'user',
