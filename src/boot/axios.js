@@ -2,7 +2,8 @@ import Vue from 'vue'
 import axios from 'axios'
 // import { Notify } from 'quasar'
 
-axios.defaults.baseURL = 'http://localhost:8080/api/'
+// axios.defaults.baseURL = process.env.baseURL
+axios.defaults.baseURL = process.env.baseURL ? process.env.baseURL : 'http://localhost:8080/api/'
 
 const services = {
   auth: 'user',
