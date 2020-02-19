@@ -15,8 +15,6 @@
           <q-btn to="/">
             <img class='toolbar-brand' alt='imicros-logo' src='~assets/imicros-grau.png'>
           </q-btn>
-          <q-chip color="grey-10" text-color="orange" v-if="user.email" size="sm">{{ user.email }}</q-chip>
-          <q-chip color="grey-10" text-color="orange" icon="ion-at" v-if="access.group.id" size="sm">{{ access.group.name }}</q-chip>
         </q-toolbar-title>
         <q-btn to='/login' icon="ion-log-in" v-if="!isAuthenticated()" />
         <!--
@@ -80,10 +78,24 @@
       overlay
       bordered
     >
-      <q-chip>{{ user.email }}</q-chip>
-      <q-chip>{{ user.id }}</q-chip>
       <q-list>
-        <q-item clickable to="/files">Files</q-item>
+        <q-item dense>
+          <q-chip >{{ user.email }}</q-chip>
+          <!-- <q-chip>{{ user.id }}</q-chip> -->
+        </q-item>
+        <q-item dense>
+          <q-chip icon="ion-at" v-if="access.group.id">{{ access.group.name }}</q-chip>
+        </q-item>
+        <q-item-label header>Applications</q-item-label>
+        <q-item clickable to="/files">
+          <q-item-section avatar>
+            <q-icon name="ion-filing" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Files</q-item-label>
+            <q-item-label caption>File Manager</q-item-label>
+          </q-item-section>
+        </q-item>
         <q-item-label header>Essential Links</q-item-label>
         <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
           <q-item-section avatar>

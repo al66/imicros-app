@@ -102,7 +102,7 @@
     <!-- invite member dialog -->
     <q-dialog v-model="dialog.invite.show">
       <q-card>
-        <q-card-section align="center" class="bg-black text-white q-pa-xs q-mb-sm">
+        <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-sm">
           <div class="text-h6">{{ $t('Members.table.chip.invited') }}</div>
         </q-card-section>
         <q-card-section>

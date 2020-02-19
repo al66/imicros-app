@@ -1,8 +1,9 @@
 <template>
   <q-list>
-    <q-item dense clickable v-for='(group) in groups' v-bind:key='group.id' @click="requestAccess(group)">
+    <q-item dense clickable v-for='(group) in groups' v-bind:key='group.id' @click="requestAccess(group)" :disable="access.group.id === group.id">
       <q-item-section>
-        <q-item-label>{{ group.name }}</q-item-label>
+        <q-item-label v-if="access.group.id !== group.id">{{ group.name }}</q-item-label>
+        <q-chip icon="ion-at" v-if="access.group.id === group.id">{{ group.name }}</q-chip>
       </q-item-section>
     </q-item>
   </q-list>

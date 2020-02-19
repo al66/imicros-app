@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center">
     <q-card class="signinForm">
-      <q-card-section align="center" class="bg-black text-orange">
+      <q-card-section align="center" class="bg-black text-orange q-pa-sm q-mb-sm">
         <div class="text-h6">{{ $t('Signin.title') }}</div>
       </q-card-section>
       <q-card-section>
@@ -11,13 +11,13 @@
             <q-input v-model="password" filled dense type="password" :hint="$t('Signin.password.label')"  />
           </div>
         </div>
-        <div class="q-pa-md" full-width>
+        <div class="q-pa-none" full-width>
           <q-btn flat class="full-width" color="primary" icon="ion-log-in" :label="$t('Signin.button.submit')" @click="signin()" />
         </div>
       </q-card-section>
-      <q-separator inset />
+      <q-separator inset/>
       <q-card-section>
-        <div class="q-pa-md">
+        <div class="q-pa-sm">
           <div class="col"  align="center">
             <q-btn flat no-caps class="full-width" color="secondary" label="Already an account ?" to='/login' />
           </div>

@@ -9,7 +9,9 @@ console.log('Using backend:', axios.defaults.baseUrl)
 const services = {
   auth: 'api/user',
   groups: 'api/groups',
-  acl: 'api/acl'
+  acl: 'api/acl',
+  minio: 'api/minio',
+  file: 'api/file'
 }
 
 Vue.prototype.$axios = axios

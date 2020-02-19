@@ -2,10 +2,14 @@
   <div>
     <!-- main navigation tabs -->
     <q-tabs v-model="tab" :class="$q.dark.isActive ? 'text-gray-2' : 'text-grey-10'" dense >
-      <q-tab name="groups" icon="ion-at" :label="$t('Groups.tab.groups.title')"  transition-show="slide-right">
+      <!-- <q-tab name="groups" icon="ion-at" :label="$t('Groups.tab.groups.title')"  transition-show="slide-right"> -->
+      <q-tab name="groups" icon="ion-at" transition-show="slide-right">
+        <q-tooltip>{{ $t('Groups.tab.groups.title') }}</q-tooltip>
         <q-badge v-if="counter.invitedBy > 0" color="orange-10" floating>{{ counter.invitedBy }}</q-badge>
       </q-tab>
-      <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people" :label="$t('Groups.tab.members.title')">
+      <!-- <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people" :label="$t('Groups.tab.members.title')"> -->
+      <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people">
+        <q-tooltip>{{ $t('Groups.tab.members.title') }}</q-tooltip>
         <q-badge v-if="counter.member > 0" color="blue" floating>{{ counter.member }}</q-badge>
       </q-tab>
     </q-tabs>
@@ -146,7 +150,7 @@
     <!-- invitation confirm dialog -->
     <q-dialog v-model="invitation.confirm" v-if="invitation.group">
       <q-card>
-        <q-card-section align="center" class="bg-black text-white q-pa-none q-mb-lg">
+        <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-lg">
           <div class="text-h6">{{ $t('Members.table.chip.invited') }}</div>
         </q-card-section>
         <q-card-section align="center">
@@ -170,7 +174,7 @@
     <!-- edit group dialog -->
     <q-dialog v-model="edit" >
       <q-card>
-        <q-card-section align="center" class="bg-black text-white q-pa-none q-mb-sm">
+        <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-sm">
           <div class="text-h6">{{ $t('Action.edit') }}</div>
         </q-card-section>
         <q-card-section>

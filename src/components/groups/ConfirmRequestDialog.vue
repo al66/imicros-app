@@ -2,7 +2,7 @@
   <!-- request confirm dialog -->
   <q-dialog v-model="dialog" v-if="request.request">
     <q-card>
-      <q-card-section align="center" class="bg-black text-white q-pa-xs q-mb-lg">
+      <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-lg">
         <div class="text-h6">{{ $t('Members.dialog.request.title') }}</div>
       </q-card-section>
       <q-card-section class="q-pt-none">

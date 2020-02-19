@@ -67,7 +67,7 @@
         auto-upload
         multiple
         no-thumbnails
-        url="http://localhost:8080/api/upload"
+        :url="this.$axios.defaults.baseUrl + '/api/upload'"
         :field-name="(file) => this.path + file.name"
         :headers="headers"
         style="max-width: 300px"
@@ -163,7 +163,7 @@ export default {
       instance.defaults.headers.post['x-imicros-xtoken'] = this.access.token
       let params = {
       }
-      instance.post('/minio/makeBucket', params).then(async (response) => {
+      instance.post('/#minio/makeBucket', params).then(async (response) => {
         if (response.data) {
         }
       }).catch((err) => {
@@ -179,7 +179,7 @@ export default {
         prefix: this.path,
         recursive: false
       }
-      instance.post('/minio/listObjectsArray', params).then(async (response) => {
+      instance.post('/#minio/listObjectsArray', params).then(async (response) => {
         if (response.data) {
           this.ls = response.data.map(entry => (Object.assign(entry, { listname: entry.name || entry.prefix })))
         } else {
@@ -264,7 +264,7 @@ export default {
         objectName: row.name
       }
       */
-      instance.get('/file/' + row.name, {
+      instance.get('/#file/' + row.name, {
         responseType: 'stream' // important
       }).then(async (response) => {
         const stream = response.data
@@ -283,7 +283,7 @@ export default {
       //
       let instance = this.$instance()
       instance.defaults.headers.delete['x-imicros-xtoken'] = this.access.token
-      instance.delete('/file/?objectName=' + row.name).then((response) => {
+      instance.delete('/#file/?objectName=' + row.name).then((response) => {
         if (response.data && response.data.objectName) {
           this.getFiles()
         }

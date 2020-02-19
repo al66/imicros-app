@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center">
     <q-card class="loginForm" v-if="isAuthenticated()" >
-      <q-card-section align="center" class="bg-black text-orange">
+      <q-card-section align="center" class="bg-black text-orange q-pa-sm q-mb-sm">
         <div class="text-h6">{{ $t('Login.title') }}</div>
       </q-card-section>
       <q-card-section>
@@ -15,7 +15,7 @@
       </q-card-section>
     </q-card>
     <q-card class="loginForm" v-if="!isAuthenticated()" >
-      <q-card-section align="center" class="bg-black text-orange">
+      <q-card-section align="center" class="bg-black text-orange q-pa-sm q-mb-sm">
         <div class="text-h6">{{ $t('Login.title') }}</div>
       </q-card-section>
       <q-card-section>
