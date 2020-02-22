@@ -71,10 +71,12 @@ module.exports = function (ctx) {
 
       // Quasar plugins
       plugins: [
-        'Notify'
+        'Notify',
+        'Loading'
       ],
       config: {
-        notify: { /* Notify defaults */ }
+        notify: { /* Notify defaults */ },
+        loading: { /* Loading defaults */ }
       }
     },
 

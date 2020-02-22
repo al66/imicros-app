@@ -219,63 +219,27 @@ export default {
     addFile () {
       this.dialog.add.show = true
     },
-    streamToBlob (stream, mimeType) {
-      if (mimeType != null && typeof mimeType !== 'string') {
-        throw new Error('Invalid mimetype, expected string.')
-      }
-      return new Promise((resolve, reject) => {
-        const chunks = []
-        /*
-        stream
-          .on('data', chunk => chunks.push(chunk))
-          .once('finish', () => {
-            const blob = mimeType != null
-              ? new Blob(chunks, { type: mimeType })
-              : new Blob(chunks)
-            resolve(blob)
-          })
-          .once('error', reject)
-        */
-        stream
-          .on('data', (chunk) => {
-            console.log(chunk)
-            chunks.push(chunk)
-          })
-          .once('finish', () => {
-            console.log('finish')
-            const blob = mimeType != null
-              ? new Blob(chunks, { type: mimeType })
-              : new Blob(chunks)
-            resolve(blob)
-          })
-          .once('error', (err) => {
-            console.log(err)
-            reject()
-        })
-      })
-    },
     downloadFile (row) {
       //
       let instance = this.$instance()
       instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.get['Content-Type'] = 'application/octet-stream'
-      /*
-      let params = {
-        objectName: row.name
-      }
-      */
+      this.$q.loading.show({
+        delay: 400 // ms
+      })
       instance.get('/#file/' + row.name, {
-        responseType: 'stream' // important
-      }).then(async (response) => {
-        const stream = response.data
-        const blob = await this.streamToBlob(stream, 'application/png')
+        responseType: 'blob' // important
+      }).then((response) => {
+        const blob = new Blob([response.data])
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
         link.setAttribute('download', row.name)
         document.body.appendChild(link)
+        this.$q.loading.hide()
         link.click()
       }).catch((err) => {
+        this.$q.loading.hide()
         console.log(err)
       })
     },

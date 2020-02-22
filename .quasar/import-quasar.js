@@ -17,7 +17,7 @@ import iconSet from 'quasar/icon-set/material-icons'
 
 import Vue from 'vue'
 
-import {Quasar,QLayout,QHeader,QDrawer,QPageContainer,QPage,QToolbar,QToolbarTitle,QBtn,QBtnDropdown,QIcon,QChip,QSpace,QSeparator,QImg,QList,QItem,QItemSection,QItemLabel,Ripple,Notify} from 'quasar'
+import {Quasar,QLayout,QHeader,QDrawer,QPageContainer,QPage,QToolbar,QToolbarTitle,QBtn,QBtnDropdown,QIcon,QChip,QSpace,QSeparator,QImg,QList,QItem,QItemSection,QItemLabel,Ripple,Notify,Loading} from 'quasar'
 
 
-Vue.use(Quasar, { config: {"notify":{}},lang: lang,iconSet: iconSet,components: {QLayout,QHeader,QDrawer,QPageContainer,QPage,QToolbar,QToolbarTitle,QBtn,QBtnDropdown,QIcon,QChip,QSpace,QSeparator,QImg,QList,QItem,QItemSection,QItemLabel},directives: {Ripple},plugins: {Notify} })
+Vue.use(Quasar, { config: {"notify":{},"loading":{}},lang: lang,iconSet: iconSet,components: {QLayout,QHeader,QDrawer,QPageContainer,QPage,QToolbar,QToolbarTitle,QBtn,QBtnDropdown,QIcon,QChip,QSpace,QSeparator,QImg,QList,QItem,QItemSection,QItemLabel},directives: {Ripple},plugins: {Notify,Loading} })
