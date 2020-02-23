@@ -17,15 +17,28 @@
       @row-dblclick="selectFolder"
     >
       <template v-slot:body="props">
-        <!-- <q-tr :props="props" @contextmenu.native="contextMenu(props.row)" @mouseleave.native="if (contextMenuVisible) context = null"> -->
-        <q-tr :props="props" @contextmenu.native="contextMenu(props.row)" @mouseleave.native="mouseLeave" @dblclick="selectFolder(props.row)">
-          <q-td key="listname" :props="props">
-            {{ props.row.listname }}
-          </q-td>
+        <q-tr :props="props" @contextmenu.native="contextMenu(props.row)" @mouseleave.native="mouseLeave()" @dblclick="dblClick(props.row)">
           <q-td key="name" :props="props">
-            <q-badge color="green">
-              {{ props.row.name }}
-            </q-badge>
+            <div class="fit row justify-between">
+              <q-badge v-show="props.row.name && !props.row.save" :color="props.row.save ? 'primary' : 'grey'">
+                <div>{{ props.row.listname }}</div>
+              </q-badge>
+              <a class="q-badge q-pl-none q-pr-none"
+                 v-if="props.row.save"
+                 :href="props.row.url"
+                 :download="props.row.name"
+                 :ref="'link' + props.row.etag"
+              >
+                <q-badge v-if="props.row.name" color="primary">
+                  {{ props.row.listname }}
+                </q-badge>
+              </a>
+              <div v-if="props.row.prefix">{{ props.row.prefix }}</div>
+              <q-inner-loading :showing="spinners.indexOf(props.row.etag) >= 0">
+                <q-spinner-ios size="xs" color="primary" />
+              </q-inner-loading>
+              <q-btn flat dense size="xs" icon="ion-more" color="grey" @click="contextMenu(props.row)"></q-btn>
+            </div>
           </q-td>
           <q-td key="prefix" :props="props">
             <q-badge color="purple">
@@ -63,17 +76,26 @@
 
     <!-- add file member dialog -->
     <q-dialog v-model="dialog.add.show">
-      <q-uploader
-        auto-upload
-        multiple
-        no-thumbnails
-        :url="this.$axios.defaults.baseUrl + '/api/upload'"
-        :field-name="(file) => this.path + file.name"
-        :headers="headers"
-        style="max-width: 300px"
-        @uploaded="getFiles"
-        @finish="dialog.add.show = !dialog.add.show"
-      />
+      <q-card>
+        <q-card-section class="q-pa-none">
+          <q-uploader
+            auto-upload
+            square
+            flat
+            multiple
+            no-thumbnails
+            :url="this.$axios.defaults.baseUrl + '/api/upload'"
+            :field-name="(file) => getUploadFilename(file)"
+            :headers="headers"
+            style="max-width: 300px"
+            @uploaded="getFiles"
+            @finish="dialog.add.show = !dialog.add.show"
+          />
+        </q-card-section>
+        <q-card-section>
+          <q-input v-model="newFolder" label="new folder"></q-input>
+        </q-card-section>
+      </q-card>
     </q-dialog>
 
     <!-- <div>{{ ls }}</div> -->
@@ -107,6 +129,8 @@ export default {
       context: null,
       contextMenuVisible: false,
       showAddDialog: false,
+      spinners: [],
+      newFolder: '',
       dialog: {
         add: {
           show: false
@@ -123,7 +147,6 @@ export default {
       }),
       columns: function () {
         return [
-          { name: 'listname', field: 'listname', label: this.$t('Files.table.column.listname'), sortable: true, align: 'left' },
           { name: 'name', field: 'name', label: this.$t('Files.table.column.name'), sortable: true, align: 'left' },
           { name: 'prefix', field: 'prefix', label: this.$t('Files.table.column.prefix'), sortable: true, align: 'left' },
           { name: 'etag', field: 'etag', label: this.$t('Files.table.column.etag'), sortable: true, align: 'left' },
@@ -181,7 +204,7 @@ export default {
       }
       instance.post('/#minio/listObjectsArray', params).then(async (response) => {
         if (response.data) {
-          this.ls = response.data.map(entry => (Object.assign(entry, { listname: entry.name || entry.prefix })))
+          this.ls = response.data.map(entry => (Object.assign(entry, { listname: entry.name ? entry.name.replace(/^.*[\\\/]/, '') : entry.prefix })))
         } else {
           this.ls = []
         }
@@ -190,6 +213,12 @@ export default {
         console.log(err)
       })
     },
+    getUploadFilename (file) {
+      return this.newFolder ? this.path + this.newFolder + '/' + file.name : this.path + file.name
+    },
+    getFilename (fullPath) {
+      if (fullPath) fullPath.replace(/^.*[\\\/]/, '')
+    },
     receiveFileStream (stream) {
         return new Promise((resolve, reject) => {
             let objects = []
@@ -197,6 +226,10 @@ export default {
             stream.on('end', () => resolve(objects))
             stream.on('error', reject)
         })
+    },
+    dblClick (row) {
+      if (row.prefix) return this.selectFolder(row)
+      if (row.size > 0) return this.downloadFile(row)
     },
     selectFolder (row) {
       if (!row.prefix) return
@@ -220,26 +253,33 @@ export default {
       this.dialog.add.show = true
     },
     downloadFile (row) {
+      if (row.url && this.$refs['link' + row.etag]) return this.$refs['link' + row.etag].click()
       //
       let instance = this.$instance()
       instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.get['Content-Type'] = 'application/octet-stream'
+      this.spinners.push(row.etag)
+      /*
       this.$q.loading.show({
         delay: 400 // ms
       })
+      */
       instance.get('/#file/' + row.name, {
         responseType: 'blob' // important
       }).then((response) => {
         const blob = new Blob([response.data])
         const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', row.name)
-        document.body.appendChild(link)
-        this.$q.loading.hide()
-        link.click()
+        // this.$q.loading.hide()
+        this.spinners.splice(this.spinners.indexOf(row.etag), 1)
+        // row.listname += ' '
+        row.save = true
+        row.url = url
+        let self = this
+        setTimeout(function () { if (self.$refs['link' + row.etag]) self.$refs['link' + row.etag].click() }, 50)
+        // this.$refs['link' + row.etag].click()
       }).catch((err) => {
-        this.$q.loading.hide()
+        // this.$q.loading.hide()
+        this.spinners.splice(this.spinners.indexOf(row.etag), 1)
         console.log(err)
       })
     },
