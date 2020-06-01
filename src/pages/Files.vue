@@ -11,6 +11,8 @@
     </q-breadcrumbs>
     <q-table
       :columns="columns"
+      :visible-columns="visibleColumns"
+      :pagination.sync="pagination.groups"
       :data="ls"
       flat
       dense
@@ -19,7 +21,7 @@
       <template v-slot:body="props">
         <q-tr :props="props" @contextmenu.native="contextMenu(props.row)" @mouseleave.native="mouseLeave()" @dblclick="dblClick(props.row)">
           <q-td key="name" :props="props">
-            <div class="fit row justify-between">
+            <div class="row justify-between">
               <q-badge v-show="props.row.name && !props.row.save" :color="props.row.save ? 'primary' : 'grey'">
                 <div>{{ props.row.listname }}</div>
               </q-badge>
@@ -37,7 +39,24 @@
               <q-inner-loading :showing="spinners.indexOf(props.row.etag) >= 0">
                 <q-spinner-ios size="xs" color="primary" />
               </q-inner-loading>
-              <q-btn flat dense size="xs" icon="ion-more" color="grey" @click="contextMenu(props.row)"></q-btn>
+              <q-btn flat dense size="xs" icon="ion-more" color="grey" @click="contextMenu(props.row)">
+                <q-menu>
+                  <q-list dense style="min-width: 100px">
+                    <q-item v-close-popup>
+                      <q-item-section>{{ props.row.listname || props.row.prefix }}</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup v-if="props.row.prefix" @click="selectFolder(props.row)">
+                      <q-item-section>...open</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup v-if="props.row.name" @click="downloadFile(props.row)">
+                      <q-item-section>...download</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup v-if="props.row.name" @click="deleteFile(props.row)">
+                      <q-item-section>...delete</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
             </div>
           </q-td>
           <q-td key="prefix" :props="props">
@@ -70,6 +89,20 @@
           <q-btn round no-caps size="sm" color="primary" icon="ion-add" @click="addFile()">
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
           </q-btn>
+          <q-btn round no-caps size="sm" color="primary" icon="ion-settings">
+            <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
+            <q-menu :offset="[0, 20]">
+              <q-list>
+                <q-item dense clickable v-for='(column) in columns' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns)" >
+                  <q-item-section>
+                    <q-item-label
+                      :class="visibleColumns.indexOf(column.name) >= 0 ? 'text-primary' : ''"
+                    >{{ $t('Files.table.column.' + column.name) }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </div>
       </template>
     </q-table>
@@ -101,14 +134,17 @@
     <!-- <div>{{ ls }}</div> -->
     <q-menu touch-position context-menu v-if="context" v-model="contextMenuVisible">
       <q-list dense style="min-width: 100px">
+        <q-item v-close-popup>
+          <q-item-section>{{ context.listname || context.prefix }}</q-item-section>
+        </q-item>
         <q-item clickable v-close-popup v-if="context.prefix" @click="selectFolder(context)">
-          <q-item-section>Open...{{ context.listname }}</q-item-section>
+          <q-item-section>...open</q-item-section>
         </q-item>
         <q-item clickable v-close-popup v-if="context.name" @click="downloadFile(context)">
-          <q-item-section>Download...{{ context.listname }}</q-item-section>
+          <q-item-section>...download</q-item-section>
         </q-item>
         <q-item clickable v-close-popup v-if="context.name" @click="deleteFile(context)">
-          <q-item-section>Delete...{{ context.listname }}</q-item-section>
+          <q-item-section>...delete</q-item-section>
         </q-item>
       </q-list>
     </q-menu>
@@ -124,6 +160,12 @@ export default {
     return {
     //
       ls: [],
+      visibleColumns: [ 'name' ],
+      pagination: {
+        groups: {
+          rowsPerPage: 10
+        }
+      },
       path: null,
       breadcrumbs: null,
       context: null,
@@ -173,6 +215,21 @@ export default {
     this.makeBucket()
     this.initPath()
     this.getFiles()
+    // restore settings - component files
+    let settings = this.$store.getters.settings('files')
+    if (settings) {
+      this.visibleColumns = settings.visibleColumns
+      this.pagination = settings.pagination
+    }
+  },
+  beforeDestroy () {
+    // store settings - component files
+    this.$store.commit('setSettings', {
+      files: {
+        visibleColumns: this.visibleColumns,
+        pagination: this.pagination
+      }
+    })
   },
   methods: {
     initPath () {
@@ -294,6 +351,9 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
+    },
+    setVisibleColumns (column, visible) {
+      visible.indexOf(column.name) >= 0 ? visible.splice(visible.indexOf(column.name), 1) : visible.push(column.name)
     }
   }
 }

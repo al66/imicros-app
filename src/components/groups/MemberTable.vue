@@ -30,7 +30,7 @@
             v-if="props.row.relation === 'INVITED_BY'"
             dense
             :outline="props.row.id !== user.id"
-            color="orange-10"
+            color="orange"
             text-color="white"
             @remove="removeInvitation(props.row)"
           >{{ $t('Members.table.chip.invited') }}</q-chip>

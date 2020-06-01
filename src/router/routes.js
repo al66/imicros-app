@@ -10,7 +10,9 @@ const routes = [
       { path: 'logout', name: 'logout', component: () => import('pages/Logout.vue') },
       { path: 'signin', name: 'signin', component: () => import('pages/Signin.vue'), meta: { public: true } },
       { path: 'groups', name: 'groups', component: () => import('pages/Groups.vue') },
-      { path: 'files', name: 'files', component: () => import('pages/Files.vue') }
+      { path: 'files', name: 'files', component: () => import('pages/Files.vue') },
+      { path: 'templates', name: 'templates', component: () => import('pages/Templates.vue') },
+      { path: 'processeditor', name: 'processeditor', component: () => import('pages/Processeditor.vue') }
     ]
   }
 ]

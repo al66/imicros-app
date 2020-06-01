@@ -42,11 +42,23 @@ import '@quasar/extras/animate/rubberBand.css'
 
 import '@quasar/extras/animate/shake.css'
 
+import '@quasar/extras/animate/shakeX.css'
+
+import '@quasar/extras/animate/shakeY.css'
+
 import '@quasar/extras/animate/swing.css'
 
 import '@quasar/extras/animate/tada.css'
 
 import '@quasar/extras/animate/wobble.css'
+
+import '@quasar/extras/animate/backInDown.css'
+
+import '@quasar/extras/animate/backInLeft.css'
+
+import '@quasar/extras/animate/backInRight.css'
+
+import '@quasar/extras/animate/backInUp.css'
 
 import '@quasar/extras/animate/bounceIn.css'
 
@@ -60,6 +72,10 @@ import '@quasar/extras/animate/bounceInUp.css'
 
 import '@quasar/extras/animate/fadeIn.css'
 
+import '@quasar/extras/animate/fadeInBottomLeft.css'
+
+import '@quasar/extras/animate/fadeInBottomRight.css'
+
 import '@quasar/extras/animate/fadeInDown.css'
 
 import '@quasar/extras/animate/fadeInDownBig.css'
@@ -72,6 +88,10 @@ import '@quasar/extras/animate/fadeInRight.css'
 
 import '@quasar/extras/animate/fadeInRightBig.css'
 
+import '@quasar/extras/animate/fadeInTopLeft.css'
+
+import '@quasar/extras/animate/fadeInTopRight.css'
+
 import '@quasar/extras/animate/fadeInUp.css'
 
 import '@quasar/extras/animate/fadeInUpBig.css'
@@ -82,7 +102,9 @@ import '@quasar/extras/animate/flipInY.css'
 
 import '@quasar/extras/animate/jackInTheBox.css'
 
-import '@quasar/extras/animate/lightSpeedIn.css'
+import '@quasar/extras/animate/lightSpeedInLeft.css'
+
+import '@quasar/extras/animate/lightSpeedInRight.css'
 
 import '@quasar/extras/animate/rollIn.css'
 
@@ -114,6 +136,14 @@ import '@quasar/extras/animate/zoomInRight.css'
 
 import '@quasar/extras/animate/zoomInUp.css'
 
+import '@quasar/extras/animate/backOutDown.css'
+
+import '@quasar/extras/animate/backOutLeft.css'
+
+import '@quasar/extras/animate/backOutRight.css'
+
+import '@quasar/extras/animate/backOutUp.css'
+
 import '@quasar/extras/animate/bounceOut.css'
 
 import '@quasar/extras/animate/bounceOutDown.css'
@@ -125,6 +155,10 @@ import '@quasar/extras/animate/bounceOutRight.css'
 import '@quasar/extras/animate/bounceOutUp.css'
 
 import '@quasar/extras/animate/fadeOut.css'
+
+import '@quasar/extras/animate/fadeOutBottomLeft.css'
+
+import '@quasar/extras/animate/fadeOutBottomRight.css'
 
 import '@quasar/extras/animate/fadeOutDown.css'
 
@@ -138,6 +172,10 @@ import '@quasar/extras/animate/fadeOutRight.css'
 
 import '@quasar/extras/animate/fadeOutRightBig.css'
 
+import '@quasar/extras/animate/fadeOutTopLeft.css'
+
+import '@quasar/extras/animate/fadeOutTopRight.css'
+
 import '@quasar/extras/animate/fadeOutUp.css'
 
 import '@quasar/extras/animate/fadeOutUpBig.css'
@@ -146,7 +184,9 @@ import '@quasar/extras/animate/flipOutX.css'
 
 import '@quasar/extras/animate/flipOutY.css'
 
-import '@quasar/extras/animate/lightSpeedOut.css'
+import '@quasar/extras/animate/lightSpeedOutLeft.css'
+
+import '@quasar/extras/animate/lightSpeedOutRight.css'
 
 import '@quasar/extras/animate/rollOut.css'
 
@@ -268,7 +308,11 @@ async function start () {
 
     
 
-    new Vue(app)
+    
+      new Vue(app)
+    
+
+    
 
     
 

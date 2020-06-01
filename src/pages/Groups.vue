@@ -5,7 +5,7 @@
       <!-- <q-tab name="groups" icon="ion-at" :label="$t('Groups.tab.groups.title')"  transition-show="slide-right"> -->
       <q-tab name="groups" icon="ion-at" transition-show="slide-right">
         <q-tooltip>{{ $t('Groups.tab.groups.title') }}</q-tooltip>
-        <q-badge v-if="counter.invitedBy > 0" color="orange-10" floating>{{ counter.invitedBy }}</q-badge>
+        <q-badge v-if="counter.invitedBy > 0" color="orange" floating>{{ counter.invitedBy }}</q-badge>
       </q-tab>
       <!-- <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people" :label="$t('Groups.tab.members.title')"> -->
       <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people">
@@ -67,7 +67,7 @@
               <q-chip
                 v-if="props.row.relation === 'INVITED_BY'"
                 dense
-                color="orange-10"
+                color="orange"
                 text-color="white"
                 clickable
                 @click="confirmInvitation(props.row)"
