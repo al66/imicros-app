@@ -7,6 +7,7 @@
       <q-btn round flat no-caps size="sm" color="grey" icon="ion-add" class="q-mr-sm" @click="zoomOut()" />
       <q-btn round flat no-caps size="sm" color="grey" icon="ion-remove" class="q-mr-sm" @click="zoomIn()" />
       <q-btn round flat no-caps size="sm" color="grey" icon="ion-code" class="q-mr-lg" @click="zoomFit()" />
+      <q-btn round flat no-caps size="sm" color="grey" :icon="palette.visible ? 'ion-close' : 'ion-hammer'" class="q-mr-lg" @click="togglePalette()" />
       <q-space />
       <q-btn round no-caps size="sm" color="primary" icon="ion-add" class="q-mr-sm q-ml-lg" @click="newDiagram()" />
       <q-btn round no-caps size="sm" color="primary" icon="ion-open" class="q-mr-sm" @click="()=>{ this.files.select = !this.files.select }" />
@@ -29,18 +30,22 @@
           <q-scroll-area style="height: calc(100vh - 50px - 90px;">
             <q-card>
               <q-card-section align="center" class="bg-grey text-white q-ma-xs q-pa-xs">
-                <div class="text-h6">{{ $t('Process.editor.parameters.dialog.title') }}</div>
+                <q-item-label>{{ $t('Process.editor.parameters.dialog.title') }}</q-item-label>
               </q-card-section>
               <q-card-section align="left">
-                <q-input v-model="selected.element.id" label="element id"></q-input>
+                <q-input v-model="selected.element.id" label="element id" disable></q-input>
+                <!-- Service Task -->
                 <div v-if="selected.businessObject.$type === 'bpmn:ServiceTask'">
-                  <q-input v-model="selected.parameterObject.lastChecked" label="last checked"></q-input>
+                  <q-input v-model="selected.parameterObject.action" label="action"></q-input>
+                  <q-input v-model="selected.parameterObject.paramsKey" label="context key (params)"></q-input>
+                  <q-input v-model="selected.parameterObject.resultKey" label="context key (result)"></q-input>
                 </div>
+                <!-- Business Rule Task -->
                 <div v-if="selected.businessObject.$type === 'bpmn:BusinessRuleTask'">
                   <q-input v-model="selected.parameterObject.ruleset" label="ruleset"></q-input>
                   <q-select
                     v-model="selected.parameterObject.contextKeys"
-                    label="In: context keys"
+                    label="context keys (input)"
                     use-input
                     use-chips
                     multiple
@@ -48,7 +53,12 @@
                     input-debounce="0"
                     new-value-mode="add-unique"
                   ></q-select>
-                  <q-input v-model="selected.parameterObject.contextKey" label="Result: context key"></q-input>
+                  <q-input v-model="selected.parameterObject.contextKey" label="context key (result)"></q-input>
+                </div>
+                <!-- Start Event: Signal Event -->
+                <div v-if="selected.businessObject.$type === 'bpmn:StartEvent' && selected.subtype['bpmn:SignalEventDefinition']">
+                  <q-input v-model="selected.parameterObject.event" label="internal event"></q-input>
+                  <q-input v-model="selected.parameterObject.contextKey" label="context key (payload/metadata)"></q-input>
                 </div>
               </q-card-section>
             </q-card>
@@ -64,6 +74,10 @@
 <style lang="scss">
 /* hide default toggle button of simulation tool (own button used instead) */
 .toggle-mode {
+  display: none;
+}
+/* hide palette toggle button of diagram-js (own button is used instead) */
+.djs-palette-toggle {
   display: none;
 }
 </style>
@@ -107,10 +121,12 @@ export default {
         businessObject: {},
         parameterObject: {
           contextKeys: []
-        }
+        },
+        subtype: {}
       },
-      selectedElement: {},
-      parameterObject: {},
+      palette: {
+        visible: true
+      },
       simulation: {
         active: false
       }
@@ -134,15 +150,6 @@ export default {
         additionalModules: [
           tokenSimulation
         ]
-        /*
-        additionalModules: [
-          PropertiesPanel,
-          propertiesProviderModule
-        ],
-        propertiesPanel: {
-          parent: '#properties'
-        }
-        */
       })
     }
     if (!this.objectName) {
@@ -156,6 +163,11 @@ export default {
     // TODO store last state
   },
   methods: {
+    togglePalette () {
+      let palette = this.modeler.get('palette')
+      this.palette.visible = !this.palette.visible
+      this.palette.visible ? palette.open() : palette.close()
+    },
     toggleSimulation () {
       let eventBus = this.modeler.get('eventBus')
       this.simulation.active = !this.simulation.active
@@ -168,13 +180,37 @@ export default {
     },
     getExtension (bo, type) {
       if (!bo.extensionElements) {
-        // Create attributes, if not exists
+        /* Create attributes, if not exists */
+        // Business Rule Task
         if (bo.$type === 'bpmn:BusinessRuleTask') {
           let moddle = this.modeler.get('moddle')
           let newParam = moddle.create('fe:ExecutionParameter', {
             'ruleset': '',
             'contextKeys': [],
             'contextKey': ''
+          })
+          bo.extensionElements = moddle.create('bpmn:ExtensionElements')
+          bo.extensionElements.get('values').push(newParam)
+          return newParam
+        }
+        // Start Event
+        if (bo.$type === 'bpmn:StartEvent') {
+          let moddle = this.modeler.get('moddle')
+          let newParam = moddle.create('fe:ExecutionParameter', {
+            'event': '',
+            'contextKey': ''
+          })
+          bo.extensionElements = moddle.create('bpmn:ExtensionElements')
+          bo.extensionElements.get('values').push(newParam)
+          return newParam
+        }
+        // Service Task
+        if (bo.$type === 'bpmn:ServiceTask') {
+          let moddle = this.modeler.get('moddle')
+          let newParam = moddle.create('fe:ExecutionParameter', {
+            'action': '',
+            'paramsKey': '',
+            'resultKey': ''
           })
           bo.extensionElements = moddle.create('bpmn:ExtensionElements')
           bo.extensionElements.get('values').push(newParam)
@@ -192,7 +228,8 @@ export default {
         businessObject: {},
         parameterObject: {
           contextKeys: []
-        }
+        },
+        subtype: {}
       }
     },
     changeSelected (element) {
@@ -206,6 +243,13 @@ export default {
         if (!this.selected.parameterObject.contextKeys) this.selected.parameterObject.contextKeys = []
         if (this.selected.parameterObject.contextKeys && !Array.isArray(this.selected.parameterObject.contextKeys)) {
           this.selected.parameterObject.contextKeys = this.selected.parameterObject.contextKeys.split(',')
+        }
+        this.selected.subtype = {}
+        // determine event sub type
+        if (this.selected.businessObject.eventDefinitions) {
+          this.selected.businessObject.eventDefinitions.map((e) => {
+            this.selected.subtype[e.$type] = true
+          })
         }
       } else {
         this.selected.parameterObject = {}

@@ -23,24 +23,20 @@
       "name": "ExecutionParameter",
       "extends": [
         "bpmn:ServiceTask",
-        "bpmn:BusinessRuleTask"
+        "bpmn:BusinessRuleTask",
+        "bpmn:StartEvent"
       ],
       "superClass": [ "Element" ],
       "properties": [
         {
-          "name": "lastChecked",
-          "isAttr": true,
-          "type": "String"
-        },
-        {
-          "name": "nextCheck",
-          "isAttr": true,
-          "type": "String"
-        },
-        {
           "name": "comments",
           "isMany": true,
           "type": "Comment"
+        },
+        {
+          "name": "uid",
+          "isAttr": true,
+          "type": "String"
         },
         {
           "name": "ruleset",
@@ -54,6 +50,26 @@
         },
         {
           "name": "contextKey",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "event",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "action",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "paramsKey",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "resultKey",
           "isAttr": true,
           "type": "String"
         }

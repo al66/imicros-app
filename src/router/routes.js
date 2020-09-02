@@ -12,6 +12,7 @@ const routes = [
       { path: 'groups', name: 'groups', component: () => import('pages/Groups.vue') },
       { path: 'files', name: 'files', component: () => import('pages/Files.vue') },
       { path: 'templates', name: 'templates', component: () => import('pages/Templates.vue') },
+      { path: 'ruleseteditor', name: 'ruleseteditor', component: () => import('pages/Ruleseteditor.vue') },
       { path: 'processeditor', name: 'processeditor', component: () => import('pages/Processeditor.vue') }
     ]
   }
