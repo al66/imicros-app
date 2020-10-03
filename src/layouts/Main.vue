@@ -13,24 +13,45 @@
 
         <q-toolbar-title>
           <q-btn to="/">
-            <img class='toolbar-brand' alt='imicros-logo' src='~assets/imicros-grau.png'>
+            <img
+              class="toolbar-brand"
+              alt="imicros-logo"
+              src="~assets/imicros-grau.png"
+            >
           </q-btn>
         </q-toolbar-title>
-        <q-btn to='/login' icon="ion-log-in" v-if="!isAuthenticated()" />
+        <q-btn
+          to="/login"
+          icon="ion-log-in"
+          v-if="!isAuthenticated()"
+        />
         <!--
         <q-btn to='/login' icon="ion-log-in" :label="$t('Navbar.item.login')" v-if="!isAuthenticated()" />
         <q-btn to='/signin' :label="$t('Navbar.item.signin')" v-if="!isAuthenticated()" />
         -->
-        <q-btn icon="person" v-if="isAuthenticated()" >
+        <q-btn
+          icon="person"
+          v-if="isAuthenticated()"
+        >
           <q-menu>
             <q-list>
               <q-item>
-                <q-btn flat dense style="min-width: 150px" :label="lang">
+                <q-btn
+                  flat
+                  dense
+                  style="min-width: 150px"
+                  :label="lang"
+                >
                   <q-menu auto-close>
                     <q-list>
-                      <q-item clickable v-for='(lang) in langs' v-bind:key='lang.value' @click="setLocale(lang)">
+                      <q-item
+                        clickable
+                        v-for="(index) in langs"
+                        :key="index.value"
+                        @click="setLocale(index)"
+                      >
                         <q-item-section>
-                          <q-item-label>{{ new String(lang.label).toUpperCase() }}</q-item-label>
+                          <q-item-label>{{ new String(index.label).toUpperCase() }}</q-item-label>
                         </q-item-section>
                       </q-item>
                     </q-list>
@@ -38,10 +59,19 @@
                 </q-btn>
               </q-item>
               <q-item>
-                <q-toggle dense  v-model="dark" right-label label="dark" />
+                <q-toggle
+                  dense
+                  v-model="dark"
+                  right-label
+                  label="dark"
+                />
               </q-item>
               <q-separator />
-              <q-item clickable dense @click="logout()">
+              <q-item
+                clickable
+                dense
+                @click="logout()"
+              >
                 <q-item-section avatar>
                   <q-icon name="ion-log-out" />
                 </q-item-section>
@@ -50,12 +80,24 @@
             </q-list>
           </q-menu>
         </q-btn>
-        <q-btn icon="ion-people" v-if="isAuthenticated()" to="/groups"/>
-        <q-btn-dropdown :label="lang" v-if="!isAuthenticated()" >
+        <q-btn
+          icon="ion-people"
+          v-if="isAuthenticated()"
+          to="/groups"
+        />
+        <q-btn-dropdown
+          :label="lang"
+          v-if="!isAuthenticated()"
+        >
           <q-list>
-            <q-item clickable v-for='(lang) in langs' v-bind:key='lang.value' @click="setLocale(lang)">
+            <q-item
+              clickable
+              v-for="(index) in langs"
+              :key="index.value"
+              @click="setLocale(index)"
+            >
               <q-item-section>
-                <q-item-label>{{ new String(lang.label).toUpperCase() }}</q-item-label>
+                <q-item-label>{{ new String(index.label).toUpperCase() }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -80,102 +122,173 @@
     >
       <q-list>
         <q-item dense>
-          <q-chip >{{ user.email }}</q-chip>
+          <q-chip>{{ user.email }}</q-chip>
           <!-- <q-chip>{{ user.id }}</q-chip> -->
         </q-item>
         <q-item dense>
-          <q-chip icon="ion-at" v-if="access.group.id">{{ access.group.name }}</q-chip>
+          <q-chip
+            icon="ion-at"
+            v-if="access.group.id"
+          >
+            {{ access.group.name }}
+          </q-chip>
         </q-item>
-        <q-item-label header>Applications</q-item-label>
-        <q-item clickable to="/files">
+        <q-item-label header>
+          Applications
+        </q-item-label>
+        <q-item
+          clickable
+          to="/files"
+        >
           <q-item-section avatar>
             <q-icon name="ion-filing" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Files</q-item-label>
-            <q-item-label caption>File Manager</q-item-label>
+            <q-item-label caption>
+              File Manager
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable to="/processeditor">
+        <q-item
+          clickable
+          to="/processeditor"
+        >
           <q-item-section avatar>
             <q-icon name="ion-cog" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Processes</q-item-label>
-            <q-item-label caption>Process Editor</q-item-label>
+            <q-item-label caption>
+              Process Editor
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable to="/templates">
+        <q-item
+          clickable
+          to="/templates"
+        >
           <q-item-section avatar>
             <q-icon name="ion-code-working" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Templates</q-item-label>
-            <q-item-label caption>Template Editor</q-item-label>
+            <q-item-label caption>
+              Template Editor
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable to="/ruleseteditor">
+        <q-item
+          clickable
+          to="/ruleseteditor"
+        >
           <q-item-section avatar>
             <q-icon name="assignment" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Rules</q-item-label>
-            <q-item-label caption>Rules Editor</q-item-label>
+            <q-item-label caption>
+              Rules Editor
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item-label header>Essential Links</q-item-label>
-        <q-item clickable tag="a" target="_blank" href="https://quasar.dev">
+        <q-item-label header>
+          Essential Links
+        </q-item-label>
+        <q-item
+          clickable
+          tag="a"
+          target="_blank"
+          href="https://quasar.dev"
+        >
           <q-item-section avatar>
             <q-icon name="school" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Docs</q-item-label>
-            <q-item-label caption>quasar.dev</q-item-label>
+            <q-item-label caption>
+              quasar.dev
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable tag="a" target="_blank" href="https://github.quasar.dev">
+        <q-item
+          clickable
+          tag="a"
+          target="_blank"
+          href="https://github.quasar.dev"
+        >
           <q-item-section avatar>
             <q-icon name="code" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Github</q-item-label>
-            <q-item-label caption>github.com/quasarframework</q-item-label>
+            <q-item-label caption>
+              github.com/quasarframework
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable tag="a" target="_blank" href="https://chat.quasar.dev">
+        <q-item
+          clickable
+          tag="a"
+          target="_blank"
+          href="https://chat.quasar.dev"
+        >
           <q-item-section avatar>
             <q-icon name="chat" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Discord Chat Channel</q-item-label>
-            <q-item-label caption>chat.quasar.dev</q-item-label>
+            <q-item-label caption>
+              chat.quasar.dev
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable tag="a" target="_blank" href="https://forum.quasar.dev">
+        <q-item
+          clickable
+          tag="a"
+          target="_blank"
+          href="https://forum.quasar.dev"
+        >
           <q-item-section avatar>
             <q-icon name="record_voice_over" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Forum</q-item-label>
-            <q-item-label caption>forum.quasar.dev</q-item-label>
+            <q-item-label caption>
+              forum.quasar.dev
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable tag="a" target="_blank" href="https://twitter.quasar.dev">
+        <q-item
+          clickable
+          tag="a"
+          target="_blank"
+          href="https://twitter.quasar.dev"
+        >
           <q-item-section avatar>
             <q-icon name="rss_feed" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Twitter</q-item-label>
-            <q-item-label caption>@quasarframework</q-item-label>
+            <q-item-label caption>
+              @quasarframework
+            </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable tag="a" target="_blank" href="https://facebook.quasar.dev">
+        <q-item
+          clickable
+          tag="a"
+          target="_blank"
+          href="https://facebook.quasar.dev"
+        >
           <q-item-section avatar>
             <q-icon name="public" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Facebook</q-item-label>
-            <q-item-label caption>@QuasarFramework</q-item-label>
+            <q-item-label caption>
+              @QuasarFramework
+            </q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -187,7 +300,10 @@
       overlay
       bordered
     >
-      <access-group v-if="isAuthenticated()" :refresh="rightDrawerOpen" />
+      <access-group
+        v-if="isAuthenticated()"
+        :refresh="rightDrawerOpen"
+      />
     </q-drawer>
 
     <q-page-container>

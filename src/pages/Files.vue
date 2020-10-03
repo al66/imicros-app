@@ -3,7 +3,7 @@
     <q-breadcrumbs>
       <q-breadcrumbs-el
         v-for="breadcrumb in breadcrumbs"
-        v-bind:key="breadcrumb.prefix"
+        :key="breadcrumb.prefix"
         :icon="breadcrumb.icon"
         :label="breadcrumb.label"
         @click="selectBreadcrumb(breadcrumb)"
@@ -19,39 +19,84 @@
       @row-dblclick="selectFolder"
     >
       <template v-slot:body="props">
-        <q-tr :props="props" @contextmenu.native="contextMenu(props.row)" @mouseleave.native="mouseLeave()" @dblclick="dblClick(props.row)">
-          <q-td key="name" :props="props">
+        <q-tr
+          :props="props"
+          @contextmenu.native="contextMenu(props.row)"
+          @mouseleave.native="mouseLeave()"
+          @dblclick="dblClick(props.row)"
+        >
+          <q-td
+            key="name"
+            :props="props"
+          >
             <div class="row justify-between">
-              <q-badge v-show="props.row.name && !props.row.save" :color="props.row.save ? 'primary' : 'grey'">
+              <q-badge
+                v-show="props.row.name && !props.row.save"
+                :color="props.row.save ? 'primary' : 'grey'"
+              >
                 <div>{{ props.row.listname }}</div>
               </q-badge>
-              <a class="q-badge q-pl-none q-pr-none"
-                 v-if="props.row.save"
-                 :href="props.row.url"
-                 :download="props.row.name"
-                 :ref="'link' + props.row.etag"
+              <a
+                class="q-badge q-pl-none q-pr-none"
+                v-if="props.row.save"
+                :href="props.row.url"
+                :download="props.row.name"
+                :ref="'link' + props.row.etag"
               >
-                <q-badge v-if="props.row.name" color="primary">
+                <q-badge
+                  v-if="props.row.name"
+                  color="primary"
+                >
                   {{ props.row.listname }}
                 </q-badge>
               </a>
-              <div v-if="props.row.prefix">{{ props.row.prefix }}</div>
+              <div v-if="props.row.prefix">
+                {{ props.row.prefix }}
+              </div>
               <q-inner-loading :showing="spinners.indexOf(props.row.etag) >= 0">
-                <q-spinner-ios size="xs" color="primary" />
+                <q-spinner-ios
+                  size="xs"
+                  color="primary"
+                />
               </q-inner-loading>
-              <q-btn flat dense size="xs" icon="ion-more" color="grey" @click="contextMenu(props.row)">
+              <q-btn
+                flat
+                dense
+                size="xs"
+                icon="ion-more"
+                color="grey"
+                @click="contextMenu(props.row)"
+              >
                 <q-menu>
-                  <q-list dense style="min-width: 100px">
+                  <q-list
+                    dense
+                    style="min-width: 100px"
+                  >
                     <q-item v-close-popup>
                       <q-item-section>{{ props.row.listname || props.row.prefix }}</q-item-section>
                     </q-item>
-                    <q-item clickable v-close-popup v-if="props.row.prefix" @click="selectFolder(props.row)">
+                    <q-item
+                      clickable
+                      v-close-popup
+                      v-if="props.row.prefix"
+                      @click="selectFolder(props.row)"
+                    >
                       <q-item-section>...open</q-item-section>
                     </q-item>
-                    <q-item clickable v-close-popup v-if="props.row.name" @click="downloadFile(props.row)">
+                    <q-item
+                      clickable
+                      v-close-popup
+                      v-if="props.row.name"
+                      @click="downloadFile(props.row)"
+                    >
                       <q-item-section>...download</q-item-section>
                     </q-item>
-                    <q-item clickable v-close-popup v-if="props.row.name" @click="deleteFile(props.row)">
+                    <q-item
+                      clickable
+                      v-close-popup
+                      v-if="props.row.name"
+                      @click="deleteFile(props.row)"
+                    >
                       <q-item-section>...delete</q-item-section>
                     </q-item>
                   </q-list>
@@ -59,22 +104,34 @@
               </q-btn>
             </div>
           </q-td>
-          <q-td key="prefix" :props="props">
+          <q-td
+            key="prefix"
+            :props="props"
+          >
             <q-badge color="purple">
               {{ props.row.prefix }}
             </q-badge>
           </q-td>
-          <q-td key="etag" :props="props">
+          <q-td
+            key="etag"
+            :props="props"
+          >
             <q-badge color="orange">
               {{ props.row.etag }}
             </q-badge>
           </q-td>
-          <q-td key="size" :props="props">
+          <q-td
+            key="size"
+            :props="props"
+          >
             <q-badge color="primary">
               {{ props.row.size }}
             </q-badge>
           </q-td>
-          <q-td key="lastModified" :props="props">
+          <q-td
+            key="lastModified"
+            :props="props"
+          >
             <q-badge color="teal">
               {{ props.row.lastModified }}
             </q-badge>
@@ -83,21 +140,49 @@
       </template>
       <template v-slot:top-right>
         <div class="q-pa-md q-gutter-sm">
-          <q-btn round no-caps size="sm" color="primary" icon="ion-refresh" @click="getFiles()" >
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-refresh"
+            @click="getFiles()"
+          >
             <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-add" @click="addFile()">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-add"
+            @click="addFile()"
+          >
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-settings">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-settings"
+          >
             <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
             <q-menu :offset="[0, 20]">
               <q-list>
-                <q-item dense clickable v-for='(column) in columns' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns)" >
+                <q-item
+                  dense
+                  clickable
+                  v-for="(column) in columns"
+                  :key="column.name"
+                  @click="setVisibleColumns(column,visibleColumns)"
+                >
                   <q-item-section>
                     <q-item-label
                       :class="visibleColumns.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                    >{{ $t('Files.table.column.' + column.name) }}</q-item-label>
+                    >
+                      {{ $t('Files.table.column.' + column.name) }}
+                    </q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -126,24 +211,50 @@
           />
         </q-card-section>
         <q-card-section>
-          <q-input v-model="newFolder" label="new folder"></q-input>
+          <q-input
+            v-model="newFolder"
+            label="new folder"
+          />
         </q-card-section>
       </q-card>
     </q-dialog>
 
     <!-- <div>{{ ls }}</div> -->
-    <q-menu touch-position context-menu v-if="context" v-model="contextMenuVisible">
-      <q-list dense style="min-width: 100px">
+    <q-menu
+      touch-position
+      context-menu
+      v-if="context"
+      v-model="contextMenuVisible"
+    >
+      <q-list
+        dense
+        style="min-width: 100px"
+      >
         <q-item v-close-popup>
           <q-item-section>{{ context.listname || context.prefix }}</q-item-section>
         </q-item>
-        <q-item clickable v-close-popup v-if="context.prefix" @click="selectFolder(context)">
+        <q-item
+          clickable
+          v-close-popup
+          v-if="context.prefix"
+          @click="selectFolder(context)"
+        >
           <q-item-section>...open</q-item-section>
         </q-item>
-        <q-item clickable v-close-popup v-if="context.name" @click="downloadFile(context)">
+        <q-item
+          clickable
+          v-close-popup
+          v-if="context.name"
+          @click="downloadFile(context)"
+        >
           <q-item-section>...download</q-item-section>
         </q-item>
-        <q-item clickable v-close-popup v-if="context.name" @click="deleteFile(context)">
+        <q-item
+          clickable
+          v-close-popup
+          v-if="context.name"
+          @click="deleteFile(context)"
+        >
           <q-item-section>...delete</q-item-section>
         </q-item>
       </q-list>
@@ -160,7 +271,7 @@ export default {
     return {
     //
       ls: [],
-      visibleColumns: [ 'name' ],
+      visibleColumns: ['name'],
       pagination: {
         groups: {
           rowsPerPage: 10
@@ -198,7 +309,7 @@ export default {
       },
       headers: function () {
         return [{ name: 'x-imicros-xtoken', value: this.access.token },
-                { name: 'Authorization', value: this.$axios.defaults.headers.common['Authorization'] }]
+                { name: 'Authorization', value: this.$axios.defaults.headers.common.Authorization }]
       }
   },
   watch: {
@@ -216,7 +327,7 @@ export default {
     this.initPath()
     this.getFiles()
     // restore settings - component files
-    let settings = this.$store.getters.settings('files')
+    const settings = this.$store.getters.settings('files')
     if (settings) {
       this.visibleColumns = settings.visibleColumns
       this.pagination = settings.pagination
@@ -239,9 +350,9 @@ export default {
     makeBucket () {
       if (!this.access.token) return
       //
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.post['x-imicros-xtoken'] = this.access.token
-      let params = {
+      const params = {
       }
       instance.post('/#minio/makeBucket', params).then(async (response) => {
         if (response.data) {
@@ -253,9 +364,9 @@ export default {
     getFiles () {
       if (!this.access.token) return
       //
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.post['x-imicros-xtoken'] = this.access.token
-      let params = {
+      const params = {
         prefix: this.path,
         recursive: false
       }
@@ -278,7 +389,7 @@ export default {
     },
     receiveFileStream (stream) {
         return new Promise((resolve, reject) => {
-            let objects = []
+            const objects = []
             stream.on('data', obj => objects.push(obj))
             stream.on('end', () => resolve(objects))
             stream.on('error', reject)
@@ -312,7 +423,7 @@ export default {
     downloadFile (row) {
       if (row.url && this.$refs['link' + row.etag]) return this.$refs['link' + row.etag].click()
       //
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.get['Content-Type'] = 'application/octet-stream'
       this.spinners.push(row.etag)
@@ -331,7 +442,7 @@ export default {
         // row.listname += ' '
         row.save = true
         row.url = url
-        let self = this
+        const self = this
         setTimeout(function () { if (self.$refs['link' + row.etag]) self.$refs['link' + row.etag].click() }, 50)
         // this.$refs['link' + row.etag].click()
       }).catch((err) => {
@@ -342,7 +453,7 @@ export default {
     },
     deleteFile (row) {
       //
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.delete['x-imicros-xtoken'] = this.access.token
       instance.delete('/#file/?objectName=' + row.name).then((response) => {
         if (response.data && response.data.objectName) {

@@ -13,7 +13,10 @@
       :selected.sync="selected"
     >
       <template v-slot:body-cell-email="props">
-        <q-td dense :props="props">
+        <q-td
+          dense
+          :props="props"
+        >
           <a :href="'mailto:' + props.row.email">
             <q-chip
               dense
@@ -21,9 +24,26 @@
               color="primary"
               text-color="white"
             >{{ props.row.email }}</q-chip>
-            <q-chip dense v-if="props.row.role === 'admin' && props.row.relation === 'INVITED_BY'" outline color="primary" text-color="white">{{ props.row.email }}</q-chip>
-            <q-chip dense v-if="props.row.role === 'member' && props.row.relation !== 'INVITED_BY'" color="secondary" text-color="white">{{ props.row.email }}</q-chip>
-            <q-chip dense v-if="props.row.role === 'member' && props.row.relation === 'INVITED_BY'" outline color="secondary" text-color="white">{{ props.row.email }}</q-chip>
+            <q-chip
+              dense
+              v-if="props.row.role === 'admin' && props.row.relation === 'INVITED_BY'"
+              outline
+              color="primary"
+              text-color="white"
+            >{{ props.row.email }}</q-chip>
+            <q-chip
+              dense
+              v-if="props.row.role === 'member' && props.row.relation !== 'INVITED_BY'"
+              color="secondary"
+              text-color="white"
+            >{{ props.row.email }}</q-chip>
+            <q-chip
+              dense
+              v-if="props.row.role === 'member' && props.row.relation === 'INVITED_BY'"
+              outline
+              color="secondary"
+              text-color="white"
+            >{{ props.row.email }}</q-chip>
           </a>
           <q-chip
             :removable="props.row.id !== user.id && isAdmin"
@@ -33,7 +53,9 @@
             color="orange"
             text-color="white"
             @remove="removeInvitation(props.row)"
-          >{{ $t('Members.table.chip.invited') }}</q-chip>
+          >
+            {{ $t('Members.table.chip.invited') }}
+          </q-chip>
           <q-chip
             :clickable="props.row.id === user.id"
             v-if="props.row.request === 'revoke'"
@@ -43,53 +65,106 @@
             :color="props.row.id === user.id ? 'red' : 'red'"
             :text-color="props.row.id === user.id ? 'white' : null"
             @click="confirmDialog(props.row)"
-          >{{ $t('Members.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}</q-chip>
+          >
+            {{ $t('Members.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}
+          </q-chip>
           <q-chip
             :clickable="props.row.id === user.id"
-            :removable="props.row.id !== user.id  && isAdmin"
+            :removable="props.row.id !== user.id && isAdmin"
             v-if="props.row.request === 'nominate'"
             dense
             :outline="props.row.id !== user.id"
             color="primary"
             text-color="white"
             @click="confirmDialog(props.row)"
-          >{{ $t('Members.table.chip.nominated') }}</q-chip>
+          >
+            {{ $t('Members.table.chip.nominated') }}
+          </q-chip>
         </q-td>
       </template>
       <template v-slot:top-left>
         <q-toolbar>
-          <q-input dense debounce="300" v-model="filter" :placeholder="$t('Base.search.placeholder')">
+          <q-input
+            dense
+            debounce="300"
+            v-model="filter"
+            :placeholder="$t('Base.search.placeholder')"
+          >
             <template v-slot:append>
               <q-icon name="search" />
             </template>
           </q-input>
-          <q-separator inset/>
-          <q-chip icon="ion-at">{{ group.alias ? group.alias : group.name }}</q-chip>
+          <q-separator inset />
+          <q-chip icon="ion-at">
+            {{ group.alias ? group.alias : group.name }}
+          </q-chip>
         </q-toolbar>
       </template>
       <template v-slot:top-right>
         <div class="q-pa-md q-gutter-sm">
-          <q-btn round size="sm" color="primary" icon="ion-refresh" @click="getMember()">
+          <q-btn
+            round
+            size="sm"
+            color="primary"
+            icon="ion-refresh"
+            @click="getMember()"
+          >
             <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
           </q-btn>
-          <q-btn round size="sm" color="primary" icon="ion-person-add" v-if="isAdmin === true" @click="addInvitation()">
+          <q-btn
+            round
+            size="sm"
+            color="primary"
+            icon="ion-person-add"
+            v-if="isAdmin === true"
+            @click="addInvitation()"
+          >
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
           </q-btn>
-          <q-btn round size="sm" color="primary" icon="ion-build" v-if="isAdmin === true" :disable="selected.length < 1" @click="nominateSelected()">
+          <q-btn
+            round
+            size="sm"
+            color="primary"
+            icon="ion-build"
+            v-if="isAdmin === true"
+            :disable="selected.length < 1"
+            @click="nominateSelected()"
+          >
             <q-tooltip>{{ $t('Action.nominate') }}</q-tooltip>
           </q-btn>
-          <q-btn round size="sm" color="primary" icon="ion-trash" v-if="isAdmin === true" :disable="selected.length < 1" @click="removeSelected()">
+          <q-btn
+            round
+            size="sm"
+            color="primary"
+            icon="ion-trash"
+            v-if="isAdmin === true"
+            :disable="selected.length < 1"
+            @click="removeSelected()"
+          >
             <q-tooltip>{{ $t('Action.member.remove') }}</q-tooltip>
           </q-btn>
-          <q-btn round size="sm" color="primary" icon="ion-settings">
+          <q-btn
+            round
+            size="sm"
+            color="primary"
+            icon="ion-settings"
+          >
             <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
             <q-menu :offset="[0, 20]">
               <q-list>
-                <q-item dense clickable v-for='(column) in columns' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns)" >
+                <q-item
+                  dense
+                  clickable
+                  v-for="(column) in columns"
+                  :key="column.name"
+                  @click="setVisibleColumns(column,visibleColumns)"
+                >
                   <q-item-section>
                     <q-item-label
                       :class="visibleColumns.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                    >{{ $t('Members.table.column.' + column.name) }}</q-item-label>
+                    >
+                      {{ $t('Members.table.column.' + column.name) }}
+                    </q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -102,14 +177,32 @@
     <!-- invite member dialog -->
     <q-dialog v-model="dialog.invite.show">
       <q-card>
-        <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-sm">
-          <div class="text-h6">{{ $t('Members.table.chip.invited') }}</div>
+        <q-card-section
+          align="center"
+          class="bg-black text-white q-pa-sm q-mb-sm"
+        >
+          <div class="text-h6">
+            {{ $t('Members.table.chip.invited') }}
+          </div>
         </q-card-section>
         <q-card-section>
-          <q-chip icon="ion-at" :label="group.alias ? group.alias : group.name" />
+          <q-chip
+            icon="ion-at"
+            :label="group.alias ? group.alias : group.name"
+          />
           <div class="q-pa-md">
             <div class="q-gutter-y-md column">
-              <q-input ref="email" dense stack-label autofocus label="Email" v-model="dialog.invite.data.email" @keyup.enter="inviteMember()" :rules="validEmail()" lazy-rules />
+              <q-input
+                ref="email"
+                dense
+                stack-label
+                autofocus
+                label="Email"
+                v-model="dialog.invite.data.email"
+                @keyup.enter="inviteMember()"
+                :rules="validEmail()"
+                lazy-rules
+              />
               <div class="q-pa-lg">
                 <q-option-group
                   v-model="dialog.invite.data.role"
@@ -121,8 +214,22 @@
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn dense flat icon="ion-checkmark" :label="$t('Action.invite')" color="primary" :disable="dialog.invite.error" @click="inviteMember()"/>
-          <q-btn dense flat icon="ion-close-circle" color="grey" @click="()=>{ this.dialog.invite.show = false }">
+          <q-btn
+            dense
+            flat
+            icon="ion-checkmark"
+            :label="$t('Action.invite')"
+            color="primary"
+            :disable="dialog.invite.error"
+            @click="inviteMember()"
+          />
+          <q-btn
+            dense
+            flat
+            icon="ion-close-circle"
+            color="grey"
+            @click="()=>{ this.dialog.invite.show = false }"
+          >
             <q-tooltip>{{ $t('Action.cancel') }}</q-tooltip>
           </q-btn>
         </q-card-actions>
@@ -138,7 +245,6 @@
       @decline="getMember"
       @close="()=>{ this.dialog.confirm.show = false }"
     />
-
   </div>
 </template>
 
@@ -164,7 +270,7 @@ export default {
         member: 0
       },
       filter: '',
-      visibleColumns: [ 'email' ],
+      visibleColumns: ['email'],
       pagination: {
         rowsPerPage: 10
       },
@@ -215,7 +321,7 @@ export default {
   },
   mounted () {
     // restore settings - component member
-    let settings = this.$store.getters.settings('member')
+    const settings = this.$store.getters.settings('member')
     if (settings) {
       this.visibleColumns = settings.visibleColumns
       this.pagination = settings.pagination
@@ -232,16 +338,16 @@ export default {
   },
   methods: {
     getMember () {
-      let param = {
+      const param = {
         id: this.group.id
       }
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.post('/#groups/members', param).then((response) => {
         if (response.data) {
-          let members = []
+          const members = []
           if (Array.isArray(response.data)) {
             for (let i = 0; i < response.data.length; i++) {
-              let member = response.data[i]
+              const member = response.data[i]
               members.push(member)
             }
             this.member = members
@@ -262,8 +368,8 @@ export default {
       this.dialog.invite.show = true
     },
     removeInvitation (invitation) {
-      let instance = this.$instance()
-      let param = {
+      const instance = this.$instance()
+      const param = {
         groupId: this.group.id
       }
       if (invitation.id) {
@@ -278,9 +384,9 @@ export default {
       })
     },
     removeSelected () {
-      let instance = this.$instance()
+      const instance = this.$instance()
       for (let i = 0; i < this.selected.length; i++) {
-        let param = {
+        const param = {
           groupId: this.group.id
         }
         switch (this.selected[0].role) {
@@ -307,10 +413,10 @@ export default {
       }
     },
     nominateSelected () {
-      let instance = this.$instance()
+      const instance = this.$instance()
       for (let i = 0; i < this.selected.length; i++) {
         if (this.selected[0].role === 'member' && this.selected[0].relation === 'MEMBER_OF') {
-          let param = {
+          const param = {
             groupId: this.group.id,
             userId: this.selected[i].id
           }
@@ -326,8 +432,8 @@ export default {
       this.$refs.email.validate()
       if (this.$refs.email.hasError) return
 
-      let instance = this.$instance()
-      let param = {
+      const instance = this.$instance()
+      const param = {
         id: this.dialog.invite.data.id,
         email: this.dialog.invite.data.email,
         role: this.dialog.invite.data.role
@@ -343,10 +449,10 @@ export default {
       visible.indexOf(column.name) >= 0 ? visible.splice(visible.indexOf(column.name), 1) : visible.push(column.name)
     },
     validEmail () {
-      let rules = []
+      const rules = []
       /* eslint no-useless-escape: "off" */
-      let email = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
-      let message = this.$t('Message.validation.email')
+      const email = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+      const message = this.$t('Message.validation.email')
       rules.push(v => email.test(v) || message)
       return rules
     },

@@ -26,8 +26,8 @@ export default function ({ store }/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE
   })
   Router.beforeResolve((to, from, next) => {
-    let isAuthenticated = store.getters['isAuthenticated']
-    let user = store.getters['user'] || { verified: false }
+    const isAuthenticated = store.getters.isAuthenticated
+    const user = store.getters.user || { verified: false }
     // secure all routes if not marked as public
     try {
       if (!to.matched.some(record => record.meta.public)) {

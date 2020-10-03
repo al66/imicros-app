@@ -1,22 +1,45 @@
 <template>
   <div>
     <!-- main navigation tabs -->
-    <q-tabs v-model="tab" :class="$q.dark.isActive ? 'text-gray-2' : 'text-grey-10'" dense >
+    <q-tabs
+      v-model="tab"
+      :class="$q.dark.isActive ? 'text-gray-2' : 'text-grey-10'"
+      dense
+    >
       <!-- <q-tab name="groups" icon="ion-at" :label="$t('Groups.tab.groups.title')"  transition-show="slide-right"> -->
-      <q-tab name="groups" icon="ion-at" transition-show="slide-right">
+      <q-tab
+        name="groups"
+        icon="ion-at"
+        transition-show="slide-right"
+      >
         <q-tooltip>{{ $t('Groups.tab.groups.title') }}</q-tooltip>
-        <q-badge v-if="counter.invitedBy > 0" color="orange" floating>{{ counter.invitedBy }}</q-badge>
+        <q-badge
+          v-if="counter.invitedBy > 0"
+          color="orange"
+          floating
+        >
+          {{ counter.invitedBy }}
+        </q-badge>
       </q-tab>
       <!-- <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people" :label="$t('Groups.tab.members.title')"> -->
-      <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people">
+      <q-tab
+        :disable="selectedGroups.length != 1"
+        name="members"
+        icon="ion-people"
+      >
         <q-tooltip>{{ $t('Groups.tab.members.title') }}</q-tooltip>
-        <q-badge v-if="counter.member > 0" color="blue" floating>{{ counter.member }}</q-badge>
+        <q-badge
+          v-if="counter.member > 0"
+          color="blue"
+          floating
+        >
+          {{ counter.member }}
+        </q-badge>
       </q-tab>
     </q-tabs>
 
     <!-- panels -->
     <q-tab-panels v-model="tab">
-
       <!-- groups panel -->
       <q-tab-panel name="groups">
         <q-table
@@ -32,15 +55,20 @@
           :selected.sync="selectedGroups"
         >
           <template v-slot:body-cell-name="props">
-            <q-td dense :props="props">
+            <q-td
+              dense
+              :props="props"
+            >
               <q-chip
                 clickable
                 @click="editGroup(props.row.id)"
                 dense
                 :color="props.row.role === 'admin' ? 'primary' : 'secondary' "
                 text-color="white"
-              ><q-tooltip>{{ $t('Action.edit') }}</q-tooltip>
-                {{ props.row.alias ? props.row.alias : props.row.name }}</q-chip>
+              >
+                <q-tooltip>{{ $t('Action.edit') }}</q-tooltip>
+                {{ props.row.alias ? props.row.alias : props.row.name }}
+              </q-chip>
               <q-chip
                 clickable
                 v-if="props.row.request === 'revoke'"
@@ -48,7 +76,9 @@
                 color="red"
                 text-color="white"
                 @click="confirmDialog(props.row)"
-              >{{ $t('Groups.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}</q-chip>
+              >
+                {{ $t('Groups.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}
+              </q-chip>
               <q-chip
                 clickable
                 v-if="props.row.request === 'nominate'"
@@ -56,14 +86,18 @@
                 color="blue"
                 text-color="white"
                 @click="confirmDialog(props.row)"
-              >{{ $t('Groups.table.chip.nominated') }}</q-chip>
+              >
+                {{ $t('Groups.table.chip.nominated') }}
+              </q-chip>
               <q-chip
                 v-if="props.row.ttl"
                 dense
                 outline
                 color="red"
                 text-color="white"
-              >{{ $t('Groups.table.chip.delete') }}: {{ new Date(props.row.ttl).toLocaleDateString() }}</q-chip>
+              >
+                {{ $t('Groups.table.chip.delete') }}: {{ new Date(props.row.ttl).toLocaleDateString() }}
+              </q-chip>
               <q-chip
                 v-if="props.row.relation === 'INVITED_BY'"
                 dense
@@ -71,22 +105,36 @@
                 text-color="white"
                 clickable
                 @click="confirmInvitation(props.row)"
-              >{{ $t('Members.table.chip.invited') }}</q-chip>
+              >
+                {{ $t('Members.table.chip.invited') }}
+              </q-chip>
               <q-chip
                 dense
                 removable
                 v-model="props.row.hide"
                 icon="ion-eye-off"
                 v-if="props.row.hide"
-                @remove="unhide(props.row.id)">
-              </q-chip>
+                @remove="unhide(props.row.id)"
+              />
             </q-td>
           </template>
           <template v-slot:top-left>
             <q-toolbar>
-              <q-input dense debounce="300" v-model="filter.groups" :placeholder="$t('Base.search.placeholder')">
-                <template v-slot:after v-if="filter.groups !== ''" >
-                  <q-icon name="close" @click="filter.groups = ''" class="cursor-pointer" />
+              <q-input
+                dense
+                debounce="300"
+                v-model="filter.groups"
+                :placeholder="$t('Base.search.placeholder')"
+              >
+                <template
+                  v-slot:after
+                  v-if="filter.groups !== ''"
+                >
+                  <q-icon
+                    name="close"
+                    @click="filter.groups = ''"
+                    class="cursor-pointer"
+                  />
                 </template>
                 <template v-slot:append>
                   <q-icon name="search" />
@@ -96,30 +144,79 @@
           </template>
           <template v-slot:top-right>
             <div class="q-pa-md q-gutter-sm">
-              <q-btn round no-caps size="sm" color="primary" icon="ion-refresh" @click="refreshGroups()" >
+              <q-btn
+                round
+                no-caps
+                size="sm"
+                color="primary"
+                icon="ion-refresh"
+                @click="refreshGroups()"
+              >
                 <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
               </q-btn>
-              <q-btn round no-caps size="sm" color="primary" icon="ion-add" @click="addGroup()">
+              <q-btn
+                round
+                no-caps
+                size="sm"
+                color="primary"
+                icon="ion-add"
+                @click="addGroup()"
+              >
                 <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
               </q-btn>
-              <q-btn round no-caps size="sm" color="primary" icon="ion-log-out" @click="leaveGroups()" :disable="selectedGroups.length < 1" >
+              <q-btn
+                round
+                no-caps
+                size="sm"
+                color="primary"
+                icon="ion-log-out"
+                @click="leaveGroups()"
+                :disable="selectedGroups.length < 1"
+              >
                 <q-tooltip>{{ $t('Action.leave') }}</q-tooltip>
               </q-btn>
-              <q-btn round size="sm" color="primary" icon="ion-eye-off" v-if="selectedGroups.length > 0" @click="hideSelected()">
+              <q-btn
+                round
+                size="sm"
+                color="primary"
+                icon="ion-eye-off"
+                v-if="selectedGroups.length > 0"
+                @click="hideSelected()"
+              >
                 <q-tooltip>{{ $t('Action.hide') }}</q-tooltip>
               </q-btn>
-              <q-btn round size="sm" color="primary" :icon="showHidden ? 'ion-eye-off' : 'ion-eye'" v-if="selectedGroups.length < 1" @click="toggleHidden()">
+              <q-btn
+                round
+                size="sm"
+                color="primary"
+                :icon="showHidden ? 'ion-eye-off' : 'ion-eye'"
+                v-if="selectedGroups.length < 1"
+                @click="toggleHidden()"
+              >
                 <q-tooltip>{{ showHidden ? $t('Action.hide') : $t('Action.showHidden') }}</q-tooltip>
               </q-btn>
-              <q-btn round size="sm" color="primary" icon="ion-settings">
+              <q-btn
+                round
+                size="sm"
+                color="primary"
+                icon="ion-settings"
+              >
                 <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
                 <q-menu :offset="[0, 20]">
                   <q-list>
-                    <q-item dense clickable v-for='(column) in columnsGroups' v-bind:key='column.name' @click="setVisibleColumns(column,visibleColumns.groups)" >
+                    <q-item
+                      dense
+                      clickable
+                      v-for="(column) in columnsGroups"
+                      :key="column.name"
+                      @click="setVisibleColumns(column,visibleColumns.groups)"
+                    >
                       <q-item-section>
                         <q-item-label
                           :class="visibleColumns.groups.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                        >{{ $t('Groups.table.column.' + column.name) }}</q-item-label>
+                        >
+                          {{ $t('Groups.table.column.' + column.name) }}
+                        </q-item-label>
                       </q-item-section>
                     </q-item>
                   </q-list>
@@ -132,9 +229,12 @@
 
       <!-- members panel -->
       <q-tab-panel name="members">
-        <member-table :group="selectedSingle" :isAdmin="isAdmin" @refreshed="memberRefreshed"></member-table>
+        <member-table
+          :group="selectedSingle"
+          :is-admin="isAdmin"
+          @refreshed="memberRefreshed"
+        />
       </q-tab-panel>
-
     </q-tab-panels>
 
     <!-- request confirm dialog -->
@@ -148,10 +248,18 @@
     />
 
     <!-- invitation confirm dialog -->
-    <q-dialog v-model="invitation.confirm" v-if="invitation.group">
+    <q-dialog
+      v-model="invitation.confirm"
+      v-if="invitation.group"
+    >
       <q-card>
-        <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-lg">
-          <div class="text-h6">{{ $t('Members.table.chip.invited') }}</div>
+        <q-card-section
+          align="center"
+          class="bg-black text-white q-pa-sm q-mb-lg"
+        >
+          <div class="text-h6">
+            {{ $t('Members.table.chip.invited') }}
+          </div>
         </q-card-section>
         <q-card-section align="center">
           <q-chip
@@ -162,9 +270,29 @@
           />
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn dense flat :label="$t('Action.join')" icon="ion-thumbs-up" text-color="primary" @click="joinGroup(invitation.group.id)"/>
-          <q-btn dense flat :label="$t('Action.refuse')" icon="ion-thumbs-down" text-color="red" @click="refuseInvitation(invitation.group.id)"/>
-          <q-btn dense flat icon="ion-close-circle" color="grey" @click="()=>{ this.invitation.confirm = false }">
+          <q-btn
+            dense
+            flat
+            :label="$t('Action.join')"
+            icon="ion-thumbs-up"
+            text-color="primary"
+            @click="joinGroup(invitation.group.id)"
+          />
+          <q-btn
+            dense
+            flat
+            :label="$t('Action.refuse')"
+            icon="ion-thumbs-down"
+            text-color="red"
+            @click="refuseInvitation(invitation.group.id)"
+          />
+          <q-btn
+            dense
+            flat
+            icon="ion-close-circle"
+            color="grey"
+            @click="()=>{ this.invitation.confirm = false }"
+          >
             <q-tooltip>{{ $t('Action.cancel') }}</q-tooltip>
           </q-btn>
         </q-card-actions>
@@ -172,30 +300,68 @@
     </q-dialog>
 
     <!-- edit group dialog -->
-    <q-dialog v-model="edit" >
+    <q-dialog v-model="edit">
       <q-card>
-        <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-sm">
-          <div class="text-h6">{{ $t('Action.edit') }}</div>
+        <q-card-section
+          align="center"
+          class="bg-black text-white q-pa-sm q-mb-sm"
+        >
+          <div class="text-h6">
+            {{ $t('Action.edit') }}
+          </div>
         </q-card-section>
         <q-card-section>
-          <q-chip :label="editGroupData.id"/>
+          <q-chip :label="editGroupData.id" />
           <div class="q-pa-md">
             <div class="q-gutter-y-md column">
-              <q-input dense stack-label :autofocus="editGroupData.role === 'admin'" :disable="editGroupData.role !== 'admin'" label="Global name" v-model="editGroupData.name" @keyup.enter="saveChanges()" />
-              <q-input dense stack-label :autofocus="editGroupData.role !== 'admin'" label="Alias" v-model="editGroupData.alias" @keyup.enter="saveChanges()" />
-              <q-input dense stack-label disable label="Role" v-model="editGroupData.roleName" />
+              <q-input
+                dense
+                stack-label
+                :autofocus="editGroupData.role === 'admin'"
+                :disable="editGroupData.role !== 'admin'"
+                label="Global name"
+                v-model="editGroupData.name"
+                @keyup.enter="saveChanges()"
+              />
+              <q-input
+                dense
+                stack-label
+                :autofocus="editGroupData.role !== 'admin'"
+                label="Alias"
+                v-model="editGroupData.alias"
+                @keyup.enter="saveChanges()"
+              />
+              <q-input
+                dense
+                stack-label
+                disable
+                label="Role"
+                v-model="editGroupData.roleName"
+              />
             </div>
           </div>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn dense flat icon="ion-checkmark" :label="$t('Action.save')" color="primary" @click="saveChanges()" />
-          <q-btn dense flat icon="ion-close-circle" color="grey" @click="()=>{ this.edit = false }">
+          <q-btn
+            dense
+            flat
+            icon="ion-checkmark"
+            :label="$t('Action.save')"
+            color="primary"
+            @click="saveChanges()"
+          />
+          <q-btn
+            dense
+            flat
+            icon="ion-close-circle"
+            color="grey"
+            @click="()=>{ this.edit = false }"
+          >
             <q-tooltip>{{ $t('Action.cancel') }}</q-tooltip>
           </q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
-
   </div>
 </template>
 
@@ -226,8 +392,8 @@ export default {
         member: ''
       },
       visibleColumns: {
-        groups: [ 'name' ],
-        member: [ 'email' ]
+        groups: ['name'],
+        member: ['email']
       },
       pagination: {
         groups: {
@@ -308,7 +474,7 @@ export default {
   },
   mounted () {
     // restore settings - component member
-    let settings = this.$store.getters.settings('groups')
+    const settings = this.$store.getters.settings('groups')
     if (settings) {
       this.visibleColumns = settings.visibleColumns
       this.pagination = settings.pagination
@@ -325,14 +491,14 @@ export default {
   },
   methods: {
     refreshGroups () {
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.get('/#groups/list').then((response) => {
         if (response.data) {
-          let groups = []
+          const groups = []
           this.counter.invitedBy = 0
           if (Array.isArray(response.data)) {
             for (let i = 0; i < response.data.length; i++) {
-              let group = response.data[i]
+              const group = response.data[i]
               groups.push(group)
             }
           }
@@ -364,13 +530,13 @@ export default {
       }
     },
     addGroup () {
-      let param = {
+      const param = {
         name: 'new Group'
       }
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.post('/#groups/add', param).then((response) => {
         if (response.data && Array.isArray(response.data) && response.data[0].id) {
-          let group = response.data[0]
+          const group = response.data[0]
           this.dataGroups.push(group)
           this.translateData()
           this.editGroup(group.id)
@@ -378,9 +544,9 @@ export default {
       })
     },
     leaveGroups () {
-      let instance = this.$instance()
+      const instance = this.$instance()
       for (let i = 0; i < this.selectedGroups.length; i++) {
-        let param = {
+        const param = {
           id: this.selectedGroups[i].id
         }
         instance.post('/#groups/leave', param).then((response) => {
@@ -395,8 +561,8 @@ export default {
       this.invitation.confirm = true
     },
     joinGroup (id) {
-      let instance = this.$instance()
-      let param = {
+      const instance = this.$instance()
+      const param = {
         id: id
       }
       instance.post('/#groups/join', param).then((response) => {
@@ -408,8 +574,8 @@ export default {
       this.invitation.confirm = false
     },
     refuseInvitation (id) {
-      let instance = this.$instance()
-      let param = {
+      const instance = this.$instance()
+      const param = {
         id: id
       }
       instance.post('/#groups/refuse', param).then((response) => {
@@ -421,9 +587,9 @@ export default {
       this.invitation.confirm = false
     },
     hideSelected (unhide) {
-      let instance = this.$instance()
+      const instance = this.$instance()
       for (let i = 0; i < this.selectedGroups.length; i++) {
-        let param = {
+        const param = {
           id: this.selectedGroups[i].id,
           unhide: unhide
         }
@@ -437,8 +603,8 @@ export default {
       this.showHidden = false
     },
     unhide (id) {
-      let instance = this.$instance()
-      let param = {
+      const instance = this.$instance()
+      const param = {
         id: id,
         unhide: true
       }
@@ -453,12 +619,12 @@ export default {
       this.edit = true
     },
     saveChanges () {
-      let instance = this.$instance()
+      const instance = this.$instance()
       // determine changes
-      let newGroupData = this.editGroupData
-      let groupData = this.dataGroups.find((group) => { return group.id === newGroupData.id })
+      const newGroupData = this.editGroupData
+      const groupData = this.dataGroups.find((group) => { return group.id === newGroupData.id })
       if (newGroupData.name !== groupData.name) {
-        let param = {
+        const param = {
           id: groupData.id,
           name: newGroupData.name
         }
@@ -469,7 +635,7 @@ export default {
         })
       }
       if (newGroupData.alias !== groupData.alias) {
-        let param = {
+        const param = {
           id: groupData.id,
           alias: newGroupData.alias
         }

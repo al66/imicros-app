@@ -1,17 +1,45 @@
 <template>
   <!-- request confirm dialog -->
-  <q-dialog v-model="dialog" v-if="request.request">
+  <q-dialog
+    v-model="dialog"
+    v-if="request.request"
+  >
     <q-card>
-      <q-card-section align="center" class="bg-black text-white q-pa-sm q-mb-lg">
-        <div class="text-h6">{{ $t('Members.dialog.request.title') }}</div>
+      <q-card-section
+        align="center"
+        class="bg-black text-white q-pa-sm q-mb-lg"
+      >
+        <div class="text-h6">
+          {{ $t('Members.dialog.request.title') }}
+        </div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         {{ $t('Members.dialog.request.' + request.request) }}
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn dense flat :label="$t('Action.accept')" icon="ion-thumbs-up" text-color="primary" @click="acceptRequest()"/>
-        <q-btn dense flat :label="$t('Action.decline')" icon="ion-thumbs-down" text-color="red" @click="declineRequest()"/>
-        <q-btn dense flat icon="ion-close-circle" color="grey" @click="$emit('close')">
+        <q-btn
+          dense
+          flat
+          :label="$t('Action.accept')"
+          icon="ion-thumbs-up"
+          text-color="primary"
+          @click="acceptRequest()"
+        />
+        <q-btn
+          dense
+          flat
+          :label="$t('Action.decline')"
+          icon="ion-thumbs-down"
+          text-color="red"
+          @click="declineRequest()"
+        />
+        <q-btn
+          dense
+          flat
+          icon="ion-close-circle"
+          color="grey"
+          @click="$emit('close')"
+        >
           <q-tooltip>{{ $t('Action.cancel') }}</q-tooltip>
         </q-btn>
       </q-card-actions>
@@ -47,8 +75,8 @@ export default {
   },
   methods: {
     acceptRequest () {
-      let instance = this.$instance()
-      let param = {
+      const instance = this.$instance()
+      const param = {
         groupId: this.group.id,
         request: this.request.request
       }
@@ -60,8 +88,8 @@ export default {
       })
     },
     declineRequest () {
-      let instance = this.$instance()
-      let param = {
+      const instance = this.$instance()
+      const param = {
         groupId: this.group.id,
         request: this.request.request
       }

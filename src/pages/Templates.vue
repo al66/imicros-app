@@ -14,51 +14,130 @@
 
     <!-- panels -->
     <q-tab-panels v-model="tab">
-
       <!-- editor panel -->
-      <q-tab-panel name="editor" class="q-pt-none">
+      <q-tab-panel
+        name="editor"
+        class="q-pt-none"
+      >
         <q-toolbar>
-          <q-chip v-if="objectName">{{ objectName }}</q-chip>
-          <q-chip v-if="!objectName" class="text-white" color="orange">{{ $t('Template.editor.new.file') }}</q-chip>
+          <q-chip v-if="objectName">
+            {{ objectName }}
+          </q-chip>
+          <q-chip
+            v-if="!objectName"
+            class="text-white"
+            color="orange"
+          >
+            {{ $t('Template.editor.new.file') }}
+          </q-chip>
           <q-space />
-          <q-btn round no-caps size="sm" color="grey" icon="ion-play" class="q-mr-sm" @click="()=>{tab = 'test'}">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="grey"
+            icon="ion-play"
+            class="q-mr-sm"
+            @click="()=>{tab = 'test'}"
+          >
             <q-tooltip>{{ $t('Action.render') }}</q-tooltip>
           </q-btn>
           <q-space />
-          <q-btn round no-caps size="sm" color="primary" icon="assignment" class="q-mr-sm" />
-          <q-btn round no-caps size="sm" color="primary" icon="ion-add" class="q-mr-sm" @click="newTemplate()">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="assignment"
+            class="q-mr-sm"
+          />
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-add"
+            class="q-mr-sm"
+            @click="newTemplate()"
+          >
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-open" class="q-mr-sm" @click="()=>{ files.select = !files.select }">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-open"
+            class="q-mr-sm"
+            @click="()=>{ files.select = !files.select }"
+          >
             <q-tooltip>{{ $t('Action.open') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-save" class="q-mr-sm" @click="saveTemplate()">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-save"
+            class="q-mr-sm"
+            @click="saveTemplate()"
+          >
             <q-tooltip>{{ $t('Action.save') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-copy" class="q-mr-sm" :disable="!objectName" @click="copyTemplate">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-copy"
+            class="q-mr-sm"
+            :disable="!objectName"
+            @click="copyTemplate"
+          >
             <q-tooltip>{{ $t('Action.copy') }}</q-tooltip>
           </q-btn>
         </q-toolbar>
-        <q-splitter v-model="splitter.templates" :limits="[70, 100]">
+        <q-splitter
+          v-model="splitter.templates"
+          :limits="[70, 100]"
+        >
           <template v-slot:before>
             <q-scroll-area style="height: calc(100vh - 50px - 120px);">
-              <editor v-model="edit.template" @init="editorInit" :lang="edit.lang" theme="monokai" width="100%"></editor>
+              <editor
+                v-model="edit.template"
+                @init="editorInit"
+                :lang="edit.lang"
+                theme="monokai"
+                width="100%"
+              />
             </q-scroll-area>
           </template>
 
           <template v-slot:separator>
-            <q-avatar color="primary" text-color="white" size="30px" icon="drag_indicator" />
+            <q-avatar
+              color="primary"
+              text-color="white"
+              size="30px"
+              icon="drag_indicator"
+            />
           </template>
 
           <template v-slot:after>
             <q-scroll-area style="height: calc(100vh - 50px - 120px;">
               <q-card>
-                <q-card-section align="center" class="bg-grey text-white q-ma-xs q-pa-xs">
+                <q-card-section
+                  align="center"
+                  class="bg-grey text-white q-ma-xs q-pa-xs"
+                >
                   <q-item-label>{{ $t('Template.editor.settings.dialog.title') }}</q-item-label>
                 </q-card-section>
                 <q-card-section align="left">
-                  <q-select v-model="edit.lang" :options="edit.langOptions" dense options-dense>
-                  </q-select>
+                  <q-select
+                    v-model="edit.lang"
+                    :options="edit.langOptions"
+                    dense
+                    options-dense
+                  />
                 </q-card-section>
               </q-card>
             </q-scroll-area>
@@ -67,59 +146,160 @@
       </q-tab-panel>
 
       <!-- test panel -->
-      <q-tab-panel name="test" class="q-pt-none">
+      <q-tab-panel
+        name="test"
+        class="q-pt-none"
+      >
         <q-toolbar>
-          <q-chip v-if="objectNameTest">{{ objectNameTest }}</q-chip>
-          <q-chip v-if="!objectNameTest" class="text-white" color="orange">{{ $t('Template.editor.new.file') }}</q-chip>
+          <q-chip v-if="objectNameTest">
+            {{ objectNameTest }}
+          </q-chip>
+          <q-chip
+            v-if="!objectNameTest"
+            class="text-white"
+            color="orange"
+          >
+            {{ $t('Template.editor.new.file') }}
+          </q-chip>
           <q-space />
-          <q-btn round no-caps size="sm" color="grey" icon="edit" class="q-mr-sm" @click="()=>{tab = 'editor'}">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="grey"
+            icon="edit"
+            class="q-mr-sm"
+            @click="()=>{tab = 'editor'}"
+          >
             <q-tooltip>{{ $t('Action.edit') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="grey" icon="ion-play" class="q-mr-sm" @click="testTemplate()">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="grey"
+            icon="ion-play"
+            class="q-mr-sm"
+            @click="testTemplate()"
+          >
             <q-tooltip>{{ $t('Action.render') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="grey" :icon="preview ? 'ion-eye-off' : 'ion-eye'" v-if="edit.lang === 'html'" @click="()=>{ preview = !preview }">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="grey"
+            :icon="preview ? 'ion-eye-off' : 'ion-eye'"
+            v-if="edit.lang === 'html'"
+            @click="()=>{ preview = !preview }"
+          >
             <q-tooltip>{{ preview ? $t('Action.showHtml') : $t('Action.showPreview') }}</q-tooltip>
           </q-btn>
           <q-space />
-          <q-btn round no-caps size="sm" color="primary" icon="ion-add" class="q-mr-sm" @click="newTest()">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-add"
+            class="q-mr-sm"
+            @click="newTest()"
+          >
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-open" class="q-mr-sm" @click="()=>{ files.select = !files.select }">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-open"
+            class="q-mr-sm"
+            @click="()=>{ files.select = !files.select }"
+          >
             <q-tooltip>{{ $t('Action.open') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-save" class="q-mr-sm" @click="saveTest()">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-save"
+            class="q-mr-sm"
+            @click="saveTest()"
+          >
             <q-tooltip>{{ $t('Action.save') }}</q-tooltip>
           </q-btn>
-          <q-btn round no-caps size="sm" color="primary" icon="ion-copy" class="q-mr-sm" :disable="!objectName" @click="copyTest">
+          <q-btn
+            round
+            no-caps
+            size="sm"
+            color="primary"
+            icon="ion-copy"
+            class="q-mr-sm"
+            :disable="!objectName"
+            @click="copyTest"
+          >
             <q-tooltip>{{ $t('Action.copy') }}</q-tooltip>
           </q-btn>
         </q-toolbar>
-        <q-splitter v-model="splitter.testdata" :limits="[10, 80]">
+        <q-splitter
+          v-model="splitter.testdata"
+          :limits="[10, 80]"
+        >
           <template v-slot:before>
             <div>Table</div>
           </template>
           <template v-slot:separator>
-            <q-avatar color="primary" text-color="white" size="30px" icon="drag_indicator" />
+            <q-avatar
+              color="primary"
+              text-color="white"
+              size="30px"
+              icon="drag_indicator"
+            />
           </template>
           <template v-slot:after>
-            <q-splitter v-model="splitter.testresult" :limits="[10, 90]">
+            <q-splitter
+              v-model="splitter.testresult"
+              :limits="[10, 90]"
+            >
               <template v-slot:before>
                 <div class="row">
                   <div class="col">
-                    <editor v-model="test.data" @init="editorInit" lang="json" theme="monokai" width="100%"></editor>
+                    <editor
+                      v-model="test.data"
+                      @init="editorInit"
+                      lang="json"
+                      theme="monokai"
+                      width="100%"
+                    />
                     <div>{{ template }}</div>
                   </div>
                 </div>
               </template>
               <template v-slot:separator>
-                <q-avatar color="primary" text-color="white" size="30px" icon="drag_indicator" />
+                <q-avatar
+                  color="primary"
+                  text-color="white"
+                  size="30px"
+                  icon="drag_indicator"
+                />
               </template>
               <template v-slot:after>
                 <div class="row">
                   <div class="col">
-                    <editor v-model="test.result" v-if="edit.lang !== 'html' || !preview" @init="editorInit" :lang="edit.lang" theme="monokai" width="100%"></editor>
-                    <div class="q-ml-lg" v-html="htmlResult" v-if="edit.lang === 'html' && preview"></div>
+                    <editor
+                      v-model="test.result"
+                      v-if="edit.lang !== 'html' || !preview"
+                      @init="editorInit"
+                      :lang="edit.lang"
+                      theme="monokai"
+                      width="100%"
+                    />
+                    <div
+                      class="q-ml-lg"
+                      v-html="htmlResult"
+                      v-if="edit.lang === 'html' && preview"
+                    />
                   </div>
                 </div>
               </template>
@@ -242,7 +422,7 @@ export default {
       this.objectName = null
     },
     loadTemplate (objectName) {
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.get['Content-Type'] = 'application/octet-stream'
       instance.get('/#file/' + objectName, {
@@ -267,12 +447,12 @@ export default {
         return
       }
 
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.put['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.put['x-imicros-filename'] = this.objectName
       instance.defaults.headers.put['Content-Type'] = 'application/octet-stream'
       try {
-        let template = this.edit.template
+        const template = this.edit.template
         instance.put('/api/upload', template).then((response) => {
           console.log('File ' + this.objectName + ' saved')
           // trigger refresh file lists of dialogs
@@ -301,7 +481,7 @@ export default {
       this.objectNameTest = null
     },
     loadTest (objectName) {
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.get['Content-Type'] = 'application/octet-stream'
       instance.get('/#file/' + objectName, {
@@ -331,12 +511,12 @@ export default {
         return
       }
 
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.defaults.headers.put['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.put['x-imicros-filename'] = this.objectNameTest
       instance.defaults.headers.put['Content-Type'] = 'application/octet-stream'
       try {
-        let test = this.testObject
+        const test = this.testObject
         instance.put('/api/upload', test).then((response) => {
           console.log('File ' + this.objectNameTest + ' saved')
           // trigger refresh file lists of dialogs

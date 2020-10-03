@@ -19,11 +19,11 @@ Vue.prototype.$axios = axios
 // Set interceptor function for later use on instances
 export default (/* { app } */) => {
   Vue.prototype.$instance = () => {
-    let instance = Vue.prototype.$axios.create()
+    const instance = Vue.prototype.$axios.create()
 
     instance.interceptors.request.use((config) => {
       // Replace service names
-      for (let service in services) {
+      for (const service in services) {
         if (Object.prototype.hasOwnProperty.call(services, service)) {
           config.url = config.url.replace('#' + service, services[service])
         }

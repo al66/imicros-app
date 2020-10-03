@@ -10,6 +10,8 @@
  * Boot files are your "main.js"
  **/
 
+import 'quasar/dist/quasar.ie.polyfills.js'
+
 
 
 import '@quasar/extras/ionicons-v4/ionicons-v4.css'
@@ -255,22 +257,29 @@ console.info('[Quasar] Running SPA.')
 
 
 
+const publicPath = ``
+
+
 async function start () {
   const { app, store, router } = await createApp()
 
   
 
   
-  let routeUnchanged = true
+  let hasRedirected = false
   const redirect = url => {
-    routeUnchanged = false
-    window.location.href = url
+    hasRedirected = true
+    const normalized = Object(url) === url
+      ? router.resolve(url).route.fullPath
+      : url
+
+    window.location.href = normalized
   }
 
   const urlPath = window.location.href.replace(window.location.origin, '')
   const bootFiles = [qboot_Booti18n,qboot_Bootaxios]
 
-  for (let i = 0; routeUnchanged === true && i < bootFiles.length; i++) {
+  for (let i = 0; hasRedirected === false && i < bootFiles.length; i++) {
     if (typeof bootFiles[i] !== 'function') {
       continue
     }
@@ -283,7 +292,8 @@ async function start () {
         Vue,
         ssrContext: null,
         redirect,
-        urlPath
+        urlPath,
+        publicPath
       })
     }
     catch (err) {
@@ -297,7 +307,7 @@ async function start () {
     }
   }
 
-  if (routeUnchanged === false) {
+  if (hasRedirected === true) {
     return
   }
   

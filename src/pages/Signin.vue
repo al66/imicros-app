@@ -1,25 +1,65 @@
 <template>
   <q-page class="flex flex-center">
     <q-card class="signinForm">
-      <q-card-section align="center" class="bg-black text-orange q-pa-sm q-mb-sm">
-        <div class="text-h6">{{ $t('Signin.title') }}</div>
+      <q-card-section
+        align="center"
+        class="bg-black text-orange q-pa-sm q-mb-sm"
+      >
+        <div class="text-h6">
+          {{ $t('Signin.title') }}
+        </div>
       </q-card-section>
       <q-card-section>
         <div class="q-pa-md">
-          <div class="q-gutter-y-md column" style="max-width: 800px">
-            <q-input v-model="email" filled dense placeholder="max.mustermann@test.de" :hint="$t('Signin.email.label')" />
-            <q-input v-model="password" filled dense type="password" :hint="$t('Signin.password.label')"  />
+          <div
+            class="q-gutter-y-md column"
+            style="max-width: 800px"
+          >
+            <q-input
+              v-model="email"
+              filled
+              dense
+              placeholder="max.mustermann@test.de"
+              :hint="$t('Signin.email.label')"
+            />
+            <q-input
+              v-model="password"
+              filled
+              dense
+              type="password"
+              :hint="$t('Signin.password.label')"
+            />
           </div>
         </div>
-        <div class="q-pa-none" full-width>
-          <q-btn flat class="full-width" color="primary" icon="ion-log-in" :label="$t('Signin.button.submit')" @click="signin()" />
+        <div
+          class="q-pa-none"
+          full-width
+        >
+          <q-btn
+            flat
+            class="full-width"
+            color="primary"
+            icon="ion-log-in"
+            :label="$t('Signin.button.submit')"
+            @click="signin()"
+          />
         </div>
       </q-card-section>
-      <q-separator inset/>
+      <q-separator inset />
       <q-card-section>
         <div class="q-pa-sm">
-          <div class="col"  align="center">
-            <q-btn flat no-caps class="full-width" color="secondary" label="Already an account ?" to='/login' />
+          <div
+            class="col"
+            align="center"
+          >
+            <q-btn
+              flat
+              no-caps
+              class="full-width"
+              color="secondary"
+              label="Already an account ?"
+              to="/login"
+            />
           </div>
         </div>
       </q-card-section>
@@ -43,13 +83,13 @@ export default {
     },
     signin () {
       var this_ = this
-      let user = {
+      const user = {
         email: this.email,
         password: this.password
       }
-      let instance = this.$instance(this)
+      const instance = this.$instance(this)
       // reset header
-      instance.defaults.headers.common['Authorization'] = null
+      instance.defaults.headers.common.Authorization = null
       // call create user
       instance.post('/#auth/create', user).then(function (response) {
         if (response.data && response.data.id) {
@@ -59,8 +99,8 @@ export default {
               this_.$store.commit('login', response.data.user)
               this_.$store.commit('syncAuthenticated', true)
               this_.$store.commit('setToken', response.data.token)
-              this_.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
-              instance.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
+              this_.$axios.defaults.headers.common.Authorization = 'Bearer ' + response.data.token
+              instance.defaults.headers.common.Authorization = 'Bearer ' + response.data.token
               // call confirmation mail request
               instance.post('/#auth/requestConfirmationMail', {}).then(function (response) {
                 if (response.data && response.data.sent) {

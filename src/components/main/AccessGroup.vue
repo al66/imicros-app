@@ -1,9 +1,23 @@
 <template>
   <q-list>
-    <q-item dense clickable v-for='(group) in groups' v-bind:key='group.id' @click="requestAccess(group)" :disable="access.group.id === group.id">
+    <q-item
+      dense
+      clickable
+      v-for="(group) in groups"
+      :key="group.id"
+      @click="requestAccess(group)"
+      :disable="access.group.id === group.id"
+    >
       <q-item-section>
-        <q-item-label v-if="access.group.id !== group.id">{{ group.name }}</q-item-label>
-        <q-chip icon="ion-at" v-if="access.group.id === group.id">{{ group.name }}</q-chip>
+        <q-item-label v-if="access.group.id !== group.id">
+          {{ group.name }}
+        </q-item-label>
+        <q-chip
+          icon="ion-at"
+          v-if="access.group.id === group.id"
+        >
+          {{ group.name }}
+        </q-chip>
       </q-item-section>
     </q-item>
   </q-list>
@@ -37,13 +51,13 @@ import { mapGetters } from 'vuex'
   methods: {
     getGroups () {
       // get groups
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.get('/#groups/list').then((response) => {
         if (response.data) {
           this.groups = []
           if (Array.isArray(response.data)) {
             for (let i = 0; i < response.data.length; i++) {
-              let group = response.data[i]
+              const group = response.data[i]
               if (group.relation === 'MEMBER_OF' && !group.hide) this.groups.push(group)
             }
           }
@@ -54,11 +68,11 @@ import { mapGetters } from 'vuex'
     },
     requestAccess (group) {
       //
-      let this_ = this
-      let params = {
+      const this_ = this
+      const params = {
         forGroupId: group.id
       }
-      let instance = this.$instance()
+      const instance = this.$instance()
       instance.post('/#acl/requestAccess', params).then((response) => {
         if (response.data && response.data.token) {
           this_.$store.commit('setAccess', {
