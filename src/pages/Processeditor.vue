@@ -12,124 +12,63 @@
         {{ $t('Process.editor.new.file') }}
       </q-chip>
       <q-space />
-      <q-btn
-        round
-        flat
-        no-caps
-        size="sm"
-        color="grey"
+      <toolbar-btn
+        sub
         icon="ion-add"
-        class="q-mr-sm"
         @click="zoomOut()"
       />
-      <q-btn
-        round
-        flat
-        no-caps
-        size="sm"
-        color="grey"
+      <toolbar-btn
+        sub
         icon="ion-remove"
-        class="q-mr-sm"
         @click="zoomIn()"
       />
-      <q-btn
-        round
-        flat
-        no-caps
-        size="sm"
-        color="grey"
+      <toolbar-btn
+        sub
         icon="ion-code"
-        class="q-mr-lg"
         @click="zoomFit()"
       />
-      <q-btn
-        round
-        flat
-        no-caps
-        size="sm"
-        color="grey"
-        :icon="editMode ? 'ion-eye' : 'ion-create'"
-        class="q-mr-lg"
-        @click="toggleEdit()"
+      <toolbar-btn
+        sub
+        icon="ion-map"
+        @click="toggleMinimap()"
       />
-      <q-btn
-        :disable="!editMode"
-        round
-        flat
-        no-caps
-        size="sm"
-        color="grey"
+      <q-space />
+      <toolbar-btn
+        sub
         icon="ion-undo"
-        class="q-mr-sm"
         @click="undo()"
       />
-      <q-btn
-        :disable="!editMode"
-        round
-        flat
-        no-caps
-        size="sm"
-        color="grey"
+      <toolbar-btn
+        sub
         icon="ion-redo"
-        class="q-mr-sm"
         @click="redo()"
       />
-      <q-btn
-        :disable="!editMode"
-        round
-        flat
-        no-caps
-        size="sm"
-        color="grey"
+      <toolbar-btn
+        sub
         :icon="palette.visible ? 'ion-hammer' : 'ion-hammer'"
-        class="q-mr-lg"
         @click="togglePalette()"
       />
       <q-space />
-      <q-btn
-        round
-        no-caps
-        size="sm"
-        color="primary"
+      <toolbar-btn
         icon="ion-add"
-        class="q-mr-sm q-ml-lg"
         @click="newDiagram()"
       />
-      <q-btn
-        round
-        no-caps
-        size="sm"
-        color="primary"
+      <toolbar-btn
         icon="ion-open"
-        class="q-mr-sm"
         @click="()=>{ this.files.select = !this.files.select }"
       />
-      <q-btn
-        round
-        no-caps
-        size="sm"
-        color="primary"
+      <toolbar-btn
         icon="ion-save"
-        class="q-mr-sm"
         @click="saveDiagram()"
       />
-      <q-btn
-        round
-        no-caps
-        size="sm"
-        color="primary"
+      <toolbar-btn
         icon="ion-copy"
-        class="q-mr-sm"
         :disable="!objectName"
         @click="copyDiagram()"
       />
-      <q-btn
-        round
-        no-caps
-        size="sm"
-        color="primary"
+      <toolbar-btn
         :icon="simulation.active ? 'ion-pause' : 'ion-play'"
-        class="q-mr-sm"
+        :disable="!editMode"
         @click="toggleSimulation()"
       />
     </q-toolbar>
@@ -145,12 +84,14 @@
             id="js-canvas"
             style="height: calc(100vh - 50px - 90px;"
           />
+          <!--
           <div
             v-show="!editMode"
             class="modeler js-canvas-viewer bg-white"
             id="js-canvas-viewer"
             style="height: calc(100vh - 50px - 90px;"
           />
+          -->
         </template>
         <template v-slot:separator>
           <q-avatar
@@ -306,22 +247,31 @@
 .djs-palette-toggle {
   display: none;
 }
+/* hide toggler in minimap */
+.djs-minimap .toggle {
+  display: none;
+}
 </style>
 
 <script>
 // vuex store
 import { mapGetters } from 'vuex'
+// toolbar button
+import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 // bpmn-js
 import BpmnModeler from 'bpmn-js/lib/Modeler'
 import diagramXML from 'assets/newDiagram.bpmn'
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
-import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer'
+// import NavigatedViewer from 'bpmn-js/lib/NavigatedViewer'
 // bpmn-js-token-simulation
 import tokenSimulation from 'bpmn-js-token-simulation'
 import 'bpmn-js-token-simulation/assets/css/bpmn-js-token-simulation.css'
 // meta data extensions
 import moddleMetaData from 'assets/bpmnMetaDataExtension.json'
+// mini map
+import minimapModule from 'diagram-js-minimap'
+import 'diagram-js-minimap/assets/diagram-js-minimap.css'
 // components
 import FileSelect from '../components/main/FileSelect.vue'
 import FileSaveAs from '../components/main/FileSaveAs.vue'
@@ -333,7 +283,8 @@ export default {
   name: 'Processeditor',
   components: {
     FileSelect,
-    FileSaveAs
+    FileSaveAs,
+    ToolbarBtn
   },
   data () {
     return {
@@ -356,6 +307,9 @@ export default {
       },
       mode: 'display',
       editMode: true,
+      minimap: {
+        visible: false
+      },
       palette: {
         visible: true
       },
@@ -381,19 +335,25 @@ export default {
         },
         additionalModules: [
           tokenSimulation,
-          propertiesUpdater
+          propertiesUpdater,
+          minimapModule
         ]
       })
     }
+    /*
     if (!this.viewer) {
       // this.viewer = new BpmnModeler.Viewer({
       this.viewer = new NavigatedViewer({
         container: '#js-canvas-viewer',
         moddleExtensions: {
           fe: moddleMetaData
-        }
+        },
+        additionalModules: [
+          minimapModule
+        ]
       })
     }
+    */
     if (!this.objectName) {
       this.newDiagram()
     } else {
@@ -406,6 +366,16 @@ export default {
   },
   methods: {
     toggleEdit () {
+      /*
+      // stop simulation, if active
+      if (this.editMode) this.stopSimulation()
+      // close minimap to avoid calculation errors of the selected range
+      if (this.minimap.visible) {
+        // const minimap = this.editMode ? this.modeler.get('minimap') : this.viewer.get('minimap')
+        const minimap = this.modeler.get('minimap')
+        minimap.close()
+        this.minimap.visible = false
+      }
       // synchronize selected element
       if (this.selected.element) {
         const elementRegistry = this.editMode ? this.viewer.get('elementRegistry') : this.modeler.get('elementRegistry')
@@ -414,6 +384,13 @@ export default {
         selection.select(current)
       }
       this.editMode = !this.editMode
+      */
+    },
+    toggleMinimap () {
+      // const minimap = this.editMode ? this.modeler.get('minimap') : this.viewer.get('minimap')
+      const minimap = this.modeler.get('minimap')
+      this.minimap.visible = !this.minimap.visible
+      this.minimap.visible ? minimap.open() : minimap.close()
     },
     undo () {
       this.modeler.get('commandStack').undo()
@@ -570,9 +547,10 @@ export default {
         }
       })
       eventBus.on('tokenSimulation.toggleMode', (e) => {
-        console.log(e)
+        // console.log(e)
       })
       // viewer events
+      /*
       const eventBusViewer = this.viewer.get('eventBus')
       eventBusViewer.on('element.click', (e) => {
         this.refreshSelected(e.element)
@@ -585,6 +563,7 @@ export default {
           this.initSelected()
         }
       })
+      */
     },
     async newDiagram () {
       this.stopSimulation()
@@ -606,7 +585,7 @@ export default {
       }).then(async (response) => {
         try {
           await this.modeler.importXML(response.data)
-          await this.viewer.importXML(response.data)
+          // await this.viewer.importXML(response.data)
           this.objectName = objectName
           this.zoomFit()
         } catch (err) {
@@ -633,7 +612,7 @@ export default {
           // trigger refresh file lists of dialogs
           this.files.refresh += 1
           // trigger refresh of viewer
-          this.viewer.importXML(xml)
+          // this.viewer.importXML(xml)
         }).catch((err) => {
           console.error('Failed to save file ' + this.objectName, err)
         })
@@ -651,15 +630,18 @@ export default {
       this.objectName = null
     },
     zoomIn () {
-      this.editMode ? this.modeler.get('zoomScroll').zoom(-0.5) : this.viewer.get('zoomScroll').zoom(-0.5)
+      // this.editMode ? this.modeler.get('zoomScroll').zoom(-0.5) : this.viewer.get('zoomScroll').zoom(-0.5)
+      this.modeler.get('zoomScroll').zoom(-0.5)
       // this.modeler.get('zoomScroll').stepZoom(-1)
     },
     zoomOut () {
-      this.editMode ? this.modeler.get('zoomScroll').zoom(0.5) : this.viewer.get('zoomScroll').zoom(0.5)
+      // this.editMode ? this.modeler.get('zoomScroll').zoom(0.5) : this.viewer.get('zoomScroll').zoom(0.5)
+      this.modeler.get('zoomScroll').zoom(0.5)
       // this.modeler.get('zoomScroll').stepZoom(1)
     },
     zoomFit () {
-      this.editMode ? this.modeler.get('canvas').zoom('fit-viewport') : this.viewer.get('canvas').zoom('fit-viewport')
+      // this.editMode ? this.modeler.get('canvas').zoom('fit-viewport') : this.viewer.get('canvas').zoom('fit-viewport')
+      this.modeler.get('canvas').zoom('fit-viewport')
     }
   }
 }

@@ -24,55 +24,39 @@
             <q-tooltip>{{ $t('Action.addRow') }}</q-tooltip>
           </q-btn>
           -->
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="grey"
-            icon="ion-play"
-            class="q-mr-sm"
+          <toolbar-btn
+            sub
+            icon="ion-code-working"
             @click="()=>{tab = 'test'}"
           >
             <q-tooltip>{{ $t('Action.test') }}</q-tooltip>
-          </q-btn>
+          </toolbar-btn>
           <q-space />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          <toolbar-btn
             icon="ion-add"
-            class="q-mr-sm q-ml-lg"
             @click="newRuleset()"
-          />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          >
+            <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-open"
-            class="q-mr-sm"
             @click="()=>{ this.files.select = !this.files.select }"
-          />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          >
+            <q-tooltip>{{ $t('Action.open') }}</q-tooltip>
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-save"
-            class="q-mr-sm"
             @click="saveRuleset()"
-          />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          >
+            <q-tooltip>{{ $t('Action.save') }}</q-tooltip>
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-copy"
-            class="q-mr-sm"
             :disable="!objectName"
             @click="copyRuleset()"
-          />
+          >
+            <q-tooltip>{{ $t('Action.copy') }}</q-tooltip>
+          </toolbar-btn>
         </q-toolbar>
         <q-splitter
           v-model="splitter.raw"
@@ -134,16 +118,13 @@
                       <q-chip size="md">
                         {{ 'Input' }}
                       </q-chip>
-                      <q-btn
-                        round
-                        no-caps
-                        flat
-                        size="sm"
+                      <toolbar-btn
+                        sub
                         icon="ion-add"
                         @click="addColumn(true)"
                       >
                         <q-tooltip>{{ $t('Action.addColumn') }}</q-tooltip>
-                      </q-btn>
+                      </toolbar-btn>
                     </q-th>
                     <q-th
                       :colspan="table.outputColumns.length"
@@ -153,16 +134,13 @@
                       <q-chip size="md">
                         {{ 'Output' }}
                       </q-chip>
-                      <q-btn
-                        round
-                        no-caps
-                        flat
-                        size="sm"
+                      <toolbar-btn
+                        sub
                         icon="ion-add"
                         @click="addColumn(false)"
                       >
                         <q-tooltip>{{ $t('Action.addColumn') }}</q-tooltip>
-                      </q-btn>
+                      </toolbar-btn>
                     </q-th>
                     <q-th
                       rowspan="6"
@@ -184,7 +162,7 @@
                       :key="col.name"
                       :props="props"
                       :class="$q.dark.isActive ? '' : ( col.input ? 'bg-blue-1 text-black' : 'bg-purple-1 text-black' )"
-                      @contextmenu.native="showContextMenu(col.name,'col')"
+                      @contextmenu.native="showContextMenu(col)"
                       @mouseleave.native="mouseLeave()"
                     >
                       <div>{{ col.label }}</div>
@@ -210,7 +188,7 @@
                       :key="col.name"
                       :props="props"
                       class="text-italic text-grey"
-                      @contextmenu.native="showContextMenu(col.name,'col')"
+                      @contextmenu.native="showContextMenu(col)"
                       @mouseleave.native="mouseLeave()"
                     >
                       <div>{{ col.source }}</div>
@@ -240,7 +218,7 @@
                       :key="col.name"
                       :props="props"
                       class="text-italic text-grey"
-                      @contextmenu.native="showContextMenu(col.name,'col')"
+                      @contextmenu.native="showContextMenu(col)"
                       @mouseleave.native="mouseLeave()"
                     >
                       <div>{{ col.default }}</div>
@@ -270,7 +248,7 @@
                       :key="col.name"
                       :props="props"
                       class="text-italic text-grey"
-                      @contextmenu.native="showContextMenu(col.name,'col')"
+                      @contextmenu.native="showContextMenu(col)"
                       @mouseleave.native="mouseLeave()"
                     >
                       <div v-if="col.isArray">
@@ -344,7 +322,7 @@
                 <template v-slot:body="props">
                   <q-tr
                     :props="props"
-                    @contextmenu.native="showContextMenu(props.rowIndex,'row')"
+                    @contextmenu.native="showContextMenu(props)"
                     @mouseleave.native="mouseLeave()"
                   >
                     <q-td
@@ -396,19 +374,14 @@
                 </template>
               </q-table>
               <q-toolbar @mouseenter.native="mouseLeave(true)">
-                <q-btn
-                  round
-                  flat
-                  no-caps
-                  size="sm"
-                  color="grey"
-                  icon="ion-add"
-                  class="q-mr-sm"
+                <toolbar-btn
                   v-if="table.pagination.page >= pages"
+                  sub
+                  icon="ion-add"
                   @click="addRow()"
                 >
                   <q-tooltip>{{ $t('Action.addRow') }}</q-tooltip>
-                </q-btn>
+                </toolbar-btn>
                 <q-space />
                 <q-pagination
                   v-model="table.pagination.page"
@@ -470,74 +443,46 @@
             {{ $t('Template.editor.new.file') }}
           </q-chip>
           <q-space />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="grey"
+          <toolbar-btn
+            sub
             icon="edit"
-            class="q-mr-sm"
             @click="()=>{tab = 'editor'}"
           >
             <q-tooltip>{{ $t('Action.edit') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="grey"
+          </toolbar-btn>
+          <toolbar-btn
+            sub
             icon="ion-play"
-            class="q-mr-sm"
             @click="testRuleset()"
           >
             <q-tooltip>{{ $t('Action.test') }}</q-tooltip>
-          </q-btn>
+          </toolbar-btn>
           <q-space />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          <toolbar-btn
             icon="ion-add"
-            class="q-mr-sm"
             @click="newTest()"
           >
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-open"
-            class="q-mr-sm"
             @click="()=>{ files.select = !files.select }"
           >
             <q-tooltip>{{ $t('Action.open') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-save"
-            class="q-mr-sm"
             @click="saveTest()"
           >
             <q-tooltip>{{ $t('Action.save') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-copy"
-            class="q-mr-sm"
             :disable="!objectNameTest"
-            @click="copyTest"
+            @click="copyTest()"
           >
             <q-tooltip>{{ $t('Action.copy') }}</q-tooltip>
-          </q-btn>
+          </toolbar-btn>
         </q-toolbar>
         <q-splitter
           v-model="splitter.testdata"
@@ -547,15 +492,23 @@
             <q-list>
               <q-slide-item
                 v-for="(test, index) in testObject"
+                left-color="grey-1"
+                right-color="grey-1"
                 :key="index"
                 @left="testItemAdd(index, ...arguments)"
                 @right="testItemDelete(index, ...arguments)"
               >
                 <template v-slot:left>
-                  <q-icon name="add" />
+                  <q-icon
+                    color="green"
+                    name="add"
+                  />
                 </template>
                 <template v-slot:right>
-                  <q-icon name="delete" />
+                  <q-icon
+                    color="red"
+                    name="delete"
+                  />
                 </template>
                 <q-item
                   dense
@@ -610,8 +563,8 @@
                   <div class="col">
                     <editor
                       v-model="testObject[testIndex].resultJson"
-                      @init="editorInit"
-                      :lang="edit.lang"
+                      @init="(editor) => editorInit(editor,true)"
+                      lang="json"
                       theme="monokai"
                       width="100%"
                     />
@@ -647,45 +600,60 @@
     >
       <q-list dense>
         <q-item v-close-popup>
-          <q-btn
-            round
-            flat
-            no-caps
-            size="sm"
-            color="grey"
-            icon="ion-add"
-            class="q-mr-sm"
+          <toolbar-btn
             v-if="contextMenu.type === 'row'"
+            sub
+            icon="ion-add"
             @click="addRow(contextMenu.context)"
           >
             <q-tooltip>{{ $t('Action.addRow') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            flat
-            no-caps
-            size="sm"
+          </toolbar-btn>
+          <toolbar-btn
+            v-if="contextMenu.type === 'row'"
+            sub
             color="red"
             icon="ion-remove"
-            class="q-mr-sm"
-            v-if="contextMenu.type === 'row'"
-            @click="deleteRow(contextMenu.context)"
+            @click="removeRow(contextMenu.context)"
           >
             <q-tooltip>{{ $t('Action.removeRow') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            flat
-            no-caps
-            size="sm"
+          </toolbar-btn>
+          <toolbar-btn
+            v-if="contextMenu.type === 'row'"
+            sub
+            icon="ion-arrow-dropdown"
+            @click="moveRowDown(contextMenu.context)"
+          />
+          <toolbar-btn
+            v-if="contextMenu.type === 'row'"
+            sub
+            icon="ion-arrow-dropup"
+            @click="moveRowUp(contextMenu.context)"
+          />
+          <toolbar-btn
+            v-if="contextMenu.type === 'col'"
+            sub
             color="red"
             icon="ion-remove"
-            class="q-mr-sm"
-            v-if="contextMenu.type === 'col'"
-            @click="deleteColumn(contextMenu.context)"
+            @click="deleteColumn(contextMenu.context, contextMenu.input)"
           >
             <q-tooltip>{{ $t('Action.removeColumn') }}</q-tooltip>
-          </q-btn>
+          </toolbar-btn>
+          <toolbar-btn
+            v-if="contextMenu.type === 'col'"
+            sub
+            icon="ion-arrow-dropleft"
+            @click="moveColumnLeft(contextMenu.context,contextMenu.input)"
+          >
+            <q-tooltip>{{ $t('Action.moveColumnLeft') }}</q-tooltip>
+          </toolbar-btn>
+          <toolbar-btn
+            v-if="contextMenu.type === 'col'"
+            sub
+            icon="ion-arrow-dropright"
+            @click="moveColumnRight(contextMenu.context,contextMenu.input)"
+          >
+            <q-tooltip>{{ $t('Action.moveColumnRight') }}</q-tooltip>
+          </toolbar-btn>
         </q-item>
       </q-list>
     </q-menu>
@@ -715,17 +683,21 @@ import { mapGetters } from 'vuex'
 // components
 import FileSelect from '../components/main/FileSelect.vue'
 import FileSaveAs from '../components/main/FileSaveAs.vue'
+import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 // ace
 import Editor from 'vue2-ace-editor'
 // uuid
 import { v4 as uuid } from 'uuid'
+// lodash
+// const cloneDeep = require('lodash/cloneDeep')
 
 export default {
   name: 'Ruleseteditor',
   components: {
     editor: Editor,
     FileSelect,
-    FileSaveAs
+    FileSaveAs,
+    ToolbarBtn
   },
   data () {
     return {
@@ -772,7 +744,7 @@ export default {
       },
       types: ['string', 'number', 'date', 'time', 'boolean', 'object'],
       splitter: {
-        raw: 70,
+        raw: 100,
         testdata: 30,
         testresult: 50
       },
@@ -821,8 +793,8 @@ export default {
     },
     columns: function () {
       const row = [{ name: 'row', hitpolicy: true }]
-      const input = Array.isArray(this.table.inputColumns) ? this.table.inputColumns.map((e) => { e.input = true; e.align = 'center'; return e }) : []
-      const output = Array.isArray(this.table.outputColumns) ? this.table.outputColumns.map((e) => { e.output = true; e.align = 'center'; return e }) : []
+      const input = Array.isArray(this.table.inputColumns) ? this.table.inputColumns.map((e) => { e.col = true; e.input = true; e.align = 'center'; return e }) : []
+      const output = Array.isArray(this.table.outputColumns) ? this.table.outputColumns.map((e) => { e.col = true; e.output = true; e.align = 'center'; return e }) : []
       const desc = [{ name: 'desc', desc: true }]
       return row.concat(input.concat(output.concat(desc)))
     },
@@ -909,7 +881,7 @@ export default {
     this.newRuleset()
   },
   methods: {
-    editorInit: function (editor) {
+    editorInit: function (editor, readOnly) {
       require('brace/ext/language_tools') // language extension prerequsite...
       require('brace/mode/json')
       require('brace/theme/monokai')
@@ -917,7 +889,7 @@ export default {
         autoScrollEditorIntoView: true,
         maxLines: 'Infinity',
         minLines: 20,
-        readOnly: false
+        readOnly: readOnly || false
       })
     },
     addColumn (input) {
@@ -929,10 +901,28 @@ export default {
         this.table.outputColumns.push(newCol)
       }
     },
-    deleteColumn (name) {
+    deleteColumn (name, input) {
       if (typeof name !== 'string') return
-      if (this.table.inputColumns.length > 1) this.table.inputColumns.splice(this.table.inputColumns.findIndex(item => item.name === name), 1)
-      if (this.table.outputColumns.length > 1) this.table.outputColumns.splice(this.table.outputColumns.findIndex(item => item.name === name), 1)
+      if (input) {
+        if (this.table.inputColumns.length > 1) this.table.inputColumns.splice(this.table.inputColumns.findIndex(item => item.name === name), 1)
+      } else {
+        if (this.table.outputColumns.length > 1) this.table.outputColumns.splice(this.table.outputColumns.findIndex(item => item.name === name), 1)
+      }
+    },
+    moveColumnLeft (name, input) {
+      if (typeof name !== 'string') return
+      const columns = input ? this.table.inputColumns : this.table.outputColumns
+      const oldIndex = columns.findIndex(item => item.name === name)
+      if (oldIndex > 0) this.moveItem(columns, oldIndex, oldIndex - 1)
+    },
+    moveColumnRight (name, input) {
+      if (typeof name !== 'string') return
+      const columns = input ? this.table.inputColumns : this.table.outputColumns
+      const oldIndex = columns.findIndex(item => item.name === name)
+      if (oldIndex >= 0 && oldIndex < columns.length - 1) this.moveItem(columns, oldIndex, oldIndex + 1)
+    },
+    moveItem (arr, oldIndex, newIndex) {
+      arr.splice(newIndex, 0, arr.splice(oldIndex, 1)[0])
     },
     addRow (row) {
       const newRow = { row: uuid() }
@@ -945,6 +935,14 @@ export default {
       this.table.data.splice(row, 1)
       const pages = Math.ceil(this.table.data.length / this.table.pagination.rowsPerPage)
       if (this.table.pagination.page > pages) this.table.pagination.page = pages
+    },
+    moveRowUp (row) {
+      if (typeof row !== 'number' || row < 1) return
+      this.moveItem(this.table.data, row, row - 1)
+    },
+    moveRowDown (row) {
+      if (typeof row !== 'number' || row >= this.table.data.length) return
+      this.moveItem(this.table.data, row, row + 1)
     },
     setJson (json) {
         const input = []
@@ -1074,10 +1072,10 @@ export default {
     copyRuleset () {
       this.objectName = null
     },
-    showContextMenu (context, type) {
-      console.log(context)
-      this.contextMenu.context = context
-      this.contextMenu.type = type
+    showContextMenu (context) {
+      this.contextMenu.context = context.col ? context.name : context.rowIndex
+      this.contextMenu.type = context.col ? 'col' : 'row'
+      this.contextMenu.input = context.input
       this.contextMenu.visible = true
     },
     mouseLeave (table) {

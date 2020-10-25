@@ -166,6 +166,20 @@
         </q-item>
         <q-item
           clickable
+          to="/ruleseteditor"
+        >
+          <q-item-section avatar>
+            <q-icon name="assignment" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Rules</q-item-label>
+            <q-item-label caption>
+              Rules Editor
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item
+          clickable
           to="/templates"
         >
           <q-item-section avatar>
@@ -180,15 +194,15 @@
         </q-item>
         <q-item
           clickable
-          to="/ruleseteditor"
+          to="/externalAccounts"
         >
           <q-item-section avatar>
-            <q-icon name="assignment" />
+            <q-icon name="ion-key" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Rules</q-item-label>
+            <q-item-label>External Accounts</q-item-label>
             <q-item-label caption>
-              Rules Editor
+              External access management
             </q-item-label>
           </q-item-section>
         </q-item>
