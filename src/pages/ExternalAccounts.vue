@@ -313,6 +313,12 @@ export default {
       }
   },
   watch: {
+    access: {
+      deep: true,
+      handler () {
+        this.newAccount()
+      }
+    },
     smtp: {
       deep: true,
       handler (newVal, oldVal) {
@@ -335,6 +341,18 @@ export default {
   methods: {
     async newAccount () {
       this.objectName = null
+      this.step = 1
+      this.type = null
+      this.smtp = {
+        host: '',
+        port: 465,
+        secure: true,
+        requireTLS: true,
+        user: '',
+        pass: '',
+        encrypted: null,
+        isPwd: true
+      }
       this.resetTest()
     },
     loadAccount (objectName) {

@@ -202,7 +202,8 @@
             flat
             multiple
             no-thumbnails
-            :url="this.$axios.defaults.baseUrl + '/api/upload'"
+            :url="uploaderUrl"
+            method="POST"
             :field-name="(file) => getUploadFilename(file)"
             :headers="headers"
             style="max-width: 300px"
@@ -310,6 +311,11 @@ export default {
       headers: function () {
         return [{ name: 'x-imicros-xtoken', value: this.access.token },
                 { name: 'Authorization', value: this.$axios.defaults.headers.common.Authorization }]
+      },
+      uploaderUrl: function () {
+          const url = this.$axios.defaults.baseUrl + '/api/upload'
+          console.log('uploaderUrl', url)
+          return url
       }
   },
   watch: {

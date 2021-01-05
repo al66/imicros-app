@@ -389,6 +389,13 @@ export default {
     }
   },
   watch: {
+    access: {
+      deep: true,
+      handler () {
+        this.newTemplate()
+        this.newTest()
+      }
+    },
     test: {
       deep: true,
       handler () {

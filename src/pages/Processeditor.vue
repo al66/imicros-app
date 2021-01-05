@@ -80,10 +80,18 @@
         <template v-slot:before>
           <div
             v-show="editMode"
-            class="modeler js-canvas bg-white"
+            :class="editorClass"
             id="js-canvas"
             style="height: calc(100vh - 50px - 90px;"
           />
+          <!--
+          <div
+            v-show="editMode"
+            :class="$q.dark.isActive ? 'modeler js-canvas dark' : 'modeler js-canvas'"
+            id="js-canvas"
+            style="height: calc(100vh - 50px - 90px;"
+          />
+          -->
           <!--
           <div
             v-show="!editMode"
@@ -117,6 +125,8 @@
                   v-if="selected.element.id"
                   v-model="selected.element.id"
                   label="element id"
+                  label-color="orange"
+                  stack-label
                   disable
                 />
                 <!-- Service Task -->
@@ -124,6 +134,8 @@
                   <q-select
                     v-model="selected.parameterObject.contextKeys"
                     label="context keys (input preparation step)"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     use-input
                     use-chips
@@ -136,12 +148,16 @@
                   <q-input
                     v-model="selected.parameterObject.ruleset"
                     label="ruleset for preparation of parameters"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
                   />
                   <q-select
                     v-model="selected.parameterObject.paramsKey"
                     label="context key (action parameters)"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     use-input
                     use-chips
@@ -154,12 +170,15 @@
                     v-model="selected.parameterObject.action"
                     label="action"
                     label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
                   />
                   <q-select
                     v-model="selected.parameterObject.resultKey"
                     label="context key (result)"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     use-input
                     use-chips
@@ -174,12 +193,16 @@
                   <q-input
                     v-model="selected.parameterObject.ruleset"
                     label="ruleset"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
                   />
                   <q-select
                     v-model="selected.parameterObject.contextKeys"
                     label="context keys (input)"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     use-input
                     use-chips
@@ -192,6 +215,8 @@
                   <q-input
                     v-model="selected.parameterObject.contextKey"
                     label="context key (result)"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
                   />
@@ -201,12 +226,16 @@
                   <q-input
                     v-model="selected.parameterObject.event"
                     label="internal event"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
                   />
                   <q-select
                     v-model="selected.parameterObject.contextKey"
                     label="context key (payload/metadata)"
+                    label-color="orange"
+                    stack-label
                     :readonly="!editMode"
                     use-input
                     use-chips
@@ -251,6 +280,104 @@
 .djs-minimap .toggle {
   display: none;
 }
+/* editor settings for light mode */
+.djs-container {
+  --element-fill: #fefefe;
+  --element-stroke: #000000;
+}
+/* editor settings for dark mode */
+.dark .djs-container {
+
+  --blue-base-65: #4d90ff;
+  --blue-base-65-opacity-30: rgba(77, 144, 255, 0.3);
+  --blue-darken-48: #005df7;
+  --blue-darken-55: #1a70ff;
+  --blue-lighten-82: #a2c5ff;
+
+  --orange-base-60: #ffa533;
+  --orange-base-60-opacity-30: rgba(255, 165, 51, 0.3);
+  --orange-base-60-opacity-50: rgba(255, 165, 51, 0.5);
+  --orange-lighten-85: #ffddb3;
+
+  --red-base-62: #ff3d3d;
+  --red-base-62-opacity-10: rgba(255, 61, 61, 0.1);
+
+  --silver-darken-94: #efefef;
+
+  --color-000000: #000000;
+  --color-000000-opacity-05: rgba(0, 0, 0, 0.05);
+  --color-000000-opacity-10: rgba(0, 0, 0, 0.1);
+  --color-333333: #333333;
+  --color-666666: #666666;
+  --color-aaaaaa: #aaaaaa;
+  --color-cccccc: #cccccc;
+  --color-cdcdcd: #cdcdcd;
+  --color-dddddd: #dddddd;
+  --color-f6f6f6: #f6f6f6;
+  --color-fafafa: #fafafa;
+  --color-fefefe: #fefefe;
+  --color-ffffff: #ffffff;
+
+  --element-fill: #333333;
+  --element-stroke: #fefefe;
+
+  --bendpoint-fill-color: var(--blue-base-65-opacity-30);
+  --bendpoint-stroke-color: var(--blue-base-65);
+
+  --context-pad-entry-background-color: var(--color-333333);
+  --context-pad-entry-hover-background-color: var(--color-666666);
+
+  --element-dragger-color: var(--blue-base-65);
+  --element-hover-outline-fill-color: var(--blue-darken-48);
+  --element-selected-outline-stroke-color: var(--blue-base-65);
+
+  --lasso-fill-color: var(--color-000000-opacity-05);
+  --lasso-stroke-color: var(--color-000000);
+
+  --palette-entry-color: var(--color-ffffff);
+  --palette-entry-hover-color: var(--blue-darken-48);
+  --palette-entry-selected-color: var(--blue-base-65);
+  --palette-separator-color: var(--color-ffffff);
+  --palette-toggle-hover-background-color: var(--color-666666);
+  --palette-background-color: var(--orange-base-60);
+  --palette-border-color: var(--color-cccccc);
+
+  --popup-body-background-color: var(--color-333333);
+  --popup-header-entry-selected-color: var(--blue-base-65);
+  --popup-header-entry-selected-background-color: var(--color-000000);
+  --popup-header-separator-color: var(--color-666666);
+  --popup-background-color: var(--color-666666);
+  --popup-border-color: var(--color-cccccc);
+
+  --resizer-fill-color: var(--blue-base-65-opacity-30);
+  --resizer-stroke-color: var(--blue-base-65);
+
+  --search-container-background-color: var(--color-fafafa);
+  --search-container-border-color: var(--blue-darken-55);
+  --search-container-box-shadow-color: var(--blue-lighten-82);
+  --search-container-box-shadow-inset-color: var(--color-cdcdcd);
+  --search-input-border-color: var(--color-cccccc);
+  --search-result-border-color: var(--color-aaaaaa);
+  --search-result-highlight-color: var(--color-000000);
+  --search-result-selected-color: var(--blue-base-65-opacity-30);
+
+  --shape-attach-allowed-stroke-color: var(--blue-base-65);
+  --shape-connect-allowed-fill-color: var(--color-000000-opacity-05);
+  --shape-drop-allowed-fill-color: var(--color-000000-opacity-05);
+  --shape-drop-not-allowed-fill-color: var(--red-base-62-opacity-10);
+  --shape-resize-preview-stroke-color: var(--blue-base-65);
+
+  --snap-line-stroke-color: var(--blue-base-65-opacity-30);
+
+  --space-tool-crosshair-stroke-color: var(--color-000000);
+
+  --tooltip-error-background-color: var(--red-base-62-opacity-10);
+  --tooltip-error-border-color: var(--red-base-62);
+  --tooltip-error-color: var(--red-base-62);
+}
+.dark .djs-direct-editing-content, .dark .djs-direct-editing-parent {
+  background: var(--color-000000) !important;
+}
 </style>
 
 <script>
@@ -260,6 +387,7 @@ import { mapGetters } from 'vuex'
 import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 // bpmn-js
 import BpmnModeler from 'bpmn-js/lib/Modeler'
+// import BpmnRenderer from 'bpmn-js/lib/draw/BpmnRenderer'
 import diagramXML from 'assets/newDiagram.bpmn'
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
@@ -315,45 +443,38 @@ export default {
       },
       simulation: {
         active: false
+      },
+      modelerSettings: {
+
       }
     }
   },
   computed: {
       ...mapGetters({
           access: 'access'
-      })
+      }),
+      editorClass () {
+        return this.$q.dark.isActive ? 'modeler js-canvas dark' : 'modeler js-canvas'
+      }
+  },
+  watch: {
+    access: {
+      deep: true,
+      handler () {
+        this.newDiagram()
+      }
+    },
+    '$q.dark.isActive' (val) {
+      console.log(val ? 'On dark mode' : 'On light mode')
+    }
   },
   created () {
   },
   mounted () {
     // TODO: restore last state
     if (!this.modeler) {
-      this.modeler = new BpmnModeler({
-        container: '#js-canvas',
-        moddleExtensions: {
-          fe: moddleMetaData
-        },
-        additionalModules: [
-          tokenSimulation,
-          propertiesUpdater,
-          minimapModule
-        ]
-      })
+      this.initModeler({ opts: { defaultFillColor: 'var(--element-fill)', defaultStrokeColor: 'var(--element-stroke)' } })
     }
-    /*
-    if (!this.viewer) {
-      // this.viewer = new BpmnModeler.Viewer({
-      this.viewer = new NavigatedViewer({
-        container: '#js-canvas-viewer',
-        moddleExtensions: {
-          fe: moddleMetaData
-        },
-        additionalModules: [
-          minimapModule
-        ]
-      })
-    }
-    */
     if (!this.objectName) {
       this.newDiagram()
     } else {
@@ -365,6 +486,20 @@ export default {
     // TODO store last state
   },
   methods: {
+    initModeler ({ opts }) {
+      this.modeler = new BpmnModeler({
+        container: '#js-canvas',
+        moddleExtensions: {
+          fe: moddleMetaData
+        },
+        bpmnRenderer: opts,
+        additionalModules: [
+          tokenSimulation,
+          propertiesUpdater,
+          minimapModule
+        ]
+      })
+    },
     toggleEdit () {
       /*
       // stop simulation, if active

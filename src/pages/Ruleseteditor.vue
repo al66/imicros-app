@@ -857,6 +857,13 @@ export default {
     }
   },
   watch: {
+    access: {
+      deep: true,
+      handler () {
+        this.newRuleset()
+        this.newTest()
+      }
+    },
     ruleset: function () {
       this.raw = this.ruleset
     }/*,

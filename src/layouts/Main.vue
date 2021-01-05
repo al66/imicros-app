@@ -1,7 +1,11 @@
 <template>
-  <q-layout view="hHh lpr fFf">
-    <q-header elevated>
-      <q-toolbar class="bg-black text-white">
+  <q-layout
+    view="hHh lpr fFf"
+  >
+    <q-header>
+      <q-toolbar
+        class="bg-black text-white"
+      >
         <q-btn
           flat
           dense
@@ -194,6 +198,20 @@
         </q-item>
         <q-item
           clickable
+          to="/processmonitor"
+        >
+          <q-item-section avatar>
+            <q-icon name="ion-pulse" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Processes</q-item-label>
+            <q-item-label caption>
+              Process Monitor
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item
+          clickable
           to="/externalAccounts"
         >
           <q-item-section avatar>
@@ -206,6 +224,11 @@
             </q-item-label>
           </q-item-section>
         </q-item>
+        <div v-if="access.group.core">
+          <q-item-label header>
+            Administration
+          </q-item-label>
+        </div>
         <q-item-label header>
           Essential Links
         </q-item-label>

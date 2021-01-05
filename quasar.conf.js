@@ -86,7 +86,8 @@ module.exports = function (ctx) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-            baseUrl: JSON.stringify('http://localhost:8080')
+            //baseUrl: JSON.stringify('http://localhost:8080')
+            baseUrl: 'http://localhost:8080'
             // baseUrl: JSON.stringify('http://192.168.2.124/api')
           },
       scopeHoisting: true,
