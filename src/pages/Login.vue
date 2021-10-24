@@ -126,6 +126,18 @@ export default {
       user: 'user'
     })
   },
+  mounted () {
+    if (this.$route.query && this.$route.query.confirmed) {
+      if (this.$route.query.email) this.email = this.$route.query.email
+      this.$q.notify({
+        message: this.$t('Info.success.confirmed'),
+        color: 'primary',
+        actions: [
+          { icon: 'ion-close-circle', color: 'white', handler: () => {} }
+        ]
+      })
+    }
+  },
   methods: {
     isAuthenticated () {
       return this.$store.getters.isAuthenticated
@@ -136,7 +148,7 @@ export default {
       this.$store.commit('syncAuthenticated', false)
       this.$store.commit('logout')
       // login parameter
-      var this_ = this
+      const this_ = this
       const user = {
         email: this.email,
         password: this.password

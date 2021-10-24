@@ -58,7 +58,7 @@ export default {
       this.$router.push('/logout')
     },
     requestConfirmationMail () {
-      var this_ = this
+      const this_ = this
       const instance = this_.$instance()
       instance.defaults.headers.common.Authorization = 'Bearer ' + this.$store.getters.token
       // call login

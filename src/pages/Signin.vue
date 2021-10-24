@@ -77,12 +77,17 @@ export default {
       response: null
     }
   },
+  created () {
+    if (this.$route.query && this.$route.query.token) {
+      this.confirm(this.$route.query.token)
+    }
+  },
   methods: {
     isAuthenticated () {
       return this.$store.getters.isAuthenticated
     },
     signin () {
-      var this_ = this
+      const this_ = this
       const user = {
         email: this.email,
         password: this.password
@@ -120,6 +125,31 @@ export default {
               })
             }
           })
+        }
+      }).catch((error) => {
+        // Not ok - check for message and notify
+        if (error.response && error.response.status !== 200 && error.response.data.message) {
+          this.$q.notify({
+            message: this.$t('Error.' + error.response.data.message),
+            color: 'red',
+            actions: [
+              { icon: 'ion-close-circle', color: 'white', handler: () => {} }
+            ]
+          })
+        }
+      })
+    },
+    confirm (email, token) {
+      const params = {
+        token
+      }
+      const instance = this.$instance(this)
+      // reset header
+      instance.defaults.headers.common.Authorization = null
+      // call create user
+      instance.post('/#auth/confirm', params).then(function (response) {
+        if (response.data && response.data.verified) {
+          this.$router.push({ name: 'login', query: { confirmed: true, email: response.data.verified } })
         }
       }).catch((error) => {
         // Not ok - check for message and notify

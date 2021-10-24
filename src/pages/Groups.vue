@@ -44,17 +44,18 @@
       <q-tab-panel name="groups">
         <q-table
           :columns="columnsGroups"
-          :data="dataGroups"
+          :rows="dataGroups"
           flat
           dense
           selection="multiple"
           row-key="id"
           :filter="filter.groups"
           :visible-columns="visibleColumns.groups"
-          :pagination.sync="pagination.groups"
-          :selected.sync="selectedGroups"
+          v-model:pagination="pagination.groups"
+          v-model:selected="selectedGroups"
+          @row-click="toMembers"
         >
-          <template v-slot:body-cell-name="props">
+          <template #body-cell-name="props">
             <q-td
               dense
               :props="props"
@@ -118,7 +119,7 @@
               />
             </q-td>
           </template>
-          <template v-slot:top-left>
+          <template #top-left>
             <q-toolbar>
               <q-input
                 dense
@@ -127,7 +128,7 @@
                 :placeholder="$t('Base.search.placeholder')"
               >
                 <template
-                  v-slot:after
+                  #after
                   v-if="filter.groups !== ''"
                 >
                   <q-icon
@@ -136,69 +137,48 @@
                     class="cursor-pointer"
                   />
                 </template>
-                <template v-slot:append>
+                <template #append>
                   <q-icon name="search" />
                 </template>
               </q-input>
             </q-toolbar>
           </template>
-          <template v-slot:top-right>
-            <div class="q-pa-md q-gutter-sm">
-              <q-btn
-                round
-                no-caps
-                size="sm"
-                color="primary"
+          <template #top-right>
+            <q-toolbar>
+              <toolbar-btn
                 icon="ion-refresh"
                 @click="refreshGroups()"
               >
                 <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
-              </q-btn>
-              <q-btn
-                round
-                no-caps
-                size="sm"
-                color="primary"
+              </toolbar-btn>
+              <toolbar-btn
                 icon="ion-add"
                 @click="addGroup()"
               >
                 <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
-              </q-btn>
-              <q-btn
-                round
-                no-caps
-                size="sm"
-                color="primary"
+              </toolbar-btn>
+              <toolbar-btn
                 icon="ion-log-out"
                 @click="leaveGroups()"
                 :disable="selectedGroups.length < 1"
               >
                 <q-tooltip>{{ $t('Action.leave') }}</q-tooltip>
-              </q-btn>
-              <q-btn
-                round
-                size="sm"
-                color="primary"
+              </toolbar-btn>
+              <toolbar-btn
                 icon="ion-eye-off"
                 v-if="selectedGroups.length > 0"
                 @click="hideSelected()"
               >
                 <q-tooltip>{{ $t('Action.hide') }}</q-tooltip>
-              </q-btn>
-              <q-btn
-                round
-                size="sm"
-                color="primary"
+              </toolbar-btn>
+              <toolbar-btn
                 :icon="showHidden ? 'ion-eye-off' : 'ion-eye'"
                 v-if="selectedGroups.length < 1"
                 @click="toggleHidden()"
               >
                 <q-tooltip>{{ showHidden ? $t('Action.hide') : $t('Action.showHidden') }}</q-tooltip>
-              </q-btn>
-              <q-btn
-                round
-                size="sm"
-                color="primary"
+              </toolbar-btn>
+              <toolbar-btn
                 icon="ion-settings"
               >
                 <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
@@ -221,8 +201,8 @@
                     </q-item>
                   </q-list>
                 </q-menu>
-              </q-btn>
-            </div>
+              </toolbar-btn>
+            </q-toolbar>
           </template>
         </q-table>
       </q-tab-panel>
@@ -233,6 +213,7 @@
           :group="selectedSingle"
           :is-admin="isAdmin"
           @refreshed="memberRefreshed"
+          @back="tab = 'groups'"
         />
       </q-tab-panel>
     </q-tab-panels>
@@ -366,24 +347,43 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
+// components
+import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 import MemberTable from '../components/groups/MemberTable.vue'
 import ConfirmRequestDialog from '../components/groups/ConfirmRequestDialog.vue'
 
 export default {
   name: 'Groups',
   components: {
+    ToolbarBtn,
     MemberTable,
     ConfirmRequestDialog
   },
+  setup () {
+    const $store = useStore()
+
+    const settings = computed({
+      get: () => $store.getters.settings('groups'),
+      set: val => {
+        $store.commit('setSettings', val)
+      }
+    })
+
+    return {
+      settings,
+      dataGroups: ref([]),
+      tab: ref('groups')
+    }
+  },
   data () {
     return {
-      tab: 'groups',
       counter: {
         member: 0,
         invitedBy: 0,
         invitations: 0
       },
-      dataGroups: [],
       dataGroupsAll: [],
       dataGroupsVisible: [],
       dataMember: [],
@@ -468,26 +468,29 @@ export default {
       }
     }
   },
-  created () {
+  async created () {
+    // const { visibleColumns, pagination } = this.settings
+    // console.log({ visibleColumns, pagination })
+    // console.log(this.settings)
+    // if (visibleColumns) this.visibleColumns = visibleColumns.value
+    // if (pagination) this.visibleColumns = pagination.value
     // get groups
     this.refreshGroups()
   },
   mounted () {
     // restore settings - component member
-    const settings = this.$store.getters.settings('groups')
-    if (settings) {
-      this.visibleColumns = settings.visibleColumns
-      this.pagination = settings.pagination
-    }
+    // const { visibleColumns, pagination } = this.settings
+    // if (visibleColumns) this.visibleColumns = visibleColumns
+    // if (pagination) this.visibleColumns = pagination
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // store settings - component member
-    this.$store.commit('setSettings', {
+    this.settings = {
       groups: {
         visibleColumns: this.visibleColumns,
         pagination: this.pagination
       }
-    })
+    }
   },
   methods: {
     refreshGroups () {
@@ -526,7 +529,7 @@ export default {
     },
     translateData () {
       for (let i = 0; i < this.dataGroupsAll.length; i++) {
-        this.dataGroupsAll[i].roleName = this.$t('Groups.roles.' + this.dataGroupsAll[i].role)
+        if (this.dataGroupsAll[i].role) this.dataGroupsAll[i].roleName = this.$t('Groups.roles.' + this.dataGroupsAll[i].role)
       }
     },
     addGroup () {
@@ -617,6 +620,12 @@ export default {
     editGroup (id) {
       this.editGroupData = Object.assign({}, this.dataGroups.find((group) => { return group.id === id }))
       this.edit = true
+    },
+    toMembers (evt, row, index) {
+      if (row) {
+        this.selectedSingle = row
+        this.tab = 'members'
+      }
     },
     saveChanges () {
       const instance = this.$instance()

@@ -119,7 +119,7 @@
             label="Password"
             :type="smtp.isPwd ? 'password' : 'text'"
           >
-            <template v-slot:append>
+            <template #append>
               <q-icon
                 :name="smtp.isPwd ? 'visibility_off' : 'visibility'"
                 class="cursor-pointer"
@@ -305,12 +305,12 @@ export default {
     }
   },
   computed: {
-      ...mapGetters({
-          access: 'access'
-      }),
-      types: function () {
-        return [{ label: this.$t('Accounts.type.smtp'), value: 'smtp' }]
-      }
+    ...mapGetters({
+      access: 'access'
+    }),
+    types: function () {
+      return [{ label: this.$t('Accounts.type.smtp'), value: 'smtp' }]
+    }
   },
   watch: {
     access: {
@@ -335,7 +335,7 @@ export default {
       this.loadAccount(this.objectName)
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // TODO store last state
   },
   methods: {

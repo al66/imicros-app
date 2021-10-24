@@ -5,10 +5,30 @@
       <!-- process panel -->
       <q-tab-panel name="processes">
         <q-toolbar>
+          <q-input
+            dense
+            debounce="300"
+            v-model="processes.filter"
+            :placeholder="$t('Base.search.placeholder')"
+          >
+            <template
+              #after
+              v-if="processes.filter !== ''"
+            >
+              <q-icon
+                name="close"
+                @click="processes.filter = ''"
+                class="cursor-pointer"
+              />
+            </template>
+            <template #append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
           <q-space />
           <toolbar-btn
             icon="ion-add"
-            @click="()=>{ this.files.proccessId = null; this.files.select = !this.files.select }"
+            @click="addProcess()"
           >
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
           </toolbar-btn>
@@ -22,19 +42,20 @@
         <q-table
           :columns="columnsProcessTable"
           :visible-columns="processes.visibleColumns"
-          :pagination.sync="processes.pagination"
-          :data="processes.data"
+          v-model:pagination="processes.pagination"
+          :rows="processes.data"
           flat
           dense
           row-key="processId"
           selection="multiple"
-          :selected.sync="processes.selected"
+          v-model:selected="processes.selected"
+          :filter="processes.filter"
         >
-          <template v-slot:body-cell-name="props">
+          <template #body-cell-name="props">
             <q-td
               dense
               :props="props"
-              @contextmenu.native="setContext(props.row)"
+              @contextmenu="setContext(props.row)"
             >
               <div class="row justify-between">
                 <q-chip
@@ -45,6 +66,14 @@
                   @click="showInstances(props.row.processId)"
                 >
                   {{ props.row.name }}
+                  <q-tooltip
+                    :delay="1000"
+                    anchor="center right"
+                    self="center left"
+                    :offset="[10, 10]"
+                  >
+                    {{ $t('Action.show.instances') }}
+                  </q-tooltip>
                 </q-chip>
                 <q-btn
                   flat
@@ -77,6 +106,7 @@
                       >
                         <q-item-section>...versions</q-item-section>
                       </q-item>
+                      <!-- moved to own tab versions
                       <q-item
                         clickable
                         v-close-popup
@@ -84,10 +114,27 @@
                       >
                         <q-item-section>...new version</q-item-section>
                       </q-item>
+                      -->
                     </q-list>
                   </q-menu>
                 </q-btn>
               </div>
+            </q-td>
+          </template>
+          <template #body-cell-versionId="props">
+            <q-td
+              dense
+              :props="props"
+            >
+              <q-chip
+                clickable
+                dense
+                :color="props.row.versionId ? 'orange' : 'grey'"
+                text-color="white"
+                @click="showVersions(props.row.processId)"
+              >
+                {{ props.row.versionId || formatProcessStatus(props.row.status,props.row) }}
+              </q-chip>
             </q-td>
           </template>
         </q-table>
@@ -130,19 +177,19 @@
         <q-table
           :columns="columnsVersionTable"
           :visible-columns="versions.visibleColumns"
-          :pagination.sync="versions.pagination"
-          :data="versions.data"
+          v-model:pagination="versions.pagination"
+          :rows="versions.data"
           flat
           dense
           row-key="versionId"
           selection="multiple"
-          :selected.sync="versions.selected"
+          v-model:selected="versions.selected"
         >
-          <template v-slot:body-cell-versionId="props">
+          <template #body-cell-versionId="props">
             <q-td
               dense
               :props="props"
-              @contextmenu.native="setContext(props.row)"
+              @contextmenu="setContext(props.row)"
             >
               <div class="row justify-between">
                 <q-chip
@@ -218,19 +265,19 @@
         <q-table
           :columns="columnsInstanceTable"
           :visible-columns="instances.visibleColumns"
-          :pagination.sync="instances.pagination"
-          :data="instances.data"
+          v-model:pagination="instances.pagination"
+          :rows="instances.data"
           flat
           dense
           row-key="instanceId"
           selection="multiple"
-          :selected.sync="instances.selected"
+          v-model:selected="instances.selected"
         >
-          <template v-slot:body-cell-instanceId="props">
+          <template #body-cell-instanceId="props">
             <q-td
               dense
               :props="props"
-              @contextmenu.native="setContext(props.row)"
+              @contextmenu="setContext(props.row)"
             >
               <div class="row justify-between">
                 <q-chip
@@ -310,18 +357,18 @@
           v-model="context.splitter"
           :limits="[20, 60]"
         >
-          <template v-slot:before>
+          <template #before>
             <q-table
               :columns="columnsContextTable"
               :visible-columns="context.visibleColumns"
-              :pagination.sync="context.pagination"
-              :data="context.data"
+              v-model:pagination="context.pagination"
+              :rows="context.data"
               flat
               dense
               row-key="key"
               @row-click="getKey"
             >
-              <template v-slot:body-cell-key="props">
+              <template #body-cell-key="props">
                 <q-td
                   dense
                   :props="props"
@@ -350,7 +397,7 @@
               </template>
             </q-table>
           </template>
-          <template v-slot:separator>
+          <template #separator>
             <q-avatar
               color="primary"
               text-color="white"
@@ -358,14 +405,12 @@
               icon="drag_indicator"
             />
           </template>
-          <template v-slot:after>
+          <template #after>
             <div class="row">
               <div class="col">
                 <editor
-                  v-model="context.value"
-                  @init="(editor) => editorInit(editor,true)"
-                  lang="json"
-                  theme="monokai"
+                  v-model:content="context.value"
+                  :lang="context.lang"
                   width="100%"
                 />
               </div>
@@ -422,8 +467,7 @@ import { mapGetters } from 'vuex'
 // components
 import FileSelect from '../components/main/FileSelect.vue'
 import ToolbarBtn from '../components/global/ToolbarBtn.vue'
-// ace
-import Editor from 'vue2-ace-editor'
+import Editor from '../components/global/Editor.vue'
 
 export default {
   name: 'Processmonitor',
@@ -441,7 +485,8 @@ export default {
         selected: [],
         pagination: {
           rowsPerPage: 10
-        }
+        },
+        filter: ''
       },
       contextMenu: {
         context: null,
@@ -455,7 +500,7 @@ export default {
       instances: {
         processId: null,
         data: [],
-        visibleColumns: ['instanceId', 'status', 'created', 'versionId'],
+        visibleColumns: ['instanceId', 'status', 'created', 'completed', 'versionId'],
         selected: [],
         pagination: {
           rowsPerPage: 10
@@ -479,49 +524,71 @@ export default {
         pagination: {
           rowsPerPage: 10
         },
-        editor: null,
+        lang: 'text',
         key: null,
         value: ''
       }
     }
   },
   computed: {
-      ...mapGetters({
-          access: 'access'
-      }),
-      columnsProcessTable: function () {
-        return [
-          { name: 'name', field: 'name', label: this.$t('Process.monitor.table.column.name'), sortable: true, align: 'left' },
-          { name: 'status', field: 'status', label: this.$t('Process.monitor.table.column.status'), sortable: true, align: 'left' },
-          { name: 'processId', field: 'processId', label: this.$t('Process.monitor.table.column.processId'), sortable: true, align: 'left' },
-          { name: 'versionId', field: 'versionId', label: this.$t('Process.monitor.table.column.versionId'), sortable: true, align: 'left' },
-          { name: 'versionName', field: 'versionName', label: this.$t('Process.monitor.table.column.versionName'), sortable: true, align: 'left' }
-        ]
-      },
-      columnsVersionTable: function () {
-        return [
-          { name: 'versionId', field: 'versionId', label: this.$t('Process.monitor.table.column.versionId'), sortable: true, align: 'left' },
-          { name: 'created', field: 'created', label: this.$t('Process.monitor.table.column.created'), sortable: true, align: 'left' },
-          { name: 'status', field: 'status', label: this.$t('Process.monitor.table.column.status'), sortable: true, align: 'left' }
-        ]
-      },
-      columnsInstanceTable: function () {
-        return [
-          { name: 'instanceId', field: 'instanceId', label: this.$t('Process.monitor.table.column.processId'), sortable: true, align: 'left' },
-          { name: 'created', field: 'created', label: this.$t('Process.monitor.table.column.created'), sortable: true, align: 'left' },
-          { name: 'status', field: 'status', label: this.$t('Process.monitor.table.column.status'), sortable: true, align: 'left' },
-          { name: 'versionId', field: 'versionId', label: this.$t('Process.monitor.table.column.versionId'), sortable: true, align: 'left' }
-        ]
-      },
-      columnsContextTable: function () {
-        return [
-          { name: 'key', field: 'key', label: this.$t('Process.monitor.table.column.key'), sortable: true, align: 'left' }]
-      },
-      selectedProcess: function () {
-        if (!this.instances.processId) return {}
-        const processId = this.instances.processId
-        return this.processes.data.find(e => { return e.processId === processId })
-      }
+    ...mapGetters({
+      access: 'access'
+    }),
+    columnsProcessTable: function () {
+      return [
+        { name: 'name', field: 'name', label: this.$t('Process.monitor.table.column.name'), sortable: true, align: 'left' },
+        {
+          name: 'status',
+          field: 'status',
+          label: this.$t('Process.monitor.table.column.status'),
+          sortable: true,
+          align: 'left',
+          format: this.formatProcessStatus
+        },
+        { name: 'processId', field: 'processId', label: this.$t('Process.monitor.table.column.processId'), sortable: true, align: 'left' },
+        { name: 'versionId', field: 'versionId', label: this.$t('Process.monitor.table.column.versionId'), sortable: true, align: 'left' },
+        { name: 'versionName', field: 'versionName', label: this.$t('Process.monitor.table.column.versionName'), sortable: true, align: 'left' }
+      ]
+    },
+    columnsVersionTable: function () {
+      return [
+        { name: 'versionId', field: 'versionId', label: this.$t('Process.monitor.table.column.versionId'), sortable: true, align: 'left' },
+        { name: 'created', field: 'created', label: this.$t('Process.monitor.table.column.created'), sortable: true, align: 'left' },
+        {
+          name: 'status',
+          field: 'status',
+          label: this.$t('Process.monitor.table.column.status'),
+          sortable: true,
+          align: 'left',
+          format: this.formatVersionStatus
+        }
+      ]
+    },
+    columnsInstanceTable: function () {
+      return [
+        { name: 'instanceId', field: 'instanceId', label: this.$t('Process.monitor.table.column.processId'), sortable: true, align: 'left' },
+        { name: 'created', field: 'created', label: this.$t('Process.monitor.table.column.created'), sortable: true, align: 'left' },
+        { name: 'completed', field: 'completed', label: this.$t('Process.monitor.table.column.completed'), sortable: true, align: 'left' },
+        {
+          name: 'status',
+          field: 'status',
+          label: this.$t('Process.monitor.table.column.status'),
+          sortable: true,
+          align: 'left',
+          format: this.formatInstanceStatus
+        },
+        { name: 'versionId', field: 'versionId', label: this.$t('Process.monitor.table.column.versionId'), sortable: true, align: 'left' }
+      ]
+    },
+    columnsContextTable: function () {
+      return [
+        { name: 'key', field: 'key', label: this.$t('Process.monitor.table.column.key'), sortable: true, align: 'left' }]
+    },
+    selectedProcess: function () {
+      if (!this.instances.processId) return {}
+      const processId = this.instances.processId
+      return this.processes.data.find(e => { return e.processId === processId })
+    }
   },
   watch: {
   },
@@ -530,11 +597,27 @@ export default {
   mounted () {
     this.refreshProcessList()
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // TODO store last state
   },
   methods: {
+    formatProcessStatus (val, row) {
+      return this.$t('Process.monitor.table.column.status.' + val)
+    },
+    formatInstanceStatus (val, row) {
+      return this.$t('Instances.status.' + val)
+    },
+    formatVersionStatus (val, row) {
+      return this.$t('Process.version.status.' + val)
+    },
     addProcess (objectName) {
+      // show file select dialog
+      if (!objectName) {
+        this.files.proccessId = null
+        this.files.select = !this.files.select
+        return
+      }
+
       if (!this.access.token) return
       //
       const instance = this.$instance()
@@ -556,8 +639,8 @@ export default {
       this.files.select = false
     },
     newVersion (processId) {
-        this.files.processId = processId
-        this.files.select = !this.files.select
+      this.files.processId = processId
+      this.files.select = !this.files.select
     },
     refreshProcessList () {
       if (!this.access.token) return
@@ -569,7 +652,7 @@ export default {
       instance.post('/api/flow/control/getProcesses', params).then(async (response) => {
         if (response.data) {
           this.processes.data = response.data.map(e => {
-            e.status = e.versionId ? this.$t('Process.monitor.table.column.status.active') : this.$t('Process.monitor.table.column.status.inactive')
+            e.status = e.versionId ? 'active' : 'inactive'
             return e
           })
         } else {
@@ -680,6 +763,7 @@ export default {
           // convert received data
           this.instances.data = response.data.map(e => {
             e.created = new Date(e.createdAt).toISOString()
+            e.completed = new Date(e.completedAt).toISOString()
             return e
           })
         } else {
@@ -719,22 +803,10 @@ export default {
         console.log(err)
       })
     },
-    editorInit: function (editor, readOnly) {
-      require('brace/ext/language_tools') // language extension prerequsite...
-      require('brace/mode/json')
-      require('brace/theme/monokai')
-      editor.setOptions({
-        autoScrollEditorIntoView: true,
-        maxLines: 'Infinity',
-        minLines: 20,
-        readOnly: readOnly || false
-      })
-      this.context.editor = editor
-    },
     resetKey () {
       this.context.key = null
       this.context.value = ''
-      if (this.context.editor) this.context.editor.session.setMode('ace/mode/text')
+      this.context.lang = 'text'
     },
     getKey (evt, row, index) {
       if (!this.access.token) return
@@ -749,10 +821,10 @@ export default {
         if (response.data) {
           if (typeof response.data === 'string') {
             this.context.value = response.data
-            this.context.editor.session.setMode('ace/mode/text')
+            this.context.lang = 'text'
           } else {
             this.context.value = JSON.stringify(response.data, null, '\t')
-            this.context.editor.session.setMode('ace/mode/json')
+            this.context.lang = 'json'
           }
           this.context.key = row.key
         } else {

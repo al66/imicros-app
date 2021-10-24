@@ -1,17 +1,5 @@
 <template>
   <div>
-    <!-- main navigation tabs -->
-    <!--
-    <q-tabs v-model="tab" :class="$q.dark.isActive ? 'text-gray-2' : 'text-grey-10'" dense >
-      <q-tab name="editor" icon="ion-code" transition-show="slide-right">
-        <q-tooltip>{{ 'Edit'/*$t('Templates.tab.editor.title')*/ }}</q-tooltip>
-      </q-tab>
-      <q-tab name="test" icon="ion-code-working" transition-show="slide-right">
-        <q-tooltip>{{ 'Test'/*$t('Templates.tab.test.title')*/ }}</q-tooltip>
-      </q-tab>
-    </q-tabs>
-    -->
-
     <!-- panels -->
     <q-tab-panels v-model="tab">
       <!-- editor panel -->
@@ -31,225 +19,108 @@
             {{ $t('Template.editor.new.file') }}
           </q-chip>
           <q-space />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="grey"
-            icon="ion-play"
-            class="q-mr-sm"
-            @click="()=>{tab = 'test'}"
-          >
-            <q-tooltip>{{ $t('Action.render') }}</q-tooltip>
-          </q-btn>
-          <q-space />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="assignment"
-            class="q-mr-sm"
-          />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="ion-add"
-            class="q-mr-sm"
-            @click="newTemplate()"
-          >
-            <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="ion-open"
-            class="q-mr-sm"
-            @click="()=>{ files.select = !files.select }"
-          >
-            <q-tooltip>{{ $t('Action.open') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="ion-save"
-            class="q-mr-sm"
-            @click="saveTemplate()"
-          >
-            <q-tooltip>{{ $t('Action.save') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="ion-copy"
-            class="q-mr-sm"
-            :disable="!objectName"
-            @click="copyTemplate"
-          >
-            <q-tooltip>{{ $t('Action.copy') }}</q-tooltip>
-          </q-btn>
-        </q-toolbar>
-        <q-splitter
-          v-model="splitter.templates"
-          :limits="[70, 100]"
-        >
-          <template v-slot:before>
-            <q-scroll-area style="height: calc(100vh - 50px - 120px);">
-              <editor
-                v-model="edit.template"
-                @init="editorInit"
-                :lang="edit.lang"
-                theme="monokai"
-                width="100%"
-              />
-            </q-scroll-area>
-          </template>
-
-          <template v-slot:separator>
-            <q-avatar
-              color="primary"
-              text-color="white"
-              size="30px"
-              icon="drag_indicator"
+          <div class="q-gutter-sm">
+            <q-radio
+              dense
+              size="xs"
+              v-model="edit.lang"
+              val="text"
+              label="Text"
             />
-          </template>
-
-          <template v-slot:after>
-            <q-scroll-area style="height: calc(100vh - 50px - 120px;">
-              <q-card>
-                <q-card-section
-                  align="center"
-                  class="bg-grey text-white q-ma-xs q-pa-xs"
-                >
-                  <q-item-label>{{ $t('Template.editor.settings.dialog.title') }}</q-item-label>
-                </q-card-section>
-                <q-card-section align="left">
-                  <q-select
-                    v-model="edit.lang"
-                    :options="edit.langOptions"
-                    dense
-                    options-dense
-                  />
-                </q-card-section>
-              </q-card>
-            </q-scroll-area>
-          </template>
-        </q-splitter>
-      </q-tab-panel>
-
-      <!-- test panel -->
-      <q-tab-panel
-        name="test"
-        class="q-pt-none"
-      >
-        <q-toolbar>
-          <q-chip v-if="objectNameTest">
-            {{ objectNameTest }}
-          </q-chip>
-          <q-chip
-            v-if="!objectNameTest"
-            class="text-white"
-            color="orange"
-          >
-            {{ $t('Template.editor.new.file') }}
-          </q-chip>
+            <q-radio
+              dense
+              size="xs"
+              v-model="edit.lang"
+              val="html"
+              label="HTML"
+            />
+            <q-radio
+              dense
+              size="xs"
+              v-model="edit.lang"
+              val="json"
+              label="Json"
+            />
+          </div>
           <q-space />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="grey"
-            icon="edit"
-            class="q-mr-sm"
-            @click="()=>{tab = 'editor'}"
-          >
-            <q-tooltip>{{ $t('Action.edit') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="grey"
-            icon="ion-play"
-            class="q-mr-sm"
-            @click="testTemplate()"
+          <toolbar-btn
+            sub
+            icon="ion-arrow-back"
+            @click="selectData('back')"
           >
             <q-tooltip>{{ $t('Action.render') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="grey"
+          </toolbar-btn>
+          <toolbar-btn
+            sub
+            icon="cancel"
+            @click="selectData('clear')"
+          >
+            <q-tooltip>{{ $t('Action.render') }}</q-tooltip>
+          </toolbar-btn>
+          <toolbar-btn
+            sub
+            icon="ion-arrow-forward"
+            @click="selectData('next')"
+          >
+            <q-tooltip>{{ $t('Action.render') }}</q-tooltip>
+          </toolbar-btn>
+          <toolbar-btn
+            sub
             :icon="preview ? 'ion-eye-off' : 'ion-eye'"
             v-if="edit.lang === 'html'"
             @click="()=>{ preview = !preview }"
           >
             <q-tooltip>{{ preview ? $t('Action.showHtml') : $t('Action.showPreview') }}</q-tooltip>
-          </q-btn>
+          </toolbar-btn>
           <q-space />
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          <toolbar-btn
             icon="ion-add"
-            class="q-mr-sm"
-            @click="newTest()"
+            @click="newTemplate()"
           >
             <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-open"
-            class="q-mr-sm"
             @click="()=>{ files.select = !files.select }"
           >
             <q-tooltip>{{ $t('Action.open') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-save"
-            class="q-mr-sm"
-            @click="saveTest()"
+            @click="saveTemplate()"
           >
             <q-tooltip>{{ $t('Action.save') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
+          </toolbar-btn>
+          <toolbar-btn
             icon="ion-copy"
-            class="q-mr-sm"
             :disable="!objectName"
-            @click="copyTest"
+            @click="copyTemplate"
           >
             <q-tooltip>{{ $t('Action.copy') }}</q-tooltip>
-          </q-btn>
+          </toolbar-btn>
         </q-toolbar>
         <q-splitter
-          v-model="splitter.testdata"
-          :limits="[10, 80]"
+          v-model="splitter.templates"
+          :limits="[30, 100]"
         >
-          <template v-slot:before>
-            <div>Table</div>
+          <template #before>
+            <q-chip
+              outline
+              square
+              color="primary"
+            >
+              Template
+            </q-chip>
+            <q-scroll-area style="height: calc(100vh - 50px - 120px);">
+              <editor
+                v-model:content="edit.template"
+                :lang="edit.lang"
+                width="100%"
+              />
+            </q-scroll-area>
           </template>
-          <template v-slot:separator>
+
+          <template #separator>
             <q-avatar
               color="primary"
               text-color="white"
@@ -257,26 +128,29 @@
               icon="drag_indicator"
             />
           </template>
-          <template v-slot:after>
+
+          <template #after>
             <q-splitter
               v-model="splitter.testresult"
               :limits="[10, 90]"
             >
-              <template v-slot:before>
-                <div class="row">
-                  <div class="col">
-                    <editor
-                      v-model="test.data"
-                      @init="editorInit"
-                      lang="json"
-                      theme="monokai"
-                      width="100%"
-                    />
-                    <div>{{ template }}</div>
-                  </div>
-                </div>
+              <template #before>
+                <q-chip
+                  outline
+                  square
+                  color="primary"
+                >
+                  Example Data ({{ test.index + 1 }}/{{ data.length }})
+                </q-chip>
+                <q-scroll-area style="height: calc(100vh - 50px - 120px);">
+                  <editor
+                    v-model:content="test.data"
+                    lang="json"
+                    width="100%"
+                  />
+                </q-scroll-area>
               </template>
-              <template v-slot:separator>
+              <template #separator>
                 <q-avatar
                   color="primary"
                   text-color="white"
@@ -284,24 +158,27 @@
                   icon="drag_indicator"
                 />
               </template>
-              <template v-slot:after>
-                <div class="row">
-                  <div class="col">
-                    <editor
-                      v-model="test.result"
-                      v-if="edit.lang !== 'html' || !preview"
-                      @init="editorInit"
-                      :lang="edit.lang"
-                      theme="monokai"
-                      width="100%"
-                    />
-                    <div
-                      class="q-ml-lg"
-                      v-html="htmlResult"
-                      v-if="edit.lang === 'html' && preview"
-                    />
-                  </div>
-                </div>
+              <template #after>
+                <q-chip
+                  square
+                  text-color="white"
+                  :color="edit.valid ? 'teal' : 'red'"
+                >
+                  Result
+                </q-chip>
+                <q-scroll-area style="height: calc(100vh - 50px - 120px);">
+                  <editor
+                    v-model:content="test.result"
+                    v-if="edit.lang !== 'html' || !preview"
+                    :lang="edit.lang"
+                    width="100%"
+                  />
+                  <div
+                    class="q-ml-lg"
+                    v-html="htmlResult"
+                    v-if="edit.lang === 'html' && preview"
+                  />
+                </q-scroll-area>
               </template>
             </q-splitter>
           </template>
@@ -311,13 +188,14 @@
     <file-select
       :refresh="files.refresh"
       :show="files.select"
+      suffix=".tpl"
       @close="()=>{ this.files.select = false }"
       @file="(objectName)=>{ tab === 'editor' ? loadTemplate(objectName) : loadTest(objectName) }"
     />
     <file-save-as
       :refresh="files.refresh"
       :show="files.saveAs"
-      suffix=""
+      suffix=".tpl"
       @close="()=>{ this.files.saveAs = false }"
       @file="(objectName)=>{ tab === 'editor' ? saveTemplateAs(objectName) : saveTestAs(objectName) }"
     />
@@ -327,19 +205,21 @@
 <script>
 // vuex store
 import { mapGetters } from 'vuex'
-import Editor from 'vue2-ace-editor'
 // handelbars
-import Handlebars from 'handlebars'
+import Handlebars from 'handlebars/dist/cjs/handlebars'
 // sanitize html
 import sanitizeHtml from 'sanitize-html'
 // components
+import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 import FileSelect from '../components/main/FileSelect.vue'
 import FileSaveAs from '../components/main/FileSaveAs.vue'
+import Editor from '../components/global/Editor.vue'
 
 export default {
   name: 'Templates',
   components: {
-    editor: Editor,
+    ToolbarBtn,
+    Editor,
     FileSelect,
     FileSaveAs
   },
@@ -349,14 +229,15 @@ export default {
       edit: {
         template: '',
         lang: 'text',
-        langOptions: ['text', 'html']
+        langOptions: ['text', 'html', 'json'],
+        valid: true
       },
       test: {
-        key: '1',
-        data: '',
+        index: 0,
+        data: '{}',
         result: ''
       },
-      testObject: {},
+      // testObject: {},
       files: {
         select: false,
         saveAs: false,
@@ -365,10 +246,10 @@ export default {
       objectName: null,
       objectNameTest: null,
       preview: false,
-      template: '',
-      data: '',
+      // template: '',
+      data: ['{}'],
       splitter: {
-        templates: 80, // start at 80%
+        templates: 50, // start at 80%
         testdata: 30,
         testresult: 50
       },
@@ -382,10 +263,29 @@ export default {
   },
   computed: {
     ...mapGetters({
-        access: 'access'
+      access: 'access'
     }),
     htmlResult: function () {
-      return sanitizeHtml(this.test.result)
+      // TODO: check, which makes sense and is still seure....
+      const options = {
+        allowedTags: [
+          'a', 'address', 'article', 'aside', 'div', 'footer', 'header', 'h1', 'h2', 'h3', 'h4',
+          'h5', 'h6', 'hgroup', 'img', 'main', 'nav', 'section', 'blockquote', 'dd', 'div',
+          'dl', 'dt', 'figcaption', 'figure', 'hr', 'li', 'main', 'ol', 'p', 'pre',
+          'ul', 'a', 'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'dfn',
+          'em', 'i', 'kbd', 'mark', 'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp',
+          'small', 'span', 'strong', 'sub', 'sup', 'time', 'u', 'var', 'wbr', 'caption',
+          'col', 'colgroup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr'
+        ],
+        allowedAttributes: {
+          '*': ['class', 'bgcolor', 'style', 'width'],
+          a: ['href', 'name', 'target'],
+          img: ['src'],
+          table: ['align', 'border', 'cellspacing', 'cellpadding', 'role']
+        }
+      }
+      const html = sanitizeHtml(this.test.result, options)
+      return html
     }
   },
   watch: {
@@ -393,19 +293,39 @@ export default {
       deep: true,
       handler () {
         this.newTemplate()
-        this.newTest()
+        // this.newTest()
       }
     },
-    test: {
-      deep: true,
-      handler () {
-        try {
-          this.testObject[this.test.key] = JSON.parse(this.test.data)
-        } catch (err) {
-          this.testObject[this.test.key] = null
-        }
+    'edit.template': {
+      async handler () {
+        this.edit.valid = await this.testTemplate()
+      }
+    },
+    'test.data': {
+      async handler () {
+        this.edit.valid = await this.testTemplate()
       }
     }
+  },
+  mounted () {
+    document.addEventListener('keydown', this.doSave)
+    Handlebars.registerHelper({
+      eq: (v1, v2) => v1 === v2,
+      ne: (v1, v2) => v1 !== v2,
+      lt: (v1, v2) => v1 < v2,
+      gt: (v1, v2) => v1 > v2,
+      lte: (v1, v2) => v1 <= v2,
+      gte: (v1, v2) => v1 >= v2,
+      and () {
+        return Array.prototype.every.call(arguments, Boolean)
+      },
+      or () {
+        return Array.prototype.slice.call(arguments, 0, -1).some(Boolean)
+      }
+    })
+  },
+  beforeUnmount () {
+    document.removeEventListener('keydown', this.doSave)
   },
   created () {
   },
@@ -417,6 +337,7 @@ export default {
       require('brace/mode/javascript') // language
       require('brace/mode/less')
       require('brace/theme/monokai')
+      require('brace/theme/chrome')
       require('brace/snippets/javascript') // snippet
       editor.setOptions({
         autoScrollEditorIntoView: true,
@@ -433,14 +354,20 @@ export default {
       instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
       instance.defaults.headers.get['Content-Type'] = 'application/octet-stream'
       instance.get('/#file/' + objectName, {
-        responseType: 'text'
+        // responseType: 'text'
       }).then((response) => {
         try {
-          this.edit.template = response.data
+          this.edit.template = response.data.template
+          this.edit.lang = response.data.lang
+          this.data = response.data.data || ['{}']
+          if (Array.isArray(this.data) && this.data.length > 0) {
+            this.test.index = 0
+            this.test.data = this.data[0]
+          }
           this.objectName = objectName
-          this.edit.lang = 'text'
+          // this.edit.lang = 'text'
           /* eslint no-useless-escape: "off" */
-          if (response.data.match(/<?\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)?>/)) this.edit.lang = 'html'
+          // if (this.edit.template(/<?\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)?>/)) this.edit.lang = 'html'
         } catch (err) {
           console.log('Failed to open file ' + objectName + ':', err)
         }
@@ -448,8 +375,17 @@ export default {
         console.error(err)
       })
     },
+    doSave (e) {
+      if (!(e.keyCode === 83 && e.ctrlKey)) {
+        return
+      }
+
+      e.preventDefault()
+      this.saveTemplate()
+    },
     async saveTemplate () {
       if (!this.objectName) {
+        console.log('call save as')
         this.files.saveAs = true
         return
       }
@@ -459,7 +395,14 @@ export default {
       instance.defaults.headers.put['x-imicros-filename'] = this.objectName
       instance.defaults.headers.put['Content-Type'] = 'application/octet-stream'
       try {
-        const template = this.edit.template
+        // save last changes of test data
+        this.data[this.test.index] = this.test.data
+        // build template object
+        const template = {
+          template: this.edit.template,
+          lang: this.edit.lang,
+          data: this.data
+        }
         instance.put('/api/upload', template).then((response) => {
           console.log('File ' + this.objectName + ' saved')
           // trigger refresh file lists of dialogs
@@ -481,95 +424,73 @@ export default {
       console.log('copy')
       this.objectName = null
     },
-    newTest () {
-      this.testObject = {}
-      this.test.data = ''
-      this.test.result = ''
-      this.objectNameTest = null
-    },
-    loadTest (objectName) {
-      const instance = this.$instance()
-      instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
-      instance.defaults.headers.get['Content-Type'] = 'application/octet-stream'
-      instance.get('/#file/' + objectName, {
-        responseType: 'text'
-      }).then((response) => {
-        try {
-          this.testObject = response.data
-          if (this.testObject && Object.keys(this.testObject)) {
-            this.test.key = Object.keys(this.testObject)[0]
-            try {
-              this.test.data = JSON.stringify(this.testObject[this.test.key], null, '\t')
-            } catch (err) {
-              console.log('Failed to parse test data', err)
-            }
-          }
-          this.objectNameTest = objectName
-        } catch (err) {
-          console.log('Failed to open file ' + objectName + ':', err)
-        }
-      }).catch((err) => {
-        console.error(err)
-      })
-    },
-    saveTest () {
-      if (!this.objectNameTest) {
-        this.files.saveAs = true
-        return
-      }
-
-      const instance = this.$instance()
-      instance.defaults.headers.put['x-imicros-xtoken'] = this.access.token
-      instance.defaults.headers.put['x-imicros-filename'] = this.objectNameTest
-      instance.defaults.headers.put['Content-Type'] = 'application/octet-stream'
-      try {
-        const test = this.testObject
-        instance.put('/api/upload', test).then((response) => {
-          console.log('File ' + this.objectNameTest + ' saved')
-          // trigger refresh file lists of dialogs
-          this.files.refresh += 1
-        }).catch((err) => {
-          console.error('Failed to save file ' + this.objectNameTest, err)
-        })
-      } catch (err) {
-        console.error('Failed to save file ' + this.objectNameTest, err)
-      }
-    },
-    async saveTestAs (objectName) {
-      this.objectNameTest = objectName
-      // hide dialog again
-      this.files.saveAs = false
-      await this.saveTest()
-    },
-    copyTest () {
-      this.objectNameTest = null
-    },
     async testTemplate () {
       // compile template
       let template
       try {
-          template = Handlebars.compile(this.edit.template)
+        template = Handlebars.compile(this.edit.template)
       } catch (err) {
-          console.log('Failed to compile template', err)
-          return false
+        // console.log('Failed to compile template', err)
+        return false
       }
 
       // parse data
       let data
       try {
-          data = JSON.parse(this.test.data)
+        data = JSON.parse(this.test.data)
       } catch (err) {
-          console.log('Failed to read JSON data', err)
-          return false
+        // console.log('Failed to read JSON data', err)
+        return false
       }
 
       // render template
       try {
-          this.test.result = await template(data)
-          return true
+        this.test.result = await template(data)
       } catch (err) {
-          console.log('Failed to render template', err)
-          return false
+        // console.log('Failed to render template', err)
+        return false
+      }
+
+      // convert to JSON
+      try {
+        if (this.edit.lang === 'json') {
+          JSON.parse(this.test.result)
+        }
+      } catch (err) {
+        return false
+      }
+
+      return true
+    },
+    selectData (cmd) {
+      switch (cmd) {
+        case 'back':
+          this.data[this.test.index] = this.test.data
+          if (this.test.index > 0) {
+            this.test.index -= 1
+            this.test.data = this.data[this.test.index]
+          }
+          break
+        case 'next':
+          this.data[this.test.index] = this.test.data
+          this.test.index++
+          if (this.test.index > this.data.length - 1) this.data.push('{}')
+          this.test.data = this.data[this.test.index]
+          break
+        case 'clear':
+          if (this.data.length > 1) {
+            if (this.test.index < this.data.length - 1) {
+              this.data.splice(this.test.index, 1)
+              this.test.data = this.data[this.test.index]
+            } else {
+              this.data.splice(this.test.index, 1)
+              this.test.index--
+              this.test.data = this.data[this.test.index]
+            }
+          } else {
+            this.test.data = '{}'
+          }
+          break
       }
     }
   }

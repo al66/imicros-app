@@ -1,6 +1,6 @@
-# imicros (imicros-app)
+# imicros App (imicros-app)
 
-imicros app
+imicros App
 
 ## Install the dependencies
 ```bash

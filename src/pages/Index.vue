@@ -1,30 +1,24 @@
 <template>
   <q-page class="flex flex-center">
-    <div>
-      <q-img
-        class="logo"
-        alt="imicros logo"
-        src="~assets/imicros-grau.png"
-        v-if="this.$q.dark.isActive"
-      />
-      <q-img
-        class="logo"
-        alt="imicros logo"
-        src="~assets/imicros.png"
-        v-if="!this.$q.dark.isActive"
-      />
-    </div>
+    <img
+      v-if="$q.dark.isActive"
+      alt="imicros logo"
+      src="~assets/imicros-logo-light-grey.svg"
+      style="width: 300px; height: 200px"
+    >
+    <img
+      v-if="!$q.dark.isActive"
+      alt="imicros logo"
+      src="~assets/imicros-logo-black.svg"
+      style="width: 300px; height: 200px"
+    >
   </q-page>
 </template>
 
 <script>
-export default {
-  name: 'PageIndex'
-}
-</script>
+import { defineComponent } from 'vue'
 
-<style>
-.logo {
-  width: 300px;
-}
-</style>
+export default defineComponent({
+  name: 'PageIndex'
+})
+</script>

@@ -9,20 +9,80 @@
         @click="selectBreadcrumb(breadcrumb)"
       />
     </q-breadcrumbs>
+    <q-toolbar>
+      <q-input
+        dense
+        debounce="300"
+        v-model="files.filter"
+        :placeholder="$t('Base.search.placeholder')"
+      >
+        <template
+          #after
+          v-if="files.filter !== ''"
+        >
+          <q-icon
+            name="close"
+            @click="files.filter = ''"
+            class="cursor-pointer"
+          />
+        </template>
+        <template #append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-space />
+      <toolbar-btn
+        icon="ion-add"
+        @click="addFile()"
+      >
+        <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
+      </toolbar-btn>
+      <toolbar-btn
+        icon="ion-refresh"
+        @click="getFiles()"
+      >
+        <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
+      </toolbar-btn>
+      <toolbar-btn
+        icon="ion-settings"
+      >
+        <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
+        <q-menu :offset="[0, 20]">
+          <q-list>
+            <q-item
+              dense
+              clickable
+              v-for="(column) in columns"
+              :key="column.name"
+              @click="setVisibleColumns(column,visibleColumns)"
+            >
+              <q-item-section>
+                <q-item-label
+                  :class="visibleColumns.indexOf(column.name) >= 0 ? 'text-primary' : ''"
+                >
+                  {{ $t('Files.table.column.' + column.name) }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </toolbar-btn>
+    </q-toolbar>
     <q-table
       :columns="columns"
       :visible-columns="visibleColumns"
-      :pagination.sync="pagination.groups"
-      :data="ls"
+      v-model:pagination="pagination.groups"
+      :rows="ls"
+      :filter="files.filter"
       flat
       dense
       @row-dblclick="selectFolder"
     >
-      <template v-slot:body="props">
+      <template #body="props">
         <q-tr
           :props="props"
-          @contextmenu.native="contextMenu(props.row)"
-          @mouseleave.native="mouseLeave()"
+          @contextmenu="contextMenu(props.row)"
+          @mouseleave="mouseLeave()"
           @dblclick="dblClick(props.row)"
         >
           <q-td
@@ -124,9 +184,7 @@
             key="size"
             :props="props"
           >
-            <q-badge color="primary">
-              {{ props.row.size }}
-            </q-badge>
+            {{ formatSize(props.row.size, props.row) }}
           </q-td>
           <q-td
             key="lastModified"
@@ -137,58 +195,6 @@
             </q-badge>
           </q-td>
         </q-tr>
-      </template>
-      <template v-slot:top-right>
-        <div class="q-pa-md q-gutter-sm">
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="ion-refresh"
-            @click="getFiles()"
-          >
-            <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="ion-add"
-            @click="addFile()"
-          >
-            <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            no-caps
-            size="sm"
-            color="primary"
-            icon="ion-settings"
-          >
-            <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
-            <q-menu :offset="[0, 20]">
-              <q-list>
-                <q-item
-                  dense
-                  clickable
-                  v-for="(column) in columns"
-                  :key="column.name"
-                  @click="setVisibleColumns(column,visibleColumns)"
-                >
-                  <q-item-section>
-                    <q-item-label
-                      :class="visibleColumns.indexOf(column.name) >= 0 ? 'text-primary' : ''"
-                    >
-                      {{ $t('Files.table.column.' + column.name) }}
-                    </q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-        </div>
       </template>
     </q-table>
 
@@ -265,12 +271,20 @@
 
 <script>
 import { mapGetters } from 'vuex'
+// components
+import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 
 export default {
   name: 'Files',
+  components: {
+    ToolbarBtn
+  },
   data () {
     return {
     //
+      files: {
+        filter: ''
+      },
       ls: [],
       visibleColumns: ['name'],
       pagination: {
@@ -296,27 +310,35 @@ export default {
     }
   },
   computed: {
-      ...mapGetters({
-          access: 'access'
-      }),
-      columns: function () {
-        return [
-          { name: 'name', field: 'name', label: this.$t('Files.table.column.name'), sortable: true, align: 'left' },
-          { name: 'prefix', field: 'prefix', label: this.$t('Files.table.column.prefix'), sortable: true, align: 'left' },
-          { name: 'etag', field: 'etag', label: this.$t('Files.table.column.etag'), sortable: true, align: 'left' },
-          { name: 'size', field: 'size', label: this.$t('Files.table.column.size'), sortable: true, align: 'left' },
-          { name: 'lastModified', field: 'lastModified', label: this.$t('Files.table.column.lastModified'), sortable: true, align: 'left' }
-        ]
-      },
-      headers: function () {
-        return [{ name: 'x-imicros-xtoken', value: this.access.token },
-                { name: 'Authorization', value: this.$axios.defaults.headers.common.Authorization }]
-      },
-      uploaderUrl: function () {
-          const url = this.$axios.defaults.baseUrl + '/api/upload'
-          console.log('uploaderUrl', url)
-          return url
-      }
+    ...mapGetters({
+      access: 'access'
+    }),
+    columns: function () {
+      return [
+        { name: 'name', field: 'name', label: this.$t('Files.table.column.name'), sortable: true, align: 'left' },
+        { name: 'prefix', field: 'prefix', label: this.$t('Files.table.column.prefix'), sortable: true, align: 'left' },
+        { name: 'etag', field: 'etag', label: this.$t('Files.table.column.etag'), sortable: true, align: 'left' },
+        {
+          name: 'size',
+          field: 'size',
+          label: this.$t('Files.table.column.size'),
+          sortable: true,
+          align: 'left',
+          format: this.formatSize
+        },
+        { name: 'lastModified', field: 'lastModified', label: this.$t('Files.table.column.lastModified'), sortable: true, align: 'left' }
+      ]
+    },
+    headers: function () {
+      return [{ name: 'x-imicros-xtoken', value: this.access.token },
+        { name: 'Authorization', value: this.$axios.defaults.headers.common.Authorization }]
+    },
+    uploaderUrl: function () {
+      // const url = this.$axios.defaults.baseUrl + '/api/upload'
+      const url = '/api/upload'
+      console.log('uploaderUrl', url)
+      return url
+    }
   },
   watch: {
     access: {
@@ -339,7 +361,7 @@ export default {
       this.pagination = settings.pagination
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // store settings - component files
     this.$store.commit('setSettings', {
       files: {
@@ -349,6 +371,11 @@ export default {
     })
   },
   methods: {
+    formatSize (val, row) {
+      const mb = Math.round((val / 1001048576 + Number.EPSILON) * 100 / 100)
+      const kb = Math.round((val / 1024 + Number.EPSILON) * 100 / 100)
+      return (mb > 1 ? `${mb} MB` : (kb > 1 ? `${kb} KB` : `${val} Byte`))
+    },
     initPath () {
       this.breadcrumbs = [{ prefix: '', icon: 'home', label: '~' }]
       this.path = ''
@@ -362,6 +389,7 @@ export default {
       }
       instance.post('/#minio/makeBucket', params).then(async (response) => {
         if (response.data) {
+          // To be done or to be ognored
         }
       }).catch((err) => {
         console.log(err)
@@ -394,12 +422,12 @@ export default {
       if (fullPath) fullPath.replace(/^.*[\\\/]/, '')
     },
     receiveFileStream (stream) {
-        return new Promise((resolve, reject) => {
-            const objects = []
-            stream.on('data', obj => objects.push(obj))
-            stream.on('end', () => resolve(objects))
-            stream.on('error', reject)
-        })
+      return new Promise((resolve, reject) => {
+        const objects = []
+        stream.on('data', obj => objects.push(obj))
+        stream.on('end', () => resolve(objects))
+        stream.on('error', reject)
+      })
     },
     dblClick (row) {
       if (row.prefix) return this.selectFolder(row)

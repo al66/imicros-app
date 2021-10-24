@@ -26,19 +26,20 @@
 <script>
 import { mapGetters } from 'vuex'
 
-  export default {
+export default {
   props: {
     refresh: Boolean
   },
+  emits: ['groupSelected'],
   data: function () {
     return {
       groups: []
     }
   },
   computed: {
-      ...mapGetters({
-          access: 'access'
-      })
+    ...mapGetters({
+      access: 'access'
+    })
   },
   watch: {
     refresh: function () {
@@ -79,6 +80,7 @@ import { mapGetters } from 'vuex'
             group: group,
             token: response.data.token
           })
+          this.$emit('groupSelected', true)
         }
       }).catch((err) => {
         console.log(err)

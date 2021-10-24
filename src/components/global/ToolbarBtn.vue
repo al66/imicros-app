@@ -8,41 +8,48 @@
     :icon="icon"
     :class="btnClass"
     :disable="disable"
-    @click="$emit('click')"
   >
+    <q-tooltip v-if="tooltip">
+      {{ tooltip }}
+    </q-tooltip>
     <slot />
   </q-btn>
 </template>
 
 <script>
-  import { QBtn } from 'quasar'
+import { QBtn } from 'quasar'
 
-  export default {
-    props: {
-      sub: Boolean,
-      icon: {
-        type: String,
-        required: true
-      },
-      specialClass: {
-        type: String,
-        default: null,
-        required: false
-      },
-      disable: Boolean,
-      color: {
-        type: String,
-        default: null,
-        required: false
-      }
+export default {
+  props: {
+    sub: Boolean,
+    icon: {
+      type: String,
+      required: true
     },
-    components: {
-      QBtn
+    specialClass: {
+      type: String,
+      default: null,
+      required: false
     },
-    data: function () {
-      return {
-        btnClass: this.specialClass ? this.specialClass : 'q-mr-sm'
-      }
+    tooltip: {
+      type: String,
+      default: null,
+      required: false
+    },
+    disable: Boolean,
+    color: {
+      type: String,
+      default: null,
+      required: false
+    }
+  },
+  components: {
+    QBtn
+  },
+  data: function () {
+    return {
+      btnClass: this.specialClass ? this.specialClass : 'q-mr-sm'
     }
   }
+}
 </script>

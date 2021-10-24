@@ -63,25 +63,25 @@
           :limits="[0, 100]"
           @input="$refs.rulesetEditor.editor.setValue(raw)"
         >
-          <template v-slot:before>
+          <template #before>
             <div class="q-pa-md">
               <q-table
                 :columns="columns"
-                :data="table.data"
+                :rows="table.data"
                 flat
                 dense
                 separator="cell"
-                :pagination.sync="table.pagination"
+                v-model:pagination="table.pagination"
                 hide-pagination
               >
-                <template v-slot:header="props">
+                <template #header="props">
                   <q-tr :props="props">
                     <!-- hit policy -->
                     <q-th
                       rowspan="6"
                       class="vertical-top text-bold"
                       width="10px"
-                      @mouseenter.native="mouseLeave(true)"
+                      @mouseenter="mouseLeave(true)"
                     >
                       <q-btn
                         flat
@@ -113,7 +113,7 @@
                     <q-th
                       :colspan="table.inputColumns.length"
                       class="text-h6"
-                      @mouseenter.native="mouseLeave(true)"
+                      @mouseenter="mouseLeave(true)"
                     >
                       <q-chip size="md">
                         {{ 'Input' }}
@@ -129,7 +129,7 @@
                     <q-th
                       :colspan="table.outputColumns.length"
                       class="text-h6"
-                      @mouseenter.native="mouseLeave(true)"
+                      @mouseenter="mouseLeave(true)"
                     >
                       <q-chip size="md">
                         {{ 'Output' }}
@@ -145,7 +145,7 @@
                     <q-th
                       rowspan="6"
                       class="vertical-top text-h6"
-                      @mouseenter.native="mouseLeave(true)"
+                      @mouseenter="mouseLeave(true)"
                     >
                       <q-chip size="md">
                         {{ 'Description' }}
@@ -162,8 +162,8 @@
                       :key="col.name"
                       :props="props"
                       :class="$q.dark.isActive ? '' : ( col.input ? 'bg-blue-1 text-black' : 'bg-purple-1 text-black' )"
-                      @contextmenu.native="showContextMenu(col)"
-                      @mouseleave.native="mouseLeave()"
+                      @contextmenu="showContextMenu(col)"
+                      @mouseleave="mouseLeave()"
                     >
                       <div>{{ col.label }}</div>
                       <q-popup-edit
@@ -188,8 +188,8 @@
                       :key="col.name"
                       :props="props"
                       class="text-italic text-grey"
-                      @contextmenu.native="showContextMenu(col)"
-                      @mouseleave.native="mouseLeave()"
+                      @contextmenu="showContextMenu(col)"
+                      @mouseleave="mouseLeave()"
                     >
                       <div>{{ col.source }}</div>
                       <q-popup-edit
@@ -218,8 +218,8 @@
                       :key="col.name"
                       :props="props"
                       class="text-italic text-grey"
-                      @contextmenu.native="showContextMenu(col)"
-                      @mouseleave.native="mouseLeave()"
+                      @contextmenu="showContextMenu(col)"
+                      @mouseleave="mouseLeave()"
                     >
                       <div>{{ col.default }}</div>
                       <q-popup-edit
@@ -248,8 +248,8 @@
                       :key="col.name"
                       :props="props"
                       class="text-italic text-grey"
-                      @contextmenu.native="showContextMenu(col)"
-                      @mouseleave.native="mouseLeave()"
+                      @contextmenu="showContextMenu(col)"
+                      @mouseleave="mouseLeave()"
                     >
                       <div v-if="col.isArray">
                         [{{ col.type }}]
@@ -319,11 +319,11 @@
                   </q-tr>
                   -->
                 </template>
-                <template v-slot:body="props">
+                <template #body="props">
                   <q-tr
                     :props="props"
-                    @contextmenu.native="showContextMenu(props)"
-                    @mouseleave.native="mouseLeave()"
+                    @contextmenu="showContextMenu(props)"
+                    @mouseleave="mouseLeave()"
                   >
                     <q-td
                       key="props.row.row"
@@ -373,7 +373,7 @@
                   </q-tr>
                 </template>
               </q-table>
-              <q-toolbar @mouseenter.native="mouseLeave(true)">
+              <q-toolbar @mouseenter="mouseLeave(true)">
                 <toolbar-btn
                   v-if="table.pagination.page >= pages"
                   sub
@@ -403,7 +403,7 @@
               -->
             </div>
           </template>
-          <template v-slot:separator>
+          <template #separator>
             <q-avatar
               color="primary"
               text-color="white"
@@ -411,15 +411,12 @@
               icon="drag_indicator"
             />
           </template>
-          <template v-slot:after>
+          <template #after>
             <q-scroll-area style="height: calc(100vh - 50px - 120px);">
               <editor
-                v-model="raw"
-                @init="editorInit"
+                v-model:content="raw"
                 ref="rulesetEditor"
-                lang="text"
                 readonly
-                theme="monokai"
                 width="100%"
               />
             </q-scroll-area>
@@ -488,7 +485,7 @@
           v-model="splitter.testdata"
           :limits="[10, 80]"
         >
-          <template v-slot:before>
+          <template #before>
             <q-list>
               <q-slide-item
                 v-for="(test, index) in testObject"
@@ -498,13 +495,13 @@
                 @left="testItemAdd(index, ...arguments)"
                 @right="testItemDelete(index, ...arguments)"
               >
-                <template v-slot:left>
+                <template #left>
                   <q-icon
                     color="green"
                     name="add"
                   />
                 </template>
-                <template v-slot:right>
+                <template #right>
                   <q-icon
                     color="red"
                     name="delete"
@@ -524,7 +521,7 @@
               </q-slide-item>
             </q-list>
           </template>
-          <template v-slot:separator>
+          <template #separator>
             <q-avatar
               color="primary"
               text-color="white"
@@ -532,25 +529,23 @@
               icon="drag_indicator"
             />
           </template>
-          <template v-slot:after>
+          <template #after>
             <q-splitter
               v-model="splitter.testresult"
               :limits="[10, 90]"
             >
-              <template v-slot:before>
+              <template #before>
                 <div class="row">
                   <div class="col">
                     <editor
-                      v-model="testObject[testIndex].dataJson"
-                      @init="editorInit"
+                      v-model:content="testObject[testIndex].dataJson"
                       lang="json"
-                      theme="monokai"
                       width="100%"
                     />
                   </div>
                 </div>
               </template>
-              <template v-slot:separator>
+              <template #separator>
                 <q-avatar
                   color="primary"
                   text-color="white"
@@ -558,14 +553,13 @@
                   icon="drag_indicator"
                 />
               </template>
-              <template v-slot:after>
+              <template #after>
                 <div class="row">
                   <div class="col">
                     <editor
-                      v-model="testObject[testIndex].resultJson"
-                      @init="(editor) => editorInit(editor,true)"
+                      v-model:content="testObject[testIndex].resultJson"
                       lang="json"
-                      theme="monokai"
+                      readonly
                       width="100%"
                     />
                   </div>
@@ -579,13 +573,14 @@
     <file-select
       :refresh="files.refresh"
       :show="files.select"
+      suffix=".ruleset"
       @close="()=>{ this.files.select = false }"
       @file="(objectName)=>{ tab === 'editor' ? loadRuleset(objectName) : loadTest(objectName) }"
     />
     <file-save-as
       :refresh="files.refresh"
       :show="files.saveAs"
-      suffix=""
+      suffix=".ruleset"
       @close="()=>{ this.files.saveAs = false }"
       @file="(objectName)=>{ tab === 'editor' ? saveRulesetAs(objectName) : saveTestAs(objectName) }"
     />
@@ -671,10 +666,10 @@
   border-left-width: 1px;
 }
 /* label size and bold */
-.row-label th {
+//.row-label th {
   /* font-size: 13px; */
   /* font-weight: 600; */
-}
+//}
 </style>
 
 <script>
@@ -684,23 +679,23 @@ import { mapGetters } from 'vuex'
 import FileSelect from '../components/main/FileSelect.vue'
 import FileSaveAs from '../components/main/FileSaveAs.vue'
 import ToolbarBtn from '../components/global/ToolbarBtn.vue'
-// ace
-import Editor from 'vue2-ace-editor'
-// uuid
-import { v4 as uuid } from 'uuid'
+import Editor from '../components/global/Editor.vue'
+// import { uuid } from 'vue-uuid'
+import { uid } from 'quasar'
 // lodash
 // const cloneDeep = require('lodash/cloneDeep')
 
 export default {
   name: 'Ruleseteditor',
   components: {
-    editor: Editor,
     FileSelect,
     FileSaveAs,
-    ToolbarBtn
+    ToolbarBtn,
+    Editor
   },
   data () {
     return {
+      uuid: uid,
       tab: 'editor',
       files: {
         select: false,
@@ -812,16 +807,18 @@ export default {
         if (e.source) raw += e.source
         if (e.type) raw += `[${e.type}]`
         if (e.label) raw += ` #${e.label}#`
+        return e
       })
       // output values
       this.table.outputColumns.map((e) => {
         if (e.type) {
-            this.table.inputColumns.length > 0 ? raw += '; > ' : raw += ' > '
-            if (e.source) raw += e.source
-            if (e.type) raw += `[${e.type}]`
-            if (e.default) raw += ` := ${e.default}`
-            if (e.label) raw += ` #${e.label}#`
+          this.table.inputColumns.length > 0 ? raw += '; > ' : raw += ' > '
+          if (e.source) raw += e.source
+          if (e.type) raw += `[${e.type}]`
+          if (e.default) raw += ` := ${e.default}`
+          if (e.label) raw += ` #${e.label}#`
         }
+        return e
       })
       // defintion end
       raw += '\r\n'
@@ -830,26 +827,29 @@ export default {
         // when
         let first = true
         this.table.inputColumns.map((e, index) => {
-          if (typeof r[e.name] === 'undefined' || r[e.name] == null || r[e.name].length === 0) return
+          if (typeof r[e.name] === 'undefined' || r[e.name] == null || r[e.name].length === 0) return e
           if (!first) raw += ' && '
           if (e.source) raw += ` ${e.source}`
           raw += ' :: '
           raw += ` ${r[e.name]} `
           first = false
+          return e
         })
         raw += ' => '
         // then
         this.table.outputColumns.map((e, index) => {
-          if (typeof r[e.name] === 'undefined' || r[e.name] == null || r[e.name].length === 0) return
+          if (typeof r[e.name] === 'undefined' || r[e.name] == null || r[e.name].length === 0) return e
           if (index > 0) raw += ';'
           if (e.source) raw += ` ${e.source} `
           raw += ' := '
           raw += `${r[e.name]} `
+          return e
         })
         // desc
         if (r.desc) raw += ` #${r.desc}#`
         // new line
         raw += '\r\n'
+        return r
       })
       // ruleset end
       raw += '@@'
@@ -888,20 +888,9 @@ export default {
     this.newRuleset()
   },
   methods: {
-    editorInit: function (editor, readOnly) {
-      require('brace/ext/language_tools') // language extension prerequsite...
-      require('brace/mode/json')
-      require('brace/theme/monokai')
-      editor.setOptions({
-        autoScrollEditorIntoView: true,
-        maxLines: 'Infinity',
-        minLines: 20,
-        readOnly: readOnly || false
-      })
-    },
     addColumn (input) {
       const name = (input ? 'input ' + (this.table.inputColumns.length + 1) : 'output ' + (this.table.outputColumns.length + 1))
-      const newCol = { name: uuid(), label: name, type: 'string', isArray: false, input: !!input, output: !input }
+      const newCol = { name: this.uuid(), label: name, type: 'string', isArray: false, input: !!input, output: !input }
       if (input) {
         this.table.inputColumns.push(newCol)
       } else {
@@ -932,7 +921,7 @@ export default {
       arr.splice(newIndex, 0, arr.splice(oldIndex, 1)[0])
     },
     addRow (row) {
-      const newRow = { row: uuid() }
+      const newRow = { row: this.uuid() }
       typeof row === 'number' ? this.table.data.splice(row, 0, newRow) : this.table.data.push(newRow)
       const pages = Math.ceil(this.table.data.length / this.table.pagination.rowsPerPage)
       if (!(typeof row === 'number') && this.table.pagination.page < pages) this.table.pagination.page = pages
@@ -952,55 +941,55 @@ export default {
       this.moveItem(this.table.data, row, row + 1)
     },
     setJson (json) {
-        const input = []
-        const output = []
-        const data = []
-        json.input.forEach((e) => {
-            const col = {
-                label: e.label,
-                name: uuid(),
-                source: e.source,
-                default: e.default,
-                type: e.type
-            }
-            input.push(col)
-        })
-        json.output.forEach((e) => {
-            const col = {
-                label: e.label,
-                name: uuid(),
-                source: e.destination,
-                default: e.default,
-                type: e.type
-            }
-            output.push(col)
-        })
-        json.rules.forEach((r) => {
-            const rule = {
-                row: uuid(),
-                desc: r.desc
-            }
-            r.conditions.forEach(cond => {
-                const col = input.find(e => e.source === cond.input)
-                if (col) {
-                    rule[col.name] = cond.expression
-                }
-            })
-            r.output.forEach(out => {
-                const col = output.find(e => e.source === out.destination)
-                if (col) {
-                    rule[col.name] = out.expression
-                }
-            })
-            data.push(rule)
-        })
-        if (input.length > 0 && output.length > 0 && data.length > 0) {
-            this.table.inputColumns = []
-            json.hitpolicy ? this.hitpolicy.value = json.hitpolicy : this.hitpolicy.value = 'F'
-            this.table.inputColumns = input
-            this.table.outputColumns = output
-            this.table.data = data
+      const input = []
+      const output = []
+      const data = []
+      json.input.forEach((e) => {
+        const col = {
+          label: e.label,
+          name: this.uuid(),
+          source: e.source,
+          default: e.default,
+          type: e.type
         }
+        input.push(col)
+      })
+      json.output.forEach((e) => {
+        const col = {
+          label: e.label,
+          name: this.uuid(),
+          source: e.destination,
+          default: e.default,
+          type: e.type
+        }
+        output.push(col)
+      })
+      json.rules.forEach((r) => {
+        const rule = {
+          row: this.uuid(),
+          desc: r.desc
+        }
+        r.conditions.forEach(cond => {
+          const col = input.find(e => e.source === cond.input)
+          if (col) {
+            rule[col.name] = cond.expression
+          }
+        })
+        r.output.forEach(out => {
+          const col = output.find(e => e.source === out.destination)
+          if (col) {
+            rule[col.name] = out.expression
+          }
+        })
+        data.push(rule)
+      })
+      if (input.length > 0 && output.length > 0 && data.length > 0) {
+        this.table.inputColumns = []
+        json.hitpolicy ? this.hitpolicy.value = json.hitpolicy : this.hitpolicy.value = 'F'
+        this.table.inputColumns = input
+        this.table.outputColumns = output
+        this.table.data = data
+      }
     },
     loadRuleset (objectName) {
       const instance = this.$instance()
@@ -1010,15 +999,15 @@ export default {
         responseType: 'text'
       }).then(async (response) => {
         try {
-            const param = {
-                ruleset: response.data
-            }
-            instance.post('/api/rules/json', param).then((ruleset) => {
-                this.setJson(ruleset.data)
-                this.objectName = objectName
-            }).catch((err) => {
-              console.error('Failed to parse file ' + this.objectName, err)
-            })
+          const param = {
+            ruleset: response.data
+          }
+          instance.post('/api/rules/json', param).then((ruleset) => {
+            this.setJson(ruleset.data)
+            this.objectName = objectName
+          }).catch((err) => {
+            console.error('Failed to parse file ' + this.objectName, err)
+          })
         } catch (err) {
           console.log('Failed to open file ' + objectName + ':', err)
         }
@@ -1029,8 +1018,8 @@ export default {
     newRuleset () {
       //
       this.objectName = null
-      this.table.inputColumns = [{ name: uuid(), label: 'some input..', type: 'string', isArray: false, allowed: null, input: true }]
-      this.table.outputColumns = [{ name: uuid(), label: 'some output..', type: 'string', isArray: false, default: null, allowed: null, output: true }]
+      this.table.inputColumns = [{ name: this.uuid(), label: 'some input..', type: 'string', isArray: false, allowed: null, input: true }]
+      this.table.outputColumns = [{ name: this.uuid(), label: 'some output..', type: 'string', isArray: false, default: null, allowed: null, output: true }]
       // start with two empty rows
       this.table.data = []
       this.table.data.push({ row: (this.table.data.length + 1) })
@@ -1049,20 +1038,20 @@ export default {
       instance.defaults.headers.put['Content-Type'] = 'application/octet-stream'
       try {
         const param = {
-            ruleset: this.ruleset
+          ruleset: this.ruleset
         }
         instance.post('/api/rules/json', param).then((ruleset) => {
-            if (!ruleset || !ruleset.data || !ruleset.data.input) {
-                console.error('Failed to parse ruleset', param)
-                return
-            }
-            instance.put('/api/upload', this.ruleset).then((response) => {
-              console.log('File ' + this.objectName + ' saved')
-              // trigger refresh file lists of dialogs
-              this.files.refresh += 1
-            }).catch((err) => {
-              console.error('Failed to save file ' + this.objectName, err)
-            })
+          if (!ruleset || !ruleset.data || !ruleset.data.input) {
+            console.error('Failed to parse ruleset', param)
+            return
+          }
+          instance.put('/api/upload', this.ruleset).then((response) => {
+            console.log('File ' + this.objectName + ' saved')
+            // trigger refresh file lists of dialogs
+            this.files.refresh += 1
+          }).catch((err) => {
+            console.error('Failed to save file ' + this.objectName, err)
+          })
         }).catch((err) => {
           console.error('Failed to save file ' + this.objectName, err)
         })
@@ -1098,8 +1087,8 @@ export default {
         instance.defaults.headers.post['Content-Type'] = 'application/octet-stream'
         for (let i = 0; i < this.testObject.length; i++) {
           const params = {
-              name: this.objectName,
-              data: {}
+            name: this.objectName,
+            data: {}
           }
           try {
             params.data = JSON.parse(this.testObject[i].dataJson)
@@ -1108,16 +1097,16 @@ export default {
           }
           // console.log(params)
           instance.post('/api/rules/eval', params).then((result) => {
-              // console.log(result.data)
-              if (result.data) {
-                try {
-                  const resultJson = JSON.stringify(result.data, null, '\t')
-                  this.testObject[i].resultJson = resultJson
-                } catch (err) {
-                  console.log('Invalid response on ruleset execution', err)
-                }
+            // console.log(result.data)
+            if (result.data) {
+              try {
+                const resultJson = JSON.stringify(result.data, null, '\t')
+                this.testObject[i].resultJson = resultJson
+              } catch (err) {
+                console.log('Invalid response on ruleset execution', err)
               }
-              this.testObject[i].result = result
+            }
+            this.testObject[i].result = result
           }).catch((err) => {
             console.error('Failed to execute ruleset ' + this.objectName + ' test index ' + i, err)
           })

@@ -1,11 +1,15 @@
-import Vue from 'vue'
+import { boot } from 'quasar/wrappers'
 import axios from 'axios'
-// import { Notify } from 'quasar'
 
-// axios.defaults.baseURL = process.env.baseURL
-axios.defaults.baseUrl = process.env.baseUrl
-console.log('Using backend:', axios.defaults.baseUrl)
+// Be careful when using SSR for cross-request state pollution
+// due to creating a Singleton instance here;
+// If any client changes this (global) instance, it might be a
+// good idea to move this instance creation inside of the
+// "export default () => {}" function below (which runs individually
+// for each client)
+const api = axios.create({ baseURL: 'https://api.example.com' })
 
+// added: service names
 const services = {
   auth: 'api/user',
   groups: 'api/groups',
@@ -14,13 +18,31 @@ const services = {
   file: 'api/file'
 }
 
-Vue.prototype.$axios = axios
+// added: replace of placeholders by service names
+api.interceptors.request.use((config) => {
+  // Replace service names
+  for (const service in services) {
+    if (Object.prototype.hasOwnProperty.call(services, service)) {
+      config.url = config.url.replace('#' + service, services[service])
+    }
+  }
+  return config
+})
 
-// Set interceptor function for later use on instances
-export default (/* { app } */) => {
-  Vue.prototype.$instance = () => {
-    const instance = Vue.prototype.$axios.create()
+export default boot(({ app }) => {
+  // for use inside Vue files (Options API) through this.$axios and this.$api
 
+  app.config.globalProperties.$axios = axios
+  // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
+  //       so you won't necessarily have to import axios in each vue file
+
+  app.config.globalProperties.$api = api
+  // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
+  //       so you can easily perform requests against your app's API
+
+  // added: helper function $instance
+  app.config.globalProperties.$instance = () => {
+    const instance = axios.create()
     instance.interceptors.request.use((config) => {
       // Replace service names
       for (const service in services) {
@@ -30,28 +52,8 @@ export default (/* { app } */) => {
       }
       return config
     })
-    /*  General response interceptor for error handling not used - error handling should be service specific
-    instance.interceptors.response.use((response) => {
-      return response
-    }, (error) => {
-      // Not ok
-      if (error.response && error.response.status === 500) {
-        // check for message and notify
-        if (error.response.data.message) {
-          console.log(error.response.data)
-          Notify.create({
-            // error.response.data.message
-            message: app.i18n.t('Error.' + error.response.data.message),
-            color: 'red',
-            actions: [
-              { icon: 'ion-close-circle', color: 'white', handler: () => {} }
-            ]
-          })
-        }
-      }
-      return Promise.reject(error.message)
-    })
-    */
     return instance
   }
-}
+})
+
+export { api }

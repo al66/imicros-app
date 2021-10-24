@@ -2,17 +2,17 @@
   <div>
     <q-table
       :columns="columns"
-      :data="member"
+      :rows="member"
       flat
       selection="multiple"
       row-key="email"
       :filter="filter"
       :visible-columns="visibleColumns"
       dense
-      :pagination.sync="pagination"
-      :selected.sync="selected"
+      v-model:pagination="pagination"
+      v-model:selected="selected"
     >
-      <template v-slot:body-cell-email="props">
+      <template #body-cell-email="props">
         <q-td
           dense
           :props="props"
@@ -82,7 +82,7 @@
           </q-chip>
         </q-td>
       </template>
-      <template v-slot:top-left>
+      <template #top-left>
         <q-toolbar>
           <q-input
             dense
@@ -90,66 +90,56 @@
             v-model="filter"
             :placeholder="$t('Base.search.placeholder')"
           >
-            <template v-slot:append>
+            <template #append>
               <q-icon name="search" />
             </template>
           </q-input>
           <q-separator inset />
-          <q-chip icon="ion-at">
+          <q-chip
+            clickable
+            icon="ion-at"
+            @click="$emit('back')"
+          >
             {{ group.alias ? group.alias : group.name }}
           </q-chip>
         </q-toolbar>
       </template>
-      <template v-slot:top-right>
-        <div class="q-pa-md q-gutter-sm">
-          <q-btn
-            round
-            size="sm"
-            color="primary"
+      <template #top-right>
+        <q-toolbar>
+          <toolbar-btn
+            icon="ion-at"
+            sub
+            @click="$emit('back')"
+          />
+          <toolbar-btn
             icon="ion-refresh"
+            :tooltip="$t('Action.refresh')"
             @click="getMember()"
-          >
-            <q-tooltip>{{ $t('Action.refresh') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            size="sm"
-            color="primary"
+          />
+          <toolbar-btn
+            v-if="isAdmin === true"
             icon="ion-person-add"
-            v-if="isAdmin === true"
+            :tooltip="$t('Action.add')"
             @click="addInvitation()"
-          >
-            <q-tooltip>{{ $t('Action.add') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            size="sm"
-            color="primary"
-            icon="ion-build"
+          />
+          <toolbar-btn
             v-if="isAdmin === true"
+            icon="ion-build"
+            :tooltip="$t('Action.nominate')"
             :disable="selected.length < 1"
             @click="nominateSelected()"
-          >
-            <q-tooltip>{{ $t('Action.nominate') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            size="sm"
-            color="primary"
-            icon="ion-trash"
+          />
+          <toolbar-btn
             v-if="isAdmin === true"
+            icon="ion-trash"
+            :tooltip="$t('Action.member.remove')"
             :disable="selected.length < 1"
             @click="removeSelected()"
-          >
-            <q-tooltip>{{ $t('Action.member.remove') }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            round
-            size="sm"
-            color="primary"
+          />
+          <toolbar-btn
             icon="ion-settings"
+            :tooltip="$t('Action.settings')"
           >
-            <q-tooltip>{{ $t('Action.settings') }}</q-tooltip>
             <q-menu :offset="[0, 20]">
               <q-list>
                 <q-item
@@ -169,8 +159,8 @@
                 </q-item>
               </q-list>
             </q-menu>
-          </q-btn>
-        </div>
+          </toolbar-btn>
+        </q-toolbar>
       </template>
     </q-table>
 
@@ -250,7 +240,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
+// components
 import ConfirmRequestDialog from './ConfirmRequestDialog.vue'
+import ToolbarBtn from '../global/ToolbarBtn.vue'
 
 export default {
   props: {
@@ -260,8 +252,10 @@ export default {
     },
     isAdmin: Boolean
   },
+  emits: ['back', 'refreshed'],
   components: {
-    ConfirmRequestDialog
+    ConfirmRequestDialog,
+    ToolbarBtn
   },
   data: function () {
     return {
@@ -298,7 +292,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-        user: 'user'
+      user: 'user'
     }),
     columns: function () {
       return [
@@ -327,7 +321,7 @@ export default {
       this.pagination = settings.pagination
     }
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // store settings - component member
     this.$store.commit('setSettings', {
       member: {

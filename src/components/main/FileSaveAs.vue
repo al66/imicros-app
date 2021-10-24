@@ -78,7 +78,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
-  export default {
+export default {
   props: {
     refresh: {
       type: Number,
@@ -94,6 +94,7 @@ import { mapGetters } from 'vuex'
       default: ''
     }
   },
+  emits: ['close', 'file'],
   data: function () {
     return {
       dialog: false,
@@ -104,9 +105,9 @@ import { mapGetters } from 'vuex'
     }
   },
   computed: {
-      ...mapGetters({
-          access: 'access'
-      })
+    ...mapGetters({
+      access: 'access'
+    })
   },
   watch: {
     show: function (oldVal, newVal) {
@@ -150,6 +151,13 @@ import { mapGetters } from 'vuex'
         if (response.data) {
           /* eslint no-useless-escape: "off" */
           response.data.map(entry => (this.objects.push(Object.assign(entry, { objectName: entry.name ? entry.name.replace(/^.*[\\\/]/, '') : entry.prefix }))))
+          if (this.suffix) {
+            try {
+              this.objects = this.objects.filter(o => { return o.name ? o.name.endsWith(this.suffix) : true })
+            } catch (err) {
+              console.log(err)
+            }
+          }
         } else {
           this.objects = []
         }

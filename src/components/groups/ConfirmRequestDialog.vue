@@ -60,6 +60,7 @@ export default {
       required: true
     }
   },
+  emits: ['close', 'accept', 'decline'],
   data: function () {
     return {
       dialog: false

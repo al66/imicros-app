@@ -55,7 +55,7 @@
       />
       <toolbar-btn
         icon="ion-open"
-        @click="()=>{ this.files.select = !this.files.select }"
+        @click="openDiagram"
       />
       <toolbar-btn
         icon="ion-save"
@@ -77,7 +77,7 @@
         v-model="splitter.attributes"
         :limits="[70, 100]"
       >
-        <template v-slot:before>
+        <template #before>
           <div
             v-show="editMode"
             :class="editorClass"
@@ -101,7 +101,7 @@
           />
           -->
         </template>
-        <template v-slot:separator>
+        <template #separator>
           <q-avatar
             color="primary"
             text-color="white"
@@ -109,7 +109,7 @@
             icon="drag_indicator"
           />
         </template>
-        <template v-slot:after>
+        <template #after>
           <q-scroll-area style="height: calc(100vh - 50px - 90px;">
             <q-card>
               <q-card-section
@@ -124,17 +124,22 @@
                 <q-input
                   v-if="selected.element.id"
                   v-model="selected.element.id"
-                  label="element id"
-                  label-color="orange"
+                  :label="$t('Process.editor.parameters.dialog.label.elementId')"
                   stack-label
                   disable
                 />
                 <!-- Service Task -->
                 <div v-if="selected.businessObject && selected.businessObject.$type === 'bpmn:ServiceTask'">
+                  <q-option-group
+                    v-model="selected.parameterObject.prepFunction"
+                    :options="optionsPreparation"
+                    inline
+                    @input="changePrepFunction"
+                  />
                   <q-select
+                    v-if="selected.parameterObject.prepFunction && selected.parameterObject.prepFunction !== ''"
                     v-model="selected.parameterObject.contextKeys"
-                    label="context keys (input preparation step)"
-                    label-color="orange"
+                    :label="$t('Process.editor.parameters.dialog.label.contextKeyPreparation')"
                     stack-label
                     :readonly="!editMode"
                     use-input
@@ -146,17 +151,35 @@
                     @input="updateProperties"
                   />
                   <q-input
+                    v-if="selected.parameterObject.prepFunction === 'template'"
+                    v-model="selected.parameterObject.template"
+                    label="Template for mapping of parameters"
+                    stack-label
+                    readonly
+                    @change="updateProperties"
+                  >
+                    <template #before>
+                      <q-btn
+                        v-if="selected.parameterObject.prepFunction === 'template'"
+                        class="justify-center"
+                        size="sm"
+                        color="primary"
+                        icon="edit"
+                        @click="editTemplate"
+                      />
+                    </template>
+                  </q-input>
+                  <q-input
+                    v-if="selected.parameterObject.prepFunction === 'ruleset'"
                     v-model="selected.parameterObject.ruleset"
-                    label="ruleset for preparation of parameters"
-                    label-color="orange"
+                    :label="$t('Process.editor.parameters.dialog.label.rulesetPreparation')"
                     stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
                   />
                   <q-select
                     v-model="selected.parameterObject.paramsKey"
-                    label="context key (action parameters)"
-                    label-color="orange"
+                    :label="$t('Process.editor.parameters.dialog.label.contextKeyTask')"
                     stack-label
                     :readonly="!editMode"
                     use-input
@@ -168,16 +191,34 @@
                   />
                   <q-input
                     v-model="selected.parameterObject.action"
-                    label="action"
-                    label-color="orange"
+                    :label="$t('Process.editor.parameters.dialog.label.action')"
+                    stack-label
+                    :readonly="!editMode"
+                    clearable
+                    @change="updateProperties"
+                  />
+                  <q-select
+                    v-model="selected.parameterObject.serviceId"
+                    :options="optionsAgents"
+                    :label="$t('Process.editor.parameters.dialog.label.agent')"
+                    stack-label
+                    clearable
+                    emit-value
+                    map-options
+                    @input="updateProperties"
+                  />
+                  <!--
+                  <q-input
+                    v-model="selected.parameterObject.serviceId"
+                    label="agent"
                     stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
                   />
+                  -->
                   <q-select
                     v-model="selected.parameterObject.resultKey"
-                    label="context key (result)"
-                    label-color="orange"
+                    :label="$t('Process.editor.parameters.dialog.label.contextKeyResult')"
                     stack-label
                     :readonly="!editMode"
                     use-input
@@ -192,7 +233,7 @@
                 <div v-if="selected.businessObject && selected.businessObject.$type === 'bpmn:BusinessRuleTask'">
                   <q-input
                     v-model="selected.parameterObject.ruleset"
-                    label="ruleset"
+                    :label="$t('Process.editor.parameters.dialog.label.ruleset')"
                     label-color="orange"
                     stack-label
                     :readonly="!editMode"
@@ -201,7 +242,6 @@
                   <q-select
                     v-model="selected.parameterObject.contextKeys"
                     label="context keys (input)"
-                    label-color="orange"
                     stack-label
                     :readonly="!editMode"
                     use-input
@@ -215,7 +255,6 @@
                   <q-input
                     v-model="selected.parameterObject.contextKey"
                     label="context key (result)"
-                    label-color="orange"
                     stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
@@ -226,7 +265,6 @@
                   <q-input
                     v-model="selected.parameterObject.event"
                     label="internal event"
-                    label-color="orange"
                     stack-label
                     :readonly="!editMode"
                     @change="updateProperties"
@@ -234,7 +272,6 @@
                   <q-select
                     v-model="selected.parameterObject.contextKey"
                     label="context key (payload/metadata)"
-                    label-color="orange"
                     stack-label
                     :readonly="!editMode"
                     use-input
@@ -254,6 +291,7 @@
     <file-select
       :refresh="files.refresh"
       :show="files.select"
+      suffix=".bpmn"
       @close="()=>{ this.files.select = false }"
       @file="loadDiagram"
     />
@@ -264,6 +302,51 @@
       @close="()=>{ this.files.saveAs = false }"
       @file="saveDiagramAs"
     />
+
+    <q-dialog
+      v-model="template.edit"
+      @show="editor.focus()"
+      full-width
+      full-height
+    >
+      <q-card>
+        <q-card-section
+          align="center"
+          class="bg-black text-white q-pa-sm q-mb-sm"
+        >
+          <div class="text-h6">
+            {{ $t('Action.edit') }}
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <editor
+            v-model="template.data"
+            @init="editorInit"
+            lang="json"
+            :theme="template.theme"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            dense
+            flat
+            icon="ion-checkmark"
+            :label="$t('Action.save')"
+            color="primary"
+            @click="saveTemplate"
+          />
+          <q-btn
+            dense
+            flat
+            icon="ion-close-circle"
+            color="grey"
+            @click="()=>{ this.template.edit = false }"
+          >
+            <q-tooltip>{{ $t('Action.cancel') }}</q-tooltip>
+          </q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -334,12 +417,12 @@
   --lasso-fill-color: var(--color-000000-opacity-05);
   --lasso-stroke-color: var(--color-000000);
 
-  --palette-entry-color: var(--color-ffffff);
-  --palette-entry-hover-color: var(--blue-darken-48);
-  --palette-entry-selected-color: var(--blue-base-65);
+  --palette-entry-color: var(--orange-base-60);
+  --palette-entry-hover-color: var(--color-ffffff);
+  --palette-entry-selected-color: var(--color-ffffff);
   --palette-separator-color: var(--color-ffffff);
   --palette-toggle-hover-background-color: var(--color-666666);
-  --palette-background-color: var(--orange-base-60);
+  --palette-background-color: var(--color-333333);
   --palette-border-color: var(--color-cccccc);
 
   --popup-body-background-color: var(--color-333333);
@@ -404,6 +487,8 @@ import 'diagram-js-minimap/assets/diagram-js-minimap.css'
 import FileSelect from '../components/main/FileSelect.vue'
 import FileSaveAs from '../components/main/FileSaveAs.vue'
 import { propertiesUpdater } from '../components/process/propertiesUpdater'
+// editor
+import Editor from 'vue2-ace-editor'
 
 const cloneDeep = require('lodash/cloneDeep')
 
@@ -412,8 +497,19 @@ export default {
   components: {
     FileSelect,
     FileSaveAs,
-    ToolbarBtn
+    ToolbarBtn,
+    Editor
   },
+  /*
+  events: {
+      'vue-ace-editor:init': function () {
+          require('brace/ext/language_tools')
+          require('brace/mode/json')
+          require('brace/theme/chrome')
+          require('brace/theme/monokai')
+      }
+  },
+  */
   data () {
     return {
       files: {
@@ -446,16 +542,34 @@ export default {
       },
       modelerSettings: {
 
+      },
+      template: {
+        edit: false,
+        data: '',
+        theme: 'chrome'
+      },
+      agents: {
+        data: []
       }
     }
   },
   computed: {
-      ...mapGetters({
-          access: 'access'
-      }),
-      editorClass () {
-        return this.$q.dark.isActive ? 'modeler js-canvas dark' : 'modeler js-canvas'
-      }
+    ...mapGetters({
+      access: 'access'
+    }),
+    editorClass () {
+      return this.$q.dark.isActive ? 'modeler js-canvas dark' : 'modeler js-canvas'
+    },
+    optionsPreparation () {
+      return [
+        { label: 'No preparation step', value: '' },
+        { label: 'Map', value: 'template' },
+        { label: 'Ruleset', value: 'ruleset' }
+      ]
+    },
+    optionsAgents () {
+      return this.agents.data.map(agent => { return { label: agent.label, value: agent.serviceId } })
+    }
   },
   watch: {
     access: {
@@ -466,11 +580,15 @@ export default {
     },
     '$q.dark.isActive' (val) {
       console.log(val ? 'On dark mode' : 'On light mode')
+      val ? this.template.theme = 'monokai' : this.template.theme = 'chrome'
     }
   },
   created () {
   },
   mounted () {
+    // short keys
+    document.addEventListener('keydown', this.doSave)
+
     // TODO: restore last state
     if (!this.modeler) {
       this.initModeler({ opts: { defaultFillColor: 'var(--element-fill)', defaultStrokeColor: 'var(--element-stroke)' } })
@@ -481,8 +599,11 @@ export default {
       this.loadDiagram(this.objectName)
     }
     this.registerEvents()
+    this.refreshAgents()
   },
-  beforeDestroy () {
+  beforeUnmount () {
+    // short keys
+    document.removeEventListener('keydown', this.doSave)
     // TODO store last state
   },
   methods: {
@@ -499,6 +620,18 @@ export default {
           minimapModule
         ]
       })
+    },
+    editorInit: function (editor) {
+      require('brace/ext/language_tools') // language extension prerequsite...
+      require('brace/mode/json')
+      require('brace/theme/monokai')
+      require('brace/theme/chrome')
+      editor.setOptions({
+        autoScrollEditorIntoView: true,
+        maxLines: 'Infinity',
+        minLines: 20
+      })
+      this.editor = editor
     },
     toggleEdit () {
       /*
@@ -542,14 +675,14 @@ export default {
 
         let equal = true
         extensionElements.values = extensionElements.values.map((e) => {
-                if (e.$instanceOf('fe:ExecutionParameter')) {
-                  if (JSON.stringify(e) !== JSON.stringify(this.selected.parameterObject)) {
-                    equal = false
-                    return cloneDeep(this.selected.parameterObject)
-                  }
-                }
-                return e
-              })
+          if (e.$instanceOf('fe:ExecutionParameter')) {
+            if (JSON.stringify(e) !== JSON.stringify(this.selected.parameterObject)) {
+              equal = false
+              return cloneDeep(this.selected.parameterObject)
+            }
+          }
+          return e
+        })
 
         if (!equal) {
           const commandStack = this.modeler.get('commandStack')
@@ -616,9 +749,12 @@ export default {
           const moddle = this.modeler.get('moddle')
           const newParam = moddle.create('fe:ExecutionParameter', {
             contextKeys: [],
+            prepFunction: '',
             ruleset: '',
+            template: '',
             paramsKey: null,
             action: '',
+            serviceId: null,
             resultKey: null
           })
           bo.extensionElements = moddle.create('bpmn:ExtensionElements')
@@ -661,6 +797,7 @@ export default {
         if (this.selected.businessObject.eventDefinitions) {
           this.selected.businessObject.eventDefinitions.map((e) => {
             this.selected.subtype[e.$type] = true
+            return e
           })
         }
       } else {
@@ -730,6 +867,17 @@ export default {
         console.error(err)
       })
     },
+    openDiagram () {
+      this.files.select = true
+    },
+    doSave (e) {
+      if (!(e.keyCode === 83 && e.ctrlKey)) {
+        return
+      }
+
+      e.preventDefault()
+      this.saveDiagram()
+    },
     async saveDiagram () {
       if (!this.objectName) {
         this.files.saveAs = true
@@ -777,7 +925,52 @@ export default {
     zoomFit () {
       // this.editMode ? this.modeler.get('canvas').zoom('fit-viewport') : this.viewer.get('canvas').zoom('fit-viewport')
       this.modeler.get('canvas').zoom('fit-viewport')
+    },
+    changePrepFunction () {
+      switch (this.selected.parameterObject.prepFunction) {
+        case 'template':
+          this.selected.parameterObject.ruleset = ''
+          break
+        case 'ruleset':
+          this.selected.parameterObject.template = ''
+          break
+        default:
+          this.selected.parameterObject.ruleset = ''
+          this.selected.parameterObject.template = ''
+      }
+      this.updateProperties()
+    },
+    editTemplate () {
+      // this.template.data = this.selected.parameterObject.template
+      this.template.data = Buffer.from(this.selected.parameterObject.template, 'base64').toString('ascii')
+      this.template.edit = true
+    },
+    saveTemplate () {
+      // this.selected.parameterObject.template = this.template.data
+      this.selected.parameterObject.template = Buffer.from(this.template.data).toString('base64')
+      this.updateProperties()
+      this.template.edit = false
+    },
+    refreshAgents () {
+      if (!this.access.token) return
+      //
+      const instance = this.$instance()
+      instance.defaults.headers.get['x-imicros-xtoken'] = this.access.token
+      return new Promise((resolve, reject) => {
+        instance.get('/api/agents/getAll').then((response) => {
+          if (response.data && Array.isArray(response.data)) {
+            this.agents.data = response.data
+            resolve()
+          }
+        }).catch((err) => {
+          console.log(err)
+          reject()
+        })
+      })
     }
   }
 }
 </script>
+
+<i18n src="./Processeditor.de.json"></i18n>
+<i18n src="./Processeditor.en-us.json"></i18n>

@@ -1,54 +1,59 @@
 {
   "name": "imicros-app",
-  "version": "0.0.2",
-  "description": "imicros app",
-  "productName": "imicros",
-  "cordovaId": "org.cordova.quasar.app",
-  "capacitorId": "",
+  "version": "0.1.0",
+  "description": "imicros App",
+  "productName": "imicros App",
   "author": "al66 <andreas.leinen@imicros.de>",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.vue src",
-    "dev": "quasar dev",
-    "build": "quasar build",
-    "build:pwa": "quasar build -m pwa"
+    "lint": "eslint --ext .js,.vue ./",
+    "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.9.12",
+    "@quasar/extras": "^1.11.2",
     "axios": "^0.21.1",
-    "bpmn-js": "7.3.0",
-    "bpmn-js-properties-panel": "^0.35.0",
-    "bpmn-js-token-simulation": "^0.10.0",
+    "bpmn-js": "8.8.1",
+    "bpmn-js-properties-panel": "^0.45.0",
+    "bpmn-js-token-simulation": "^0.21.1",
+    "core-js": "^3.18.3",
     "diagram-js-minimap": "^2.0.4",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.1.0",
-    "handlebars": "^4.7.6",
-    "quasar": "^1.15.0",
-    "rfdc": "^1.1.4",
-    "sanitize-html": "^2.3.0",
+    "handlebars": "^4.7.7",
+    "quasar": "^2.1.5",
+    "raw-loader": "^4.0.2",
+    "sanitize-html": "^2.5.2",
     "uuid": "^8.3.2",
-    "vue-i18n": "^8.22.2"
+    "vue-i18n": "^9.0.0",
+    "vue-uuid": "^2.0.2",
+    "vue2-ace-editor": "0.0.15",
+    "vue3-ace-editor": "^2.2.1",
+    "vuex": "^4.0.1"
   },
   "devDependencies": {
-    "@kazupon/vue-i18n-loader": "^0.5.0",
-    "@quasar/app": "^2.1.14",
-    "@vue/eslint-config-standard": "^5.1.2",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.17.0",
-    "eslint-loader": "^4.0.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "raw-loader": "^4.0.2",
-    "vue2-ace-editor": "0.0.15"
-  },
-  "engines": {
-    "node": ">= 8.9.0",
-    "npm": ">= 5.6.0",
-    "yarn": ">= 1.6.0"
+    "@babel/eslint-parser": "^7.15.8",
+    "@intlify/vue-i18n-loader": "^3.2.0",
+    "@quasar/app": "^3.1.4",
+    "eslint": "^7.18.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-vue": "^7.20.0",
+    "eslint-webpack-plugin": "^2.4.0"
   },
   "browserslist": [
-    "last 1 version, not dead, ie >= 11"
-  ]
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 12.22.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
 }

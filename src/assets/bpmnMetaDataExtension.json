@@ -39,6 +39,16 @@
           "type": "String"
         },
         {
+          "name": "prepFunction",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "template",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
           "name": "ruleset",
           "isAttr": true,
           "type": "String"
@@ -60,6 +70,11 @@
         },
         {
           "name": "action",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "serviceId",
           "isAttr": true,
           "type": "String"
         },
