@@ -349,6 +349,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+const cloneDeep = require('lodash/cloneDeep')
 // components
 import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 import MemberTable from '../components/groups/MemberTable.vue'
@@ -479,18 +480,20 @@ export default {
   },
   mounted () {
     // restore settings - component member
-    // const { visibleColumns, pagination } = this.settings
-    // if (visibleColumns) this.visibleColumns = visibleColumns
-    // if (pagination) this.visibleColumns = pagination
+    const settings = this.$store.getters.settings('groups')
+    if (settings) {
+      this.visibleColumns = cloneDeep(settings.visibleColumns)
+      this.pagination = cloneDeep(settings.pagination)
+    }
   },
   beforeUnmount () {
     // store settings - component member
-    this.settings = {
+    this.$store.commit('setSettings', {
       groups: {
-        visibleColumns: this.visibleColumns,
-        pagination: this.pagination
+        visibleColumns: cloneDeep(this.visibleColumns),
+        pagination: cloneDeep(this.pagination)
       }
-    }
+    })
   },
   methods: {
     refreshGroups () {

@@ -1,0 +1,111 @@
+{
+  "name": "FlowExecution",
+  "uri": "http://www.imicros.de/schema/bpmn/fe",
+  "prefix": "fe",
+  "xml": {
+    "tagAlias": "lowerCase"
+  },
+  "types": [
+    {
+      "name": "AnalyzedNode",
+      "extends": [
+        "bpmn:ServiceTask"
+      ],
+      "properties": [
+        {
+          "name": "suitable",
+          "isAttr": true,
+          "type": "Float"
+        }
+      ]
+    },
+    {
+      "name": "ExecutionParameter",
+      "extends": [
+        "bpmn:ServiceTask",
+        "bpmn:BusinessRuleTask",
+        "bpmn:StartEvent"
+      ],
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "comments",
+          "isMany": true,
+          "type": "Comment"
+        },
+        {
+          "name": "uid",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "prepFunction",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "template",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "ruleset",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "contextKeys",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "contextKey",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "event",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "action",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "serviceId",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "paramsKey",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "resultKey",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "Comment",
+      "properties": [
+        {
+          "name": "author",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "text",
+          "isBody": true,
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "emumerations": [],
+  "associations": []
+}

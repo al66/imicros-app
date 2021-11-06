@@ -14,8 +14,8 @@ import { toRef } from 'vue'
 import { VAceEditor } from 'vue3-ace-editor'
 import 'ace-builds/src-noconflict/ext-language_tools'
 import 'ace-builds/src-noconflict/theme-monokai'
-import 'ace-builds/src-noconflict/mode-text'
-import { Mode as JavaScriptMode } from 'ace-builds/src-noconflict/mode-json'
+import { Mode as TextMode } from 'ace-builds/src-noconflict/mode-text'
+import { Mode as JsonMode } from 'ace-builds/src-noconflict/mode-json'
 
 export default {
   props: {
@@ -56,7 +56,10 @@ export default {
         })
         switch (lang.value) {
           case 'json':
-            editor.session.setMode(new JavaScriptMode())
+            editor.session.setMode(new JsonMode())
+            break
+          case 'text':
+            editor.session.setMode(new TextMode())
             break
           default:
             //

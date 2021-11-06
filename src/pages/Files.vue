@@ -271,6 +271,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+const cloneDeep = require('lodash/cloneDeep')
 // components
 import ToolbarBtn from '../components/global/ToolbarBtn.vue'
 
@@ -357,16 +358,16 @@ export default {
     // restore settings - component files
     const settings = this.$store.getters.settings('files')
     if (settings) {
-      this.visibleColumns = settings.visibleColumns
-      this.pagination = settings.pagination
+      this.visibleColumns = cloneDeep(settings.visibleColumns)
+      this.pagination = cloneDeep(settings.pagination)
     }
   },
   beforeUnmount () {
     // store settings - component files
     this.$store.commit('setSettings', {
       files: {
-        visibleColumns: this.visibleColumns,
-        pagination: this.pagination
+        visibleColumns: cloneDeep(this.visibleColumns),
+        pagination: cloneDeep(this.pagination)
       }
     })
   },

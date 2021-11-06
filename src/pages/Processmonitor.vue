@@ -410,6 +410,7 @@
               <div class="col">
                 <editor
                   v-model:content="context.value"
+                  readonly
                   :lang="context.lang"
                   width="100%"
                 />

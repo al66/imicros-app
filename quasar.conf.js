@@ -9,6 +9,7 @@
 /* eslint-env node */
 const ESLintPlugin = require('eslint-webpack-plugin')
 const { configure } = require('quasar/wrappers')
+const webpack = require('webpack')
 
 module.exports = configure(function (ctx) {
   return {
@@ -83,6 +84,7 @@ module.exports = configure(function (ctx) {
           test: /\.bpmn$/,
           loader: 'raw-loader'
         })
+        cfg.plugins.push(new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }))
       },
 
       // https://quasar.dev/quasar-cli/handling-webpack

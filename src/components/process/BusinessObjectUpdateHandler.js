@@ -52,7 +52,12 @@ function getProperties (businessObject, propertyNames) {
 
 function setProperties (businessObject, properties) {
   forEach(properties, function (value, key) {
-    businessObject.set(key, value)
+    // console.log('BusinessObject.set', key, value)
+    try {
+      businessObject.set(key, value)
+    } catch (err) {
+      console.log(err)
+    }
   })
 }
 
@@ -101,6 +106,7 @@ UpdateBusinessObjectHandler.prototype.execute = function (context) {
   }
 
   // update properties
+  // console.log('call setProperties in Handler')
   setProperties(businessObject, properties)
 
   // store old values

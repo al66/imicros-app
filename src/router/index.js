@@ -11,7 +11,7 @@ import routes from './routes'
  * with the Router instance.
  */
 
-export default route(function (/* { store, ssrContext } */) {
+export default route(function ({ store }/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
@@ -24,6 +24,35 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE)
+  })
+
+  Router.beforeResolve((to, from, next) => {
+    const isAuthenticated = store.getters.isAuthenticated
+    const user = store.getters.user || { verified: false }
+    // secure all routes if not marked as public
+    try {
+      if (!to.matched.some(record => record.meta.public)) {
+        // no public route
+        if (to.name === 'logout' && isAuthenticated) {
+          // never redirect logout
+          next()
+        } else if (!isAuthenticated) {
+          // redirect all non public routes, if not authenticated
+          next({ name: 'login' })
+        } else {
+          if (!user.verified && to.fullPath !== '/verify') {
+            // redirect not verified users to confirm page
+            next({ name: 'verify', replace: true })
+          } else {
+            next()
+          }
+        }
+      } else {
+        next()
+      }
+    } catch (error) {
+      console.log(error)
+    }
   })
 
   return Router
