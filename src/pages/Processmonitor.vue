@@ -3,7 +3,10 @@
     <!-- panels -->
     <q-tab-panels v-model="tab">
       <!-- process panel -->
-      <q-tab-panel name="processes">
+      <q-tab-panel
+        name="processes"
+        class="q-pt-none"
+      >
         <q-toolbar>
           <q-input
             dense
@@ -596,6 +599,7 @@ export default {
   created () {
   },
   mounted () {
+    this.files.processId = null
     this.refreshProcessList()
   },
   beforeUnmount () {
@@ -644,6 +648,7 @@ export default {
       this.files.select = !this.files.select
     },
     refreshProcessList () {
+      this.files.processId = null
       if (!this.access.token) return
       //
       const instance = this.$instance()

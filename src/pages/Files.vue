@@ -146,6 +146,30 @@
                     <q-item
                       clickable
                       v-close-popup
+                      v-if="props.row.name && props.row.name.match(/bpmn$/)"
+                      @click="$router.push({ path: 'processeditor', query: { open: props.row.name }})"
+                    >
+                      <q-item-section>...open</q-item-section>
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      v-if="props.row.name && props.row.name.match(/ruleset$/)"
+                      @click="$router.push({ path: 'ruleseteditor', query: { open: props.row.name }})"
+                    >
+                      <q-item-section>...open</q-item-section>
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      v-if="props.row.name && props.row.name.match(/tpl$/)"
+                      @click="$router.push({ path: 'templates', query: { open: props.row.name }})"
+                    >
+                      <q-item-section>...open</q-item-section>
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
                       v-if="props.row.name"
                       @click="downloadFile(props.row)"
                     >
@@ -168,7 +192,10 @@
             key="prefix"
             :props="props"
           >
-            <q-badge color="purple">
+            <q-badge
+              v-if="props.row.prefix"
+              color="purple"
+            >
               {{ props.row.prefix }}
             </q-badge>
           </q-td>
@@ -176,7 +203,10 @@
             key="etag"
             :props="props"
           >
-            <q-badge color="orange">
+            <q-badge
+              v-if="props.row.etag"
+              color="orange"
+            >
               {{ props.row.etag }}
             </q-badge>
           </q-td>
@@ -190,7 +220,10 @@
             key="lastModified"
             :props="props"
           >
-            <q-badge color="teal">
+            <q-badge
+              v-if="props.row.lastModified"
+              color="teal"
+            >
               {{ props.row.lastModified }}
             </q-badge>
           </q-td>
@@ -245,6 +278,30 @@
           v-close-popup
           v-if="context.prefix"
           @click="selectFolder(context)"
+        >
+          <q-item-section>...open</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-close-popup
+          v-if="context.name && context.name.match(/bpmn$/)"
+          @click="$router.push({ path: 'processeditor', query: { open: context.name }})"
+        >
+          <q-item-section>...open</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-close-popup
+          v-if="context.name && context.name.match(/ruleset$/)"
+          @click="$router.push({ path: 'ruleseteditor', query: { open: context.name }})"
+        >
+          <q-item-section>...open</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-close-popup
+          v-if="context.name && context.name.match(/tpl$/)"
+          @click="$router.push({ path: 'templates', query: { open: context.name }})"
         >
           <q-item-section>...open</q-item-section>
         </q-item>

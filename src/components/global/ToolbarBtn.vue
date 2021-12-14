@@ -1,19 +1,38 @@
 <template>
-  <q-btn
-    :flat="sub"
-    round
-    no-caps
-    size="sm"
-    :color="color ? color : sub === true ? 'grey' : 'primary'"
-    :icon="icon"
-    :class="btnClass"
-    :disable="disable"
-  >
-    <q-tooltip v-if="tooltip">
-      {{ tooltip }}
-    </q-tooltip>
-    <slot />
-  </q-btn>
+  <div>
+    <q-btn
+      v-if="icon"
+      :flat="sub"
+      round
+      no-caps
+      size="sm"
+      :icon="icon"
+      :color="color ? color : sub === true ? 'grey' : 'primary'"
+      :class="btnClass"
+      :disable="disable"
+    >
+      <q-tooltip v-if="tooltip">
+        {{ tooltip }}
+      </q-tooltip>
+      <slot />
+    </q-btn>
+    <q-btn
+      v-if="!icon"
+      :flat="sub"
+      round
+      no-caps
+      size="sm"
+      :label="label"
+      :color="color ? color : sub === true ? 'grey' : 'primary'"
+      :class="btnClass"
+      :disable="disable"
+    >
+      <q-tooltip v-if="tooltip">
+        {{ tooltip }}
+      </q-tooltip>
+      <slot />
+    </q-btn>
+  </div>
 </template>
 
 <script>
@@ -24,7 +43,13 @@ export default {
     sub: Boolean,
     icon: {
       type: String,
-      required: true
+      default: null,
+      required: false
+    },
+    label: {
+      type: String,
+      default: null,
+      required: false
     },
     specialClass: {
       type: String,

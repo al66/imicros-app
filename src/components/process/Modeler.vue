@@ -33,6 +33,7 @@
 
 <script>
 import { markRaw, toRaw } from 'vue'
+// import { useQuasar } from 'quasar'
 const cloneDeep = require('lodash/cloneDeep')
 // vuex store
 import { mapGetters } from 'vuex'
@@ -77,6 +78,11 @@ export default {
       default: '',
       required: false
     },
+    svg: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
     zoom: {
       type: Number,
       default: 0,
@@ -98,7 +104,7 @@ export default {
       required: false
     }
   },
-  emits: ['xml'],
+  emits: ['xml', 'svg'],
   components: {
     Parameters
   },
@@ -106,7 +112,7 @@ export default {
     return {
       modeler: null,
       splitter: {
-        attributes: 80 // start at 80%
+        attributes: 100 // start at 80%
       },
       selected: {
         type: '',
@@ -157,12 +163,26 @@ export default {
     palette: function (newVal, oldVal) {
       const palette = this.modeler.get('palette')
       newVal ? palette.open() : palette.close()
+    },
+    svg: function () {
+      this.getSVG()
+    }/*,
+    '$q.dark.isActive' (val) {
+      console.log('dark:' + val)
+      if (val) {
+        this.initModeler({ opts: { defaultFillColor: '#333333', defaultStrokeColor: '#fefefe' } })
+      } else {
+        this.initModeler({ opts: { } })
+      }
     }
+    */
   },
   created () {
     // TODO: restore last state
     if (!this.modeler) {
-      this.initModeler({ opts: { defaultFillColor: 'var(--element-fill)', defaultStrokeColor: 'var(--element-stroke)' } })
+      // const $q = useQuasar()
+      // this.initModeler({ opts: { defaultFillColor: '--element-fill', defaultStrokeColor: '--element-stroke' } })
+      this.initModeler({ opts: { } })
     }
   },
   mounted () {
@@ -173,7 +193,6 @@ export default {
   },
   methods: {
     initModeler ({ opts }) {
-      console.log(this.id)
       this.modeler = markRaw(new BpmnModeler({
         // container: '#' + this.id
         bpmnRenderer: opts,
@@ -313,6 +332,10 @@ export default {
     zoomFit () {
       // this.editMode ? this.modeler.get('canvas').zoom('fit-viewport') : this.viewer.get('canvas').zoom('fit-viewport')
       this.modeler.get('canvas').zoom('fit-viewport')
+    },
+    async getSVG () {
+      const { svg } = await this.modeler.saveSVG({ format: true })
+      this.$emit('svg', svg)
     }
   }
 }
@@ -337,6 +360,17 @@ export default {
   --element-stroke: #000000;
 }
 /* editor settings for dark mode */
+.dark .djs-container {
+  background: var(--color-666666);
+
+  --context-pad-entry-background-color: var(--color-333333);
+  --context-pad-entry-hover-background-color: var(--color-666666);
+}
+.dark .djs-direct-editing-content, .dark .djs-direct-editing-parent {
+  background: var(--color-ffffff) !important;
+  color: var(--color-000000)
+}
+/*
 .dark .djs-container {
 
   --blue-base-65: #4d90ff;
@@ -429,4 +463,5 @@ export default {
 .dark .djs-direct-editing-content, .dark .djs-direct-editing-parent {
   background: var(--color-000000) !important;
 }
+*/
 </style>

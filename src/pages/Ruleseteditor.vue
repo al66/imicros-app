@@ -886,6 +886,11 @@ export default {
   },
   mounted () {
     this.newRuleset()
+
+    // open file parameter
+    const file = this.$route?.query?.open ?? null
+    if (file) this.loadRuleset(file)
+    this.$router.replace({ query: null })
   },
   methods: {
     addColumn (input) {

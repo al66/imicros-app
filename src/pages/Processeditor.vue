@@ -50,6 +50,19 @@
       />
       <q-space />
       <toolbar-btn
+        sub
+        label="SVG"
+        @click="triggerSVG = !triggerSVG"
+      />
+      <a
+        class="q-badge q-pl-none q-pr-none hidden"
+        v-if="download.url"
+        :href="download.url"
+        :download="objectName +'.svg'"
+        :ref="'link'"
+      />
+      <q-space />
+      <toolbar-btn
         icon="ion-add"
         @click="newDiagram"
       />
@@ -79,7 +92,9 @@
         :fit="triggerFit"
         :minimap="minimap"
         :palette="palette"
+        :svg="triggerSVG"
         @xml="saveXML"
+        @svg="downloadSVG"
       />
       <div
         v-show="false"
@@ -135,12 +150,17 @@ export default {
       triggerRedo: false,
       triggerSave: '',
       triggerFit: false,
+      triggerSVG: false,
       zoom: 0,
       minimap: false,
       palette: true,
       editMode: true,
       agents: {
         data: []
+      },
+      download: {
+        svg: '',
+        url: null
       }
     }
   },
@@ -172,6 +192,11 @@ export default {
   mounted () {
     // short keys
     document.addEventListener('keydown', this.doSave)
+
+    // open file parameter
+    const file = this.$route?.query?.open ?? null
+    if (file) this.loadDiagram(file)
+    this.$router.replace({ query: null })
   },
   beforeUnmount () {
     // short keys
@@ -265,6 +290,17 @@ export default {
           this.selected.parameterObject.template = ''
       }
       this.updateProperties()
+    },
+    async downloadSVG (svg) {
+      // console.log(svg)
+      this.download.svg = svg
+
+      // const blob = new Blob([svg])
+      // const url = window.URL.createObjectURL(blob)
+      const data = encodeURIComponent(svg)
+      this.download.url = 'data:application/bpmn20-xml;charset=UTF-8,' + data
+      const self = this
+      setTimeout(function () { if (self.$refs.link) self.$refs.link.click() }, 50)
     }
   }
 }

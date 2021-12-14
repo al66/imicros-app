@@ -26,6 +26,7 @@
       <q-card-section align="center">
         <q-btn
           color="primary"
+          no-caps
           icon="ion-log-out"
           :label="$t('Login.button.logout')"
           @click="logout()"
@@ -70,6 +71,7 @@
         <div class="q-pa-md">
           <q-btn
             flat
+            no-caps
             class="full-width"
             color="primary"
             icon="ion-log-in"
@@ -87,7 +89,8 @@
               no-caps
               class="full-width"
               color="primary"
-              label="Forgot password?"
+              :label="$t('Login.button.password.reset')"
+              to="/passwordreset"
             />
           </div>
           <div
@@ -99,7 +102,7 @@
               no-caps
               class="full-width"
               color="secondary"
-              label="New to imicros ?"
+              :label="$t('Login.button.signin')"
               to="/signin"
             />
           </div>

@@ -1,7 +1,6 @@
 <template>
   <q-list>
     <q-item
-      dense
       clickable
       v-for="(group) in groups"
       :key="group.id"

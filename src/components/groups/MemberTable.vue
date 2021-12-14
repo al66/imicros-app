@@ -102,15 +102,36 @@
           >
             {{ group.alias ? group.alias : group.name }}
           </q-chip>
+          <div class="q-pa-md q-gutter-md">
+            <q-badge
+              v-if="counter.admin > 0"
+              outline
+              color="primary"
+              align="top"
+            >
+              {{ counter.admin }}
+            </q-badge>
+            <q-badge
+              v-if="counter.member > 0"
+              outline
+              color="secondary"
+              align="top"
+            >
+              {{ counter.member }}
+            </q-badge>
+            <q-badge
+              v-if="counter.invited > 0"
+              outline
+              color="orange"
+              align="top"
+            >
+              {{ counter.invited }}
+            </q-badge>
+          </div>
         </q-toolbar>
       </template>
       <template #top-right>
         <q-toolbar>
-          <toolbar-btn
-            icon="ion-at"
-            sub
-            @click="$emit('back')"
-          />
           <toolbar-btn
             icon="ion-refresh"
             :tooltip="$t('Action.refresh')"
@@ -240,6 +261,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+const cloneDeep = require('lodash/cloneDeep')
 // components
 import ConfirmRequestDialog from './ConfirmRequestDialog.vue'
 import ToolbarBtn from '../global/ToolbarBtn.vue'
@@ -261,7 +283,9 @@ export default {
     return {
       member: [],
       counter: {
-        member: 0
+        member: 0,
+        admin: 0,
+        invited: 0
       },
       filter: '',
       visibleColumns: ['email'],
@@ -309,7 +333,7 @@ export default {
       immediate: true,
       handler (group) {
         // get member
-        this.getMember()
+        if (group && group.id) this.getMember()
       }
     }
   },
@@ -317,16 +341,16 @@ export default {
     // restore settings - component member
     const settings = this.$store.getters.settings('member')
     if (settings) {
-      this.visibleColumns = settings.visibleColumns
-      this.pagination = settings.pagination
+      this.visibleColumns = cloneDeep(settings.visibleColumns)
+      this.pagination = cloneDeep(settings.pagination)
     }
   },
   beforeUnmount () {
     // store settings - component member
     this.$store.commit('setSettings', {
       member: {
-        visibleColumns: this.visibleColumns,
-        pagination: this.pagination
+        visibleColumns: cloneDeep(this.visibleColumns),
+        pagination: cloneDeep(this.pagination)
       }
     })
   },
@@ -339,15 +363,26 @@ export default {
       instance.post('/#groups/members', param).then((response) => {
         if (response.data) {
           const members = []
+          this.counter.invited = 0
+          this.counter.member = 0
+          this.counter.admin = 0
           if (Array.isArray(response.data)) {
             for (let i = 0; i < response.data.length; i++) {
               const member = response.data[i]
               members.push(member)
+              if (member.relation === 'INVITED_BY') {
+                this.counter.invited++
+              } else {
+                if (member.role === 'admin') {
+                  this.counter.admin++
+                } else {
+                  this.counter.member++
+                }
+              }
             }
             this.member = members
-            this.counter.member = members.length
             this.translateData()
-            this.$emit('refreshed', { count: this.member.length })
+            this.$emit('refreshed', { count: this.counter.member + this.counter.admin })
           }
         }
       })
@@ -372,7 +407,7 @@ export default {
         param.email = invitation.email
       }
       instance.post('/#groups/remove', param).then((response) => {
-        if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].email) {
+        if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].key) {
           this.getMember()
         }
       })
@@ -399,7 +434,7 @@ export default {
               param.email = this.selected[i].email
             }
             instance.post('/#groups/remove', param).then((response) => {
-              if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].email) {
+              if (response.data && Array.isArray(response.data) && response.data.length > 0 && response.data[0].key) {
                 this.getMember()
               }
             })

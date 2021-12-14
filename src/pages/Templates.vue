@@ -308,6 +308,11 @@ export default {
     }
   },
   mounted () {
+    // open file parameter
+    const file = this.$route?.query?.open ?? null
+    if (file) this.loadTemplate(file)
+    this.$router.replace({ query: null })
+
     document.addEventListener('keydown', this.doSave)
     Handlebars.registerHelper({
       eq: (v1, v2) => v1 === v2,

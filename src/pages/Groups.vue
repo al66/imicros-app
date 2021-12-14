@@ -1,47 +1,12 @@
 <template>
   <div>
-    <!-- main navigation tabs -->
-    <q-tabs
-      v-model="tab"
-      :class="$q.dark.isActive ? 'text-gray-2' : 'text-grey-10'"
-      dense
-    >
-      <!-- <q-tab name="groups" icon="ion-at" :label="$t('Groups.tab.groups.title')"  transition-show="slide-right"> -->
-      <q-tab
-        name="groups"
-        icon="ion-at"
-        transition-show="slide-right"
-      >
-        <q-tooltip>{{ $t('Groups.tab.groups.title') }}</q-tooltip>
-        <q-badge
-          v-if="counter.invitedBy > 0"
-          color="orange"
-          floating
-        >
-          {{ counter.invitedBy }}
-        </q-badge>
-      </q-tab>
-      <!-- <q-tab :disable="selectedGroups.length != 1" name="members" icon="ion-people" :label="$t('Groups.tab.members.title')"> -->
-      <q-tab
-        :disable="selectedGroups.length != 1"
-        name="members"
-        icon="ion-people"
-      >
-        <q-tooltip>{{ $t('Groups.tab.members.title') }}</q-tooltip>
-        <q-badge
-          v-if="counter.member > 0"
-          color="blue"
-          floating
-        >
-          {{ counter.member }}
-        </q-badge>
-      </q-tab>
-    </q-tabs>
-
     <!-- panels -->
     <q-tab-panels v-model="tab">
       <!-- groups panel -->
-      <q-tab-panel name="groups">
+      <q-tab-panel
+        name="groups"
+        class="q-pt-none"
+      >
         <q-table
           :columns="columnsGroups"
           :rows="dataGroups"
@@ -62,7 +27,7 @@
             >
               <q-chip
                 clickable
-                @click="editGroup(props.row.id)"
+                @click.stop="editGroup(props.row.id)"
                 dense
                 :color="props.row.role === 'admin' ? 'primary' : 'secondary' "
                 text-color="white"
@@ -76,7 +41,7 @@
                 dense
                 color="red"
                 text-color="white"
-                @click="confirmDialog(props.row)"
+                @click.stop="confirmDialog(props.row)"
               >
                 {{ $t('Groups.table.chip.revoke') }}: {{ new Date(props.row.tte).toLocaleDateString() }}
               </q-chip>
@@ -86,7 +51,7 @@
                 dense
                 color="blue"
                 text-color="white"
-                @click="confirmDialog(props.row)"
+                @click.stop="confirmDialog(props.row)"
               >
                 {{ $t('Groups.table.chip.nominated') }}
               </q-chip>
@@ -105,7 +70,7 @@
                 color="orange"
                 text-color="white"
                 clickable
-                @click="confirmInvitation(props.row)"
+                @click.stop="confirmInvitation(props.row)"
               >
                 {{ $t('Members.table.chip.invited') }}
               </q-chip>
@@ -208,7 +173,11 @@
       </q-tab-panel>
 
       <!-- members panel -->
-      <q-tab-panel name="members">
+      <q-tab-panel
+        name="members"
+        class="q-pt-none"
+        transition-show="jump-down"
+      >
         <member-table
           :group="selectedSingle"
           :is-admin="isAdmin"
@@ -572,6 +541,7 @@ export default {
         id: id
       }
       instance.post('/#groups/join', param).then((response) => {
+        console.log(response.data)
         if (response.data && Array.isArray(response.data) && response.data[0].id) {
           this.refreshGroups()
         }
@@ -627,6 +597,8 @@ export default {
     toMembers (evt, row, index) {
       if (row) {
         this.selectedSingle = row
+        // set flag admin
+        this.selectedSingle.role === 'admin' && this.selectedSingle.relation === 'MEMBER_OF' ? this.isAdmin = true : this.isAdmin = false
         this.tab = 'members'
       }
     },

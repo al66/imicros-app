@@ -80,6 +80,16 @@
         >
           <q-menu>
             <q-list>
+              <q-item
+                clickable
+                to="/user"
+              >
+                <q-item-section avatar>
+                  <q-icon name="ion-settings" />
+                </q-item-section>
+                <q-item-section>{{ user.email }}</q-item-section>
+              </q-item>
+              <q-separator />
               <q-item>
                 <q-btn
                   flat
@@ -124,7 +134,6 @@
               <q-separator />
               <q-item
                 clickable
-                dense
                 @click="logout()"
               >
                 <q-item-section avatar>
@@ -163,7 +172,7 @@
           v-bind="link"
         />
       </q-list>
-      <q-list>
+      <q-list v-if="essentialLinks.length">
         <q-item-label
           header
         >
@@ -186,7 +195,7 @@
     >
       <access-group
         v-if="isAuthenticated()"
-        :refresh="rightDrawerOpen.value"
+        :refresh="rightDrawerOpen"
         @groupSelected="toggleRightDrawer"
       />
     </q-drawer>
@@ -201,6 +210,7 @@
 import EssentialLink from 'components/EssentialLink.vue'
 
 const linksList = [
+  /*
   {
     title: 'Docs',
     caption: 'quasar.dev',
@@ -243,6 +253,7 @@ const linksList = [
     icon: 'favorite',
     link: 'https://awesome.quasar.dev'
   }
+  */
 ]
 import AppLink from '../components/main/AppLink.vue'
 import AccessGroup from '../components/main/AccessGroup.vue'
@@ -268,31 +279,36 @@ const appList = [
     title: 'Rules',
     caption: 'Rules Editor',
     icon: 'assignment',
-    route: '/ruleseteditor'
+    route: '/ruleseteditor',
+    status: 'experimental'
   },
   {
     title: 'Templates',
     caption: 'Template Editor',
     icon: 'ion-code',
-    route: '/templates'
+    route: '/templates',
+    status: 'alpha'
   },
   {
     title: 'Processes',
     caption: 'Process Monitor',
     icon: 'ion-pulse',
-    route: '/processmonitor'
+    route: '/processmonitor',
+    status: 'experimental'
   },
   {
     title: 'Agents',
     caption: 'Manage accounts for external acces',
     icon: 'ion-key',
-    route: '/agents'
+    route: '/agents',
+    status: 'alpha'
   },
   {
     title: 'Mail accounts',
     caption: 'Manage mail account acces',
     icon: 'ion-mail',
-    route: '/externalAccounts'
+    route: '/externalAccounts',
+    status: 'alpha'
   }
 ]
 

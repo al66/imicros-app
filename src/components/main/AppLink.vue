@@ -10,7 +10,16 @@
     </q-item-section>
 
     <q-item-section>
-      <q-item-label>{{ title }}</q-item-label>
+      <q-item-label>
+        {{ title }}
+        <q-badge
+          v-if="status"
+          align="top"
+          color="orange"
+        >
+          {{ status }}
+        </q-badge>
+      </q-item-label>
       <q-item-label caption>
         {{ caption }}
       </q-item-label>
@@ -40,6 +49,11 @@ export default defineComponent({
     },
 
     icon: {
+      type: String,
+      default: ''
+    },
+
+    status: {
       type: String,
       default: ''
     }

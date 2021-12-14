@@ -37,6 +37,7 @@
         >
           <q-btn
             flat
+            no-caps
             class="full-width"
             color="primary"
             icon="ion-log-in"
@@ -139,7 +140,8 @@ export default {
         }
       })
     },
-    confirm (email, token) {
+    confirm (token) {
+      const self = this
       const params = {
         token
       }
@@ -149,7 +151,7 @@ export default {
       // call create user
       instance.post('/#auth/confirm', params).then(function (response) {
         if (response.data && response.data.verified) {
-          this.$router.push({ name: 'login', query: { confirmed: true, email: response.data.verified } })
+          self.$router.push({ path: 'login', query: { confirmed: true, email: response.data.verified } })
         }
       }).catch((error) => {
         // Not ok - check for message and notify

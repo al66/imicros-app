@@ -3,7 +3,10 @@
     <!-- panels -->
     <q-tab-panels v-model="panels.tab">
       <!-- process panel -->
-      <q-tab-panel name="agents">
+      <q-tab-panel
+        name="agents"
+        class="q-pt-none"
+      >
         <q-toolbar>
           <q-input
             dense

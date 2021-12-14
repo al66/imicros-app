@@ -12,7 +12,7 @@
   "dependencies": {
     "@quasar/extras": "^1.11.4",
     "axios": "^0.21.1",
-    "bpmn-js": "8.8.2",
+    "bpmn-js": "8.8.3",
     "core-js": "^3.18.3",
     "diagram-js-minimap": "^2.0.4",
     "handlebars": "^4.7.7",

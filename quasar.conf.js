@@ -103,9 +103,10 @@ module.exports = configure(function (ctx) {
       proxy: {
         // proxy all requests starting with /api to jsonplaceholder
         '/api': {
-          target: 'http://192.168.2.124:31028',
+          // target: 'http://192.168.2.124:31028'
+          target: 'http://home.server:8080',
           pathRewrite: {
-            '^/api': ''
+            // '^/api': ''
           },
           // target: 'http://home.server/api',
           // secure: false,
@@ -131,7 +132,8 @@ module.exports = configure(function (ctx) {
 
       // Quasar plugins
       plugins: [
-        'AppFullscreen'
+        'AppFullscreen',
+        'Notify'
       ]
     },
 
