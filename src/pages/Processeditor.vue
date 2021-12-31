@@ -58,7 +58,7 @@
         class="q-badge q-pl-none q-pr-none hidden"
         v-if="download.url"
         :href="download.url"
-        :download="objectName +'.svg'"
+        :download="download.filename"
         :ref="'link'"
       />
       <q-space />
@@ -160,6 +160,7 @@ export default {
       },
       download: {
         svg: '',
+        filename: '',
         url: null
       }
     }
@@ -294,6 +295,7 @@ export default {
     async downloadSVG (svg) {
       // console.log(svg)
       this.download.svg = svg
+      this.download.filename = this.objectName.replace(/\.bpmn$/, '.svg')
 
       // const blob = new Blob([svg])
       // const url = window.URL.createObjectURL(blob)
