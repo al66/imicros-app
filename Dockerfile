@@ -9,6 +9,7 @@ COPY . .
 FROM develop-stage as build-stage
 RUN npm install && npm install --only=dev
 ## RUN yarn
+RUN quasar inspect
 RUN quasar build
 
 # production stage
