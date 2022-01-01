@@ -1,14 +1,13 @@
 # build stage
-FROM node:latest as build-stage
+FROM node:16.13.1-alpine as build-stage
 WORKDIR /app
 
 ## COPY package*.json ./
 ## COPY quasar.conf.js ./
 COPY ./ ./
 
-RUN ls
-
-RUN npm install && npm install --only=dev
+## RUN npm install && npm install --only=dev
+RUN npm install
 ## RUN npm install -g @vue/cli
 ## RUN npm install -g @quasar/cli
 RUN npm run build
