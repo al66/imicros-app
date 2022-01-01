@@ -47,9 +47,6 @@ import quasarUserOptions from './quasar-user-options.js'
 
 
 
-console.info('[Quasar] Running SPA.')
-
-
 
 
 
