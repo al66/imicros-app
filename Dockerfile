@@ -10,6 +10,8 @@ COPY ./ ./
 RUN npm install
 ## RUN npm install -g @vue/cli
 ## RUN npm install -g @quasar/cli
+RUN ls /app/src/i18n/de
+RUN ls /app/src/i18n/en-US
 RUN npm run build
 
 # production stage
