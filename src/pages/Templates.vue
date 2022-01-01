@@ -210,10 +210,10 @@ import Handlebars from 'handlebars/dist/cjs/handlebars'
 // sanitize html
 import sanitizeHtml from 'sanitize-html'
 // components
-import ToolbarBtn from '../components/global/ToolbarBtn.vue'
-import FileSelect from '../components/main/FileSelect.vue'
-import FileSaveAs from '../components/main/FileSaveAs.vue'
-import Editor from '../components/global/Editor.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
+import FileSelect from 'src/components/main/FileSelect.vue'
+import FileSaveAs from 'src/components/main/FileSaveAs.vue'
+import Editor from 'src/components/global/Editor.vue'
 
 export default {
   name: 'Templates',

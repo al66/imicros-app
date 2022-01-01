@@ -321,7 +321,7 @@
 import { mapGetters } from 'vuex'
 import { copyToClipboard } from 'quasar'
 // components
-import ToolbarBtn from '../components/global/ToolbarBtn.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
 
 export default {
   name: 'Agents',

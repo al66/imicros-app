@@ -265,10 +265,10 @@
 // vuex store
 import { mapGetters } from 'vuex'
 // toolbar button
-import ToolbarBtn from '../components/global/ToolbarBtn.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
 // components
-import FileSelect from '../components/main/FileSelect.vue'
-import FileSaveAs from '../components/main/FileSaveAs.vue'
+import FileSelect from 'src/components/main/FileSelect.vue'
+import FileSaveAs from 'src/components/main/FileSaveAs.vue'
 
 export default {
   name: 'ExtternalAccounts',

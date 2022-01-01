@@ -206,7 +206,7 @@
 </template>
 
 <script>
-import Editor from '../global/Editor.vue'
+import Editor from 'src/components/global/Editor.vue'
 // vuex store
 import { mapGetters } from 'vuex'
 

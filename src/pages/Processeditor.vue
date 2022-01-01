@@ -123,10 +123,10 @@
 // vuex store
 import { mapGetters } from 'vuex'
 // components
-import ToolbarBtn from '../components/global/ToolbarBtn.vue'
-import FileSelect from '../components/main/FileSelect.vue'
-import FileSaveAs from '../components/main/FileSaveAs.vue'
-import Modeler from '../components/process/Modeler.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
+import FileSelect from 'src/components/main/FileSelect.vue'
+import FileSaveAs from 'src/components/main/FileSaveAs.vue'
+import Modeler from 'src/components/process/Modeler.vue'
 
 export default {
   name: 'Processeditor',

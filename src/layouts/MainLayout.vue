@@ -255,8 +255,8 @@ const linksList = [
   }
   */
 ]
-import AppLink from '../components/main/AppLink.vue'
-import AccessGroup from '../components/main/AccessGroup.vue'
+import AppLink from 'src/components/main/AppLink.vue'
+import AccessGroup from 'src/components/main/AccessGroup.vue'
 import { defineComponent, ref, watch } from 'vue'
 import { mapGetters } from 'vuex'
 import { useI18n } from 'vue-i18n'

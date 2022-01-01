@@ -676,10 +676,10 @@
 // vuex store
 import { mapGetters } from 'vuex'
 // components
-import FileSelect from '../components/main/FileSelect.vue'
-import FileSaveAs from '../components/main/FileSaveAs.vue'
-import ToolbarBtn from '../components/global/ToolbarBtn.vue'
-import Editor from '../components/global/Editor.vue'
+import FileSelect from 'src/components/main/FileSelect.vue'
+import FileSaveAs from 'src/components/main/FileSaveAs.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
+import Editor from 'src/components/global/Editor.vue'
 // import { uuid } from 'vue-uuid'
 import { uid } from 'quasar'
 // lodash

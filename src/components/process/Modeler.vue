@@ -38,16 +38,16 @@ const cloneDeep = require('lodash/cloneDeep')
 // vuex store
 import { mapGetters } from 'vuex'
 // components
-import Parameters from './Parameters.vue'
+import Parameters from 'src/components/process/Parameters.vue'
 // bpmn-js
 import BpmnModeler from 'bpmn-js/lib/Modeler'
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
 import { propertiesUpdater } from './propertiesUpdater'
 // empty diagram
-import diagramXML from './newDiagram.bpmn'
+import diagramXML from 'src/components/process/newDiagram.bpmn'
 // meta data extensions
-import moddleMetaData from './bpmnMetaDataExtension.json'
+import moddleMetaData from 'src/components/process/bpmnMetaDataExtension.json'
 // mini map
 import minimapModule from 'diagram-js-minimap'
 import 'diagram-js-minimap/assets/diagram-js-minimap.css'

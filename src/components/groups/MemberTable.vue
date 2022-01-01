@@ -263,8 +263,8 @@
 import { mapGetters } from 'vuex'
 const cloneDeep = require('lodash/cloneDeep')
 // components
-import ConfirmRequestDialog from './ConfirmRequestDialog.vue'
-import ToolbarBtn from '../global/ToolbarBtn.vue'
+import ConfirmRequestDialog from 'src/components/groups/ConfirmRequestDialog.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
 
 export default {
   props: {

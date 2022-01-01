@@ -320,9 +320,9 @@ import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
 const cloneDeep = require('lodash/cloneDeep')
 // components
-import ToolbarBtn from '../components/global/ToolbarBtn.vue'
-import MemberTable from '../components/groups/MemberTable.vue'
-import ConfirmRequestDialog from '../components/groups/ConfirmRequestDialog.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
+import MemberTable from 'src/components/groups/MemberTable.vue'
+import ConfirmRequestDialog from 'src/components/groups/ConfirmRequestDialog.vue'
 
 export default {
   name: 'Groups',

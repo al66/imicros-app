@@ -330,7 +330,7 @@
 import { mapGetters } from 'vuex'
 const cloneDeep = require('lodash/cloneDeep')
 // components
-import ToolbarBtn from '../components/global/ToolbarBtn.vue'
+import ToolbarBtn from 'src/components/global/ToolbarBtn.vue'
 
 export default {
   name: 'Files',
