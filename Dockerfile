@@ -2,16 +2,9 @@
 FROM node:16.13.1-alpine as build-stage
 WORKDIR /app
 
-## COPY package*.json ./
-## COPY quasar.conf.js ./
 COPY ./ ./
 
-## RUN npm install && npm install --only=dev
 RUN npm install
-## RUN npm install -g @vue/cli
-## RUN npm install -g @quasar/cli
-RUN ls /app/src/i18n/de
-RUN ls /app/src/i18n
 RUN npm run build
 
 # production stage
