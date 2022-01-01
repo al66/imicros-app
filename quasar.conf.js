@@ -10,6 +10,7 @@
 const ESLintPlugin = require('eslint-webpack-plugin')
 const { configure } = require('quasar/wrappers')
 const webpack = require('webpack')
+const path = require('path')
 
 module.exports = configure(function (ctx) {
   return {
@@ -85,6 +86,14 @@ module.exports = configure(function (ctx) {
           loader: 'raw-loader'
         })
         cfg.plugins.push(new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }))
+
+        // https://quasar.dev/quasar-cli/handling-webpack
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias, // This adds the existing alias
+
+          // Add your own alias like this
+          src: path.resolve(__dirname, './src')
+        }
       },
 
       // https://quasar.dev/quasar-cli/handling-webpack
