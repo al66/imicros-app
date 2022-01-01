@@ -196,7 +196,7 @@
       <access-group
         v-if="isAuthenticated()"
         :refresh="rightDrawerOpen"
-        @groupSelected="toggleRightDrawer"
+        @group-selected="toggleRightDrawer"
       />
     </q-drawer>
 
