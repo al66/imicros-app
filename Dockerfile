@@ -2,14 +2,16 @@
 FROM node:latest as build-stage
 WORKDIR /app
 
-COPY package*.json ./
-COPY quasar.conf.js ./
+## COPY package*.json ./
+## COPY quasar.conf.js ./
 COPY ./ ./
 
+RUN ls
+
 RUN npm install && npm install --only=dev
-RUN npm install -g @vue/cli
-RUN npm install -g @quasar/cli
-RUN quasar build
+## RUN npm install -g @vue/cli
+## RUN npm install -g @quasar/cli
+RUN npm run build
 
 # production stage
 FROM nginx:1.20.2-alpine as production-stage
