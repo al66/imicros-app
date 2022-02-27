@@ -55,6 +55,7 @@
               v-model="email"
               filled
               dense
+              clearable
               placeholder="max.mustermann@test.de"
               :hint="$t('Login.email.label')"
             />
@@ -62,6 +63,7 @@
               v-model="password"
               filled
               dense
+              clearable
               type="password"
               :hint="$t('Login.password.label')"
               @keyup.enter="login()"
@@ -103,7 +105,7 @@
               class="full-width"
               color="secondary"
               :label="$t('Login.button.signin')"
-              to="/signin"
+              :to="toSignin"
             />
           </div>
         </div>
@@ -127,11 +129,16 @@ export default {
   computed: {
     ...mapGetters({
       user: 'user'
-    })
+    }),
+    toSignin () {
+      return '/signin' + (this.email ? '?email=' + this.email : '')
+    }
   },
   mounted () {
+    if (this.$route.query && this.$route.query.email) {
+      this.email = this.$route.query.email
+    }
     if (this.$route.query && this.$route.query.confirmed) {
-      if (this.$route.query.email) this.email = this.$route.query.email
       this.$q.notify({
         message: this.$t('Info.success.confirmed'),
         color: 'primary',

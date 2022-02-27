@@ -290,6 +290,13 @@ const appList = [
     status: 'alpha'
   },
   {
+    title: 'Test Workbench',
+    caption: 'Test single services',
+    icon: 'bi-clipboard-check',
+    route: '/test',
+    status: 'experimental'
+  },
+  {
     title: 'Processes',
     caption: 'Process Monitor',
     icon: 'ion-pulse',

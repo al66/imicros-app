@@ -296,6 +296,8 @@ export default {
       // console.log(svg)
       this.download.svg = svg
       this.download.filename = this.objectName.replace(/\.bpmn$/, '.svg')
+      if (!this.download.filename || !this.download.filename.length) this.download.filename = this.$t('Process.editor.new.file')
+      if (!this.download.filename.endsWith('.svg')) this.download.filename = this.download.filename + '.svg'
 
       // const blob = new Blob([svg])
       // const url = window.URL.createObjectURL(blob)

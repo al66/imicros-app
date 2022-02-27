@@ -44,7 +44,8 @@ module.exports = configure(function (ctx) {
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font', // optional, you are not bound to it
-      'material-icons' // optional, you are not bound to it
+      'material-icons', // optional, you are not bound to it
+      'bootstrap-icons'
     ],
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
@@ -106,6 +107,7 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
+      // https: true,
       https: false,
       port: 8080,
       open: true, // opens browser window automatically
@@ -113,12 +115,12 @@ module.exports = configure(function (ctx) {
         // proxy all requests starting with /api to jsonplaceholder
         '/api': {
           // target: 'http://192.168.2.124:31028'
-          target: 'http://home.server:8080',
+          // target: 'http://home.server:8080',
+          target: 'https://dev.imicros.de',
           pathRewrite: {
             // '^/api': ''
           },
-          // target: 'http://home.server/api',
-          // secure: false,
+          secure: true,
           changeOrigin: true,
           logLevel: 'debug'
         }

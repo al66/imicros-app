@@ -19,6 +19,7 @@
               v-model="email"
               filled
               dense
+              clearable
               placeholder="max.mustermann@test.de"
               :hint="$t('Signin.email.label')"
             />
@@ -26,6 +27,7 @@
               v-model="password"
               filled
               dense
+              clearable
               type="password"
               :hint="$t('Signin.password.label')"
             />
@@ -59,7 +61,7 @@
               class="full-width"
               color="secondary"
               label="Already an account ?"
-              to="/login"
+              :to="toLogin"
             />
           </div>
         </div>
@@ -78,9 +80,19 @@ export default {
       response: null
     }
   },
+  computed: {
+    toLogin () {
+      return '/login' + (this.email ? '?email=' + this.email : '')
+    }
+  },
   created () {
     if (this.$route.query && this.$route.query.token) {
       this.confirm(this.$route.query.token)
+    }
+  },
+  mounted () {
+    if (this.$route.query && this.$route.query.email) {
+      this.email = this.$route.query.email
     }
   },
   methods: {

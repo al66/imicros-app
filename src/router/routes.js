@@ -17,6 +17,7 @@ const routes = [
       { path: 'templates', name: 'templates', component: () => import('pages/Templates.vue') },
       { path: 'ruleseteditor', name: 'ruleseteditor', component: () => import('pages/Ruleseteditor.vue') },
       { path: 'processeditor', name: 'processeditor', component: () => import('pages/Processeditor.vue') },
+      { path: 'test', name: 'servicetest', component: () => import('pages/ServiceTest.vue') },
       { path: 'processmonitor', name: 'processmonitor', component: () => import('pages/Processmonitor.vue') },
       { path: 'externalAccounts', name: 'externalAccounts', component: () => import('pages/ExternalAccounts.vue') },
       { path: 'agents', name: 'agents', component: () => import('pages/Agents.vue') }
