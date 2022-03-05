@@ -8,7 +8,7 @@
           v-if="isAuthenticated()"
           flat
           dense
-          icon="menu"
+          icon="bi-list"
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
@@ -266,54 +266,54 @@ const appList = [
   {
     title: 'Files',
     caption: 'File Manager',
-    icon: 'ion-filing',
+    icon: 'bi-folder',
     route: '/files'
   },
   {
     title: 'Processes',
     caption: 'BPMN Process Editor',
-    icon: 'ion-cog',
+    icon: 'bi-diagram-2',
     route: '/processeditor'
   },
   {
     title: 'Rules',
     caption: 'Rules Editor',
-    icon: 'assignment',
+    icon: 'bi-file-ruled',
     route: '/ruleseteditor',
     status: 'experimental'
   },
   {
     title: 'Templates',
     caption: 'Template Editor',
-    icon: 'ion-code',
+    icon: 'bi-code-square',
     route: '/templates',
     status: 'alpha'
   },
   {
-    title: 'Test Workbench',
+    title: 'Test Terminal',
     caption: 'Test single services',
-    icon: 'bi-clipboard-check',
+    icon: 'bi-terminal',
     route: '/test',
     status: 'experimental'
   },
   {
     title: 'Processes',
     caption: 'Process Monitor',
-    icon: 'ion-pulse',
+    icon: 'bi-activity',
     route: '/processmonitor',
     status: 'experimental'
   },
   {
     title: 'Agents',
     caption: 'Manage accounts for external acces',
-    icon: 'ion-key',
+    icon: 'bi-key',
     route: '/agents',
     status: 'alpha'
   },
   {
     title: 'Mail accounts',
     caption: 'Manage mail account acces',
-    icon: 'ion-mail',
+    icon: 'bi-mailbox',
     route: '/externalAccounts',
     status: 'alpha'
   }

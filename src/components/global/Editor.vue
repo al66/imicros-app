@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { toRef } from 'vue'
+import { ref, toRef } from 'vue'
 // import Editor from 'vue2-ace-editor'
 import { VAceEditor } from 'vue3-ace-editor'
 import 'ace-builds/src-noconflict/ext-language_tools'
@@ -37,6 +37,11 @@ export default {
       type: Boolean,
       default: false,
       required: false
+    },
+    refresh: {
+      type: Boolean,
+      default: false,
+      required: false
     }
   },
   emits: ['update:content'],
@@ -45,10 +50,13 @@ export default {
   },
   setup (props) {
     const lang = toRef(props, 'lang')
+    const editorRef = ref(null)
 
     return {
+      editorRef,
       //
       editorInit (editor) {
+        editorRef.value = editor
         editor.setOptions({
           autoScrollEditorIntoView: true,
           maxLines: 'Infinity',
@@ -70,6 +78,12 @@ export default {
         })
         */
       }
+    }
+  },
+  watch: {
+    refresh: function () {
+      console.log(this.content)
+      this.editorRef.resize()
     }
   },
   computed: {
