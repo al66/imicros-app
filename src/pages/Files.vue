@@ -154,6 +154,14 @@
                     <q-item
                       clickable
                       v-close-popup
+                      v-if="props.row.name && props.row.name.match(/dmn$/)"
+                      @click="$router.push({ path: 'decisionmodeler', query: { open: props.row.name }})"
+                    >
+                      <q-item-section>...open</q-item-section>
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
                       v-if="props.row.name && props.row.name.match(/ruleset$/)"
                       @click="$router.push({ path: 'ruleseteditor', query: { open: props.row.name }})"
                     >
@@ -286,6 +294,14 @@
           v-close-popup
           v-if="context.name && context.name.match(/bpmn$/)"
           @click="$router.push({ path: 'processeditor', query: { open: context.name }})"
+        >
+          <q-item-section>...open</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-close-popup
+          v-if="context.name && context.name.match(/dmn$/)"
+          @click="$router.push({ path: 'decisionmodeler', query: { open: context.name }})"
         >
           <q-item-section>...open</q-item-section>
         </q-item>

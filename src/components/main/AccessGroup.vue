@@ -76,7 +76,7 @@ export default {
       instance.post('/#acl/requestAccess', params).then((response) => {
         if (response.data && response.data.token) {
           this_.$store.commit('setAccess', {
-            group: group,
+            group,
             token: response.data.token
           })
           this.$emit('groupSelected', true)

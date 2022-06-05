@@ -276,6 +276,13 @@ const appList = [
     route: '/processeditor'
   },
   {
+    title: 'Decisions',
+    caption: 'DMN Modeler',
+    icon: 'bi-file-ruled',
+    route: '/decisionmodeler',
+    status: 'beta'
+  },
+  {
     title: 'Rules',
     caption: 'Rules Editor',
     icon: 'bi-file-ruled',

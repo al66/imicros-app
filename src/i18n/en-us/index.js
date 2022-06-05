@@ -97,6 +97,7 @@ export default {
   'Process.editor.parameters.dialog.label.template': 'Mapping',
   'Process.editor.parameters.dialog.label.rulesetPreparation': 'Ruleset (for mapping)',
   'Process.editor.parameters.dialog.label.ruleset': 'Ruleset',
+  'Decision.modeler.new.file': 'New',
   'Process.monitor.table.column.name': 'Name',
   'Process.monitor.table.column.processId': 'Id',
   'Process.monitor.table.column.status': 'Status',

@@ -538,7 +538,7 @@ export default {
     joinGroup (id) {
       const instance = this.$instance()
       const param = {
-        id: id
+        id
       }
       instance.post('/#groups/join', param).then((response) => {
         console.log(response.data)
@@ -552,7 +552,7 @@ export default {
     refuseInvitation (id) {
       const instance = this.$instance()
       const param = {
-        id: id
+        id
       }
       instance.post('/#groups/refuse', param).then((response) => {
         if (response.data && Array.isArray(response.data) && response.data[0].id) {
@@ -567,7 +567,7 @@ export default {
       for (let i = 0; i < this.selectedGroups.length; i++) {
         const param = {
           id: this.selectedGroups[i].id,
-          unhide: unhide
+          unhide
         }
         instance.post('/#groups/hide', param).then((response) => {
           if (response.data && Array.isArray(response.data) && response.data[0].id) {
@@ -581,7 +581,7 @@ export default {
     unhide (id) {
       const instance = this.$instance()
       const param = {
-        id: id,
+        id,
         unhide: true
       }
       instance.post('/#groups/hide', param).then((response) => {

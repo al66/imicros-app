@@ -1,56 +1,27 @@
 <template>
-  <q-splitter
-    v-model="splitter.attributes"
-    :limits="[70, 100]"
-  >
-    <template #before>
-      <div
-        :class="editorClass"
-        :id="id"
-        style="height: calc(100vh - 50px - 90px;"
-      />
-    </template>
-    <template #separator>
-      <q-avatar
-        color="primary"
-        text-color="white"
-        size="30px"
-        icon="drag_indicator"
-      />
-    </template>
-    <template #after>
-      <!-- {{ parameters }} -->
-      <parameters
-        :id="selected.id"
-        :type="selected.type"
-        :subtype="selected.subtype"
-        :parameters="parameters"
-        @update:parameters="updateParameters"
-      />
-    </template>
-  </q-splitter>
+  <div
+    :class="modelerClass"
+    :id="id"
+    style="height: calc(100vh - 50px - 90px;"
+  />
 </template>
 
 <script>
-import { markRaw, toRaw } from 'vue'
+import { markRaw } from 'vue'
 // import { useQuasar } from 'quasar'
-const cloneDeep = require('lodash/cloneDeep')
 // vuex store
 import { mapGetters } from 'vuex'
-// components
-import Parameters from 'src/components/process/Parameters.vue'
-// bpmn-js
-import BpmnModeler from 'bpmn-js/lib/Modeler'
-import 'bpmn-js/dist/assets/diagram-js.css'
-import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
-import { propertiesUpdater } from './propertiesUpdater'
-// empty diagram
-import diagramXML from 'src/components/process/newDiagram.bpmn'
-// meta data extensions
-import moddleMetaData from 'src/components/process/bpmnMetaDataExtension.json'
-// mini map
-import minimapModule from 'diagram-js-minimap'
-import 'diagram-js-minimap/assets/diagram-js-minimap.css'
+// new decison
+import decisionXML from 'src/components/dmn/newDecision.dmn'
+// dmn-js
+import DmnModeler from 'dmn-js/lib/Modeler'
+import 'dmn-js/dist/assets/diagram-js.css'
+import 'dmn-js/dist/assets/dmn-js-shared.css'
+import 'dmn-js/dist/assets/dmn-js-drd.css'
+import 'dmn-js/dist/assets/dmn-js-decision-table.css'
+import 'dmn-js/dist/assets/dmn-js-decision-table-controls.css'
+import 'dmn-js/dist/assets/dmn-js-literal-expression.css'
+import 'dmn-js/dist/assets/dmn-font/css/dmn.css'
 
 export default {
   props: {
@@ -93,11 +64,6 @@ export default {
       default: false,
       required: false
     },
-    minimap: {
-      type: Boolean,
-      default: false,
-      required: false
-    },
     palette: {
       type: Boolean,
       default: true,
@@ -105,27 +71,16 @@ export default {
     }
   },
   emits: ['xml', 'svg'],
-  components: {
-    Parameters
-  },
   data () {
     return {
-      modeler: null,
-      splitter: {
-        attributes: 100 // start at 80%
-      },
-      selected: {
-        type: '',
-        subtype: {}
-      },
-      parameters: {}
+      modeler: null
     }
   },
   computed: {
     ...mapGetters({
       access: 'access'
     }),
-    editorClass () {
+    modelerClass () {
       return this.$q.dark.isActive ? 'modeler js-canvas dark' : 'modeler js-canvas'
     }
   },
@@ -156,13 +111,13 @@ export default {
     fit: function (newVal, oldVal) {
       this.zoomFit()
     },
-    minimap: function (newVal, oldVal) {
-      const minimap = this.modeler.get('minimap')
-      newVal ? minimap.open() : minimap.close()
-    },
     palette: function (newVal, oldVal) {
-      const palette = this.modeler.get('palette')
-      newVal ? palette.open() : palette.close()
+      try {
+        const palette = this.modeler.getActiveViewer().get('palette')
+        if (palette) newVal ? palette.open() : palette.close()
+      } catch (e) {
+        // ignore any error
+      }
     },
     svg: function () {
       this.getSVG()
@@ -193,149 +148,75 @@ export default {
   },
   methods: {
     initModeler ({ opts }) {
-      this.modeler = markRaw(new BpmnModeler({
-        // container: '#' + this.id
-        bpmnRenderer: opts,
-        moddleExtensions: {
-          fe: moddleMetaData
-        },
-        additionalModules: [
-          propertiesUpdater,
-          minimapModule
-        ]
-      }))
-      this.registerEvents()
+      try {
+        this.modeler = markRaw(new DmnModeler({
+          // container: '#' + this.id,
+          DmnRenderer: opts
+        }))
+      } catch (e) {
+        console.log(e)
+      }
+      // this.registerEvents()
     },
+    /*
     registerEvents () {
       // modeler events
       const eventBus = this.modeler.get('eventBus')
       eventBus.on('element.click', (e) => {
-        this.refreshSelected(e.element)
+        // console.log('element clicked', e)
       })
       eventBus.on('selection.changed', (selection) => {
         // console.log('selection.changed', selection)
-        if (selection.newSelection && selection.newSelection.length === 1) {
-          this.refreshSelected(selection.newSelection[0])
-        } else {
-          this.initSelected()
-        }
       })
     },
+    */
     async newDiagram () {
       try {
-        await this.modeler.importXML(diagramXML)
+        await this.modeler.importXML(decisionXML)
         this.zoomFit()
       } catch (err) {
         console.log('Failed to open new diagram:', err)
       }
     },
-    updateParameters (newVal) {
-      const newParameters = toRaw(newVal)
-      this.parameters = newParameters
-      const selected = toRaw(this.selected)
-      if (selected.element) {
-        const current = cloneDeep(selected.businessObject.get('extensionElements'))
-        const extensionElements = cloneDeep(selected.businessObject.get('extensionElements'))
-
-        let equal = true
-        extensionElements.values = extensionElements.values.map((e) => {
-          if (e.$instanceOf('fe:ExecutionParameter')) {
-            if (JSON.stringify(e) !== JSON.stringify(newParameters)) {
-              equal = false
-              return cloneDeep(newParameters)
-            }
-          }
-          return e
-        })
-        if (!equal) {
-          const commandStack = this.modeler.get('commandStack')
-          commandStack.execute('properties-panel.update-businessobject', {
-            element: selected.element,
-            // businessObject: this.selected.businessObject,
-            businessObject: selected.element.businessObject,
-            properties: {
-              extensionElements
-            },
-            oldProperties: {
-              extensionElements: current
-            }
-          })
-        }
-      }
-    },
-    initSelected () {
-      this.selected = {
-        element: {},
-        businessObject: {},
-        type: '',
-        subtype: {}
-      }
-      this.parameters = {}
-    },
-    refreshSelected (element) {
-      if (element) {
-        this.selected.element = element
-        this.selected.id = element.id
-        const bo = this.selected.element.businessObject
-        this.selected.businessObject = bo
-        if (bo) {
-          this.selected.type = bo.$type
-          this.parameters = toRaw(cloneDeep(this.getExtension(bo, 'fe:ExecutionParameter'))) || {}
-
-          this.selected.subtype = {}
-          // determine event sub type
-          if (bo.eventDefinitions) {
-            bo.eventDefinitions.map((e) => {
-              this.selected.subtype[e.$type] = true
-              return e
-            })
-          }
-        } else {
-          this.parameters = {}
-        }
-      } else {
-        this.initSelected()
-      }
-    },
-    getExtension (bo, type) {
-      if (!bo) return {}
-      if (!bo.extensionElements) {
-        /* Create attributes, if not exists */
-        const moddle = this.modeler.get('moddle')
-        const newParam = moddle.create('fe:ExecutionParameter', {})
-        bo.extensionElements = moddle.create('bpmn:ExtensionElements')
-        bo.extensionElements.get('values').push(newParam)
-        return newParam
-      }
-      return bo.extensionElements.values.filter((e) => {
-        return e.$instanceOf(type)
-      })[0]
-    },
     cmdUndo () {
-      this.modeler.get('commandStack').undo()
-      this.refreshSelected()
+      this.modeler.getActiveViewer().get('commandStack').undo()
     },
     cmdRedo () {
-      this.modeler.get('commandStack').redo()
-      this.refreshSelected()
+      this.modeler.getActiveViewer().get('commandStack').redo()
     },
     zoomIn () {
       // this.editMode ? this.modeler.get('zoomScroll').zoom(-0.5) : this.viewer.get('zoomScroll').zoom(-0.5)
-      this.modeler.get('zoomScroll').zoom(-0.5)
       // this.modeler.get('zoomScroll').stepZoom(-1)
+      try {
+        this.modeler.getActiveViewer().get('zoomScroll').zoom(-0.5)
+      } catch (e) {
+        // ignore any error
+      }
     },
     zoomOut () {
       // this.editMode ? this.modeler.get('zoomScroll').zoom(0.5) : this.viewer.get('zoomScroll').zoom(0.5)
-      this.modeler.get('zoomScroll').zoom(0.5)
       // this.modeler.get('zoomScroll').stepZoom(1)
+      try {
+        this.modeler.getActiveViewer().get('zoomScroll').zoom(0.5)
+      } catch (e) {
+        // ignore any error
+      }
     },
     zoomFit () {
       // this.editMode ? this.modeler.get('canvas').zoom('fit-viewport') : this.viewer.get('canvas').zoom('fit-viewport')
-      this.modeler.get('canvas').zoom('fit-viewport')
+      try {
+        this.modeler.getActiveViewer().get('canvas').zoom('fit-viewport')
+      } catch (e) {
+        // ignore any error
+      }
     },
     async getSVG () {
-      const { svg } = await this.modeler.saveSVG({ format: true })
-      this.$emit('svg', svg)
+      try {
+        const { svg } = await this.modeler.getActiveViewer().saveSVG({ format: true })
+        this.$emit('svg', svg)
+      } catch (e) {
+        // ignore any error
+      }
     }
   }
 }
@@ -350,10 +231,10 @@ export default {
 .djs-palette-toggle {
   display: none;
 }
-/* hide toggler in minimap */
-.djs-minimap .toggle {
+/* hide box with name and id (not used at all) */
+.dmn-definitions {
   display: none;
-}
+};
 /* editor settings for light mode */
 .djs-container {
   --element-fill: #fefefe;

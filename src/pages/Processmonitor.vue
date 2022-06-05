@@ -710,8 +710,8 @@ export default {
       const instance = this.$instance()
       instance.defaults.headers.post['x-imicros-xtoken'] = this.access.token
       const params = {
-        processId: processId,
-        versionId: versionId
+        processId,
+        versionId
       }
       instance.post('/api/flow/control/activateVersion', params).then(async (response) => {
         // successful -> refreh list
@@ -731,8 +731,8 @@ export default {
       const instance = this.$instance()
       instance.defaults.headers.post['x-imicros-xtoken'] = this.access.token
       const params = {
-        processId: processId,
-        versionId: versionId
+        processId,
+        versionId
       }
       instance.post('/api/flow/control/deactivateVersion', params).then(async (response) => {
         // successful -> refresh list

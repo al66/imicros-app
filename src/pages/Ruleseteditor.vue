@@ -1150,7 +1150,7 @@ export default {
                 } else {
                   this.testObject.push({
                     key: test.key || i,
-                    dataJson: dataJson,
+                    dataJson,
                     data: {},
                     resultJson: '',
                     expected: {}

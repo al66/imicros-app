@@ -78,6 +78,7 @@ module.exports = {
     'vue/no-v-model-argument': 'off',
     'vue/no-reserved-props': 'off',
     'vue/multi-word-component-names': 'off',
+    'vue/valid-attribute-name': 'error',
 
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
