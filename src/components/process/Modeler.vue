@@ -118,7 +118,7 @@ export default {
         type: '',
         subtype: {}
       },
-      parameters: {}
+      parameters: markRaw({})
     }
   },
   computed: {
@@ -197,7 +197,7 @@ export default {
         // container: '#' + this.id
         bpmnRenderer: opts,
         moddleExtensions: {
-          fe: moddleMetaData
+          flow: moddleMetaData
         },
         additionalModules: [
           propertiesUpdater,
@@ -213,7 +213,6 @@ export default {
         this.refreshSelected(e.element)
       })
       eventBus.on('selection.changed', (selection) => {
-        // console.log('selection.changed', selection)
         if (selection.newSelection && selection.newSelection.length === 1) {
           this.refreshSelected(selection.newSelection[0])
         } else {
@@ -229,40 +228,6 @@ export default {
         console.log('Failed to open new diagram:', err)
       }
     },
-    updateParameters (newVal) {
-      const newParameters = toRaw(newVal)
-      this.parameters = newParameters
-      const selected = toRaw(this.selected)
-      if (selected.element) {
-        const current = cloneDeep(selected.businessObject.get('extensionElements'))
-        const extensionElements = cloneDeep(selected.businessObject.get('extensionElements'))
-
-        let equal = true
-        extensionElements.values = extensionElements.values.map((e) => {
-          if (e.$instanceOf('fe:ExecutionParameter')) {
-            if (JSON.stringify(e) !== JSON.stringify(newParameters)) {
-              equal = false
-              return cloneDeep(newParameters)
-            }
-          }
-          return e
-        })
-        if (!equal) {
-          const commandStack = this.modeler.get('commandStack')
-          commandStack.execute('properties-panel.update-businessobject', {
-            element: selected.element,
-            // businessObject: this.selected.businessObject,
-            businessObject: selected.element.businessObject,
-            properties: {
-              extensionElements
-            },
-            oldProperties: {
-              extensionElements: current
-            }
-          })
-        }
-      }
-    },
     initSelected () {
       this.selected = {
         element: {},
@@ -273,43 +238,227 @@ export default {
       this.parameters = {}
     },
     refreshSelected (element) {
+      if (!element) {
+        const elementRegistry = this.modeler.get('elementRegistry')
+        element = elementRegistry.get(this.selected.id)
+      }
       if (element) {
+        const deletePrefix = /(\/?)\w+:(\w+\/?) ?(\w+:\w+.*)?/g
         this.selected.element = element
         this.selected.id = element.id
         const bo = this.selected.element.businessObject
         this.selected.businessObject = bo
         if (bo) {
-          this.selected.type = bo.$type
-          this.parameters = toRaw(cloneDeep(this.getExtension(bo, 'fe:ExecutionParameter'))) || {}
-
+          this.selected.type = bo.$type.replace(deletePrefix, '$1$2')
           this.selected.subtype = {}
           // determine event sub type
           if (bo.eventDefinitions) {
-            bo.eventDefinitions.map((e) => {
-              this.selected.subtype[e.$type] = true
-              return e
+            bo.eventDefinitions.forEach((e) => {
+              this.selected.subtype[e.$type.toString().replace(deletePrefix, '$1$2')] = true
+              console.log(this.selected.subtype)
             })
           }
-        } else {
-          this.parameters = {}
         }
+        this.getParameter()
       } else {
         this.initSelected()
       }
     },
-    getExtension (bo, type) {
-      if (!bo) return {}
-      if (!bo.extensionElements) {
-        /* Create attributes, if not exists */
-        const moddle = this.modeler.get('moddle')
-        const newParam = moddle.create('fe:ExecutionParameter', {})
-        bo.extensionElements = moddle.create('bpmn:ExtensionElements')
-        bo.extensionElements.get('values').push(newParam)
-        return newParam
+    getParameter () {
+      const parameters = {}
+      if (this.selected?.businessObject) {
+        parameters.elementName = this.selected.businessObject.name
       }
-      return bo.extensionElements.values.filter((e) => {
-        return e.$instanceOf(type)
-      })[0]
+      if (this.selected?.businessObject?.extensionElements) {
+        const values = this.selected.businessObject.extensionElements.get('values')
+        // map extensions to parameters
+        values.forEach(element => {
+          if (element.$instanceOf('flow:ServiceTask')) {
+            parameters.action = element.action
+            parameters.serviceId = element.serviceId
+            parameters.contextInMultiple = []
+            if (Array.isArray(element.context)) {
+              element.context.forEach(e => {
+                if (e.io === 'in') parameters.contextIn = e.key
+                if (e.io === 'out') parameters.contextOut = e.key
+              })
+            }
+            if (element.preparation) {
+              parameters.template = element.preparation.template
+              if (element.preparation.context) {
+                element.preparation.context.forEach(e => {
+                  if (e.io === 'in') parameters.contextInMultiple.push(e.key)
+                })
+              }
+            }
+          }
+          if (element.$instanceOf('flow:DecisionModel')) {
+            parameters.objectName = element.objectName
+            parameters.contextInMultiple = []
+            if (Array.isArray(element.context)) {
+              element.context.forEach(e => {
+                if (e.io === 'in') parameters.contextInMultiple.push(e.key)
+                if (e.io === 'out') parameters.contextOut = e.key
+              })
+            }
+          }
+          if (element.$instanceOf('flow:StartEvent')) {
+            parameters.eventName = element.eventName
+            if (element.condition) parameters.condition = element.condition.body
+            if (element.context) parameters.contextOut = element.context.key
+          }
+          if (element.$instanceOf('flow:SequenceFlow')) {
+            if (element.condition) parameters.condition = element.condition.body
+            parameters.contextInMultiple = []
+            if (Array.isArray(element.context)) {
+              element.context.forEach(e => {
+                if (e.io === 'in') parameters.contextInMultiple.push(e.key)
+              })
+            }
+          }
+        })
+      }
+      this.parameters = parameters
+    },
+    updateParameters (newVal) {
+      const parameters = toRaw(newVal)
+      // this.parameters = parameters
+      // update element attributes
+      const elementRegistry = this.modeler.get('elementRegistry')
+      const modeling = this.modeler.get('modeling')
+      const element = elementRegistry.get(this.selected.id)
+      if (element.businessObject.name !== parameters.elementName) {
+        modeling.updateProperties(element, { name: this.parameters.elementName })
+        return
+      }
+      // udpate business object
+      const moddle = this.modeler.get('moddle')
+      // create extension element, if not exist
+      if (this.selected?.businessObject && !this.selected?.businessObject?.extensionElements) {
+        this.selected.businessObject.extensionElements = moddle.create('bpmn:ExtensionElements')
+      }
+      if (this.selected?.businessObject?.extensionElements) {
+        const selected = toRaw(this.selected)
+        // map parameters to extension
+        const current = cloneDeep(this.selected.businessObject.get('extensionElements'))
+        const updated = cloneDeep(current)
+        // delete old elements
+        updated.values = updated.get('values').filter(element => !element.$type.startsWith('flow:'))
+        // add new elements
+        switch (this.selected.type) {
+          case 'ServiceTask': {
+            const task = moddle.create('flow:ServiceTask', {
+              action: parameters.action,
+              serviceId: parameters.serviceId,
+              context: []
+            })
+            if (parameters.template) {
+              task.preparation = moddle.create('flow:Preparation', {
+                template: parameters.template,
+                context: []
+              })
+              if (parameters.contextInMultiple) {
+                parameters.contextInMultiple.forEach(key => {
+                  task.preparation.context.push(moddle.create('flow:Context', {
+                    io: 'in',
+                    key
+                  }))
+                })
+              }
+            }
+            if (parameters.contextIn) {
+              task.context.push(moddle.create('flow:Context', {
+                io: 'in',
+                key: parameters.contextIn
+              }))
+            }
+            if (parameters.contextOut) {
+              task.context.push(moddle.create('flow:Context', {
+                io: 'out',
+                key: parameters.contextOut
+              }))
+            }
+            updated.values.push(task)
+          }
+            break
+          case 'BusinessRuleTask': {
+            const ruleset = moddle.create('flow:DecisionModel', {
+              objectName: parameters.objectName,
+              context: []
+            })
+            if (parameters.contextOut) {
+              ruleset.context.push(moddle.create('flow:Context', {
+                io: 'out',
+                key: parameters.contextOut
+              }))
+            }
+            if (parameters.contextInMultiple) {
+              parameters.contextInMultiple.forEach(key => {
+                ruleset.context.push(moddle.create('flow:Context', {
+                  io: 'in',
+                  key
+                }))
+              })
+            }
+            updated.values.push(ruleset)
+          }
+            break
+          case 'StartEvent': {
+            const event = moddle.create('flow:StartEvent', {
+              eventName: parameters.eventName
+            })
+            if (parameters.condition) {
+              event.condition = moddle.create('flow:Expression', {
+                language: 'FEEL',
+                body: parameters.condition
+              })
+            }
+            if (parameters.contextOut) {
+              event.context = moddle.create('flow:Context', {
+                io: 'out',
+                key: parameters.contextOut
+              })
+            }
+            updated.values.push(event)
+          }
+            break
+          case 'SequenceFlow': {
+            const sequence = moddle.create('flow:SequenceFlow', {})
+            sequence.context = []
+            if (parameters.contextInMultiple) {
+              parameters.contextInMultiple.forEach(key => {
+                sequence.context.push(moddle.create('flow:Context', {
+                  io: 'in',
+                  key
+                }))
+              })
+            }
+            if (parameters.condition) {
+              sequence.condition = moddle.create('flow:Expression', {
+                language: 'FEEL',
+                body: parameters.condition
+              })
+            }
+            updated.values.push(sequence)
+          }
+        }
+        // update extension in modeler
+        try {
+          const commandStack = this.modeler.get('commandStack')
+          commandStack.execute('properties-panel.update-businessobject', {
+            element: selected.element,
+            businessObject: selected.element.businessObject,
+            properties: {
+              extensionElements: updated
+            },
+            oldProperties: {
+              extensionElements: current
+            }
+          })
+        } catch (error) {
+          console.log('failed uodate', error)
+        }
+      }
     },
     cmdUndo () {
       this.modeler.get('commandStack').undo()

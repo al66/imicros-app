@@ -283,13 +283,6 @@ const appList = [
     status: 'beta'
   },
   {
-    title: 'Rules',
-    caption: 'Rules Editor',
-    icon: 'bi-file-ruled',
-    route: '/ruleseteditor',
-    status: 'experimental'
-  },
-  {
     title: 'Templates',
     caption: 'Template Editor',
     icon: 'bi-code-square',
@@ -301,14 +294,14 @@ const appList = [
     caption: 'Test single services',
     icon: 'bi-terminal',
     route: '/test',
-    status: 'experimental'
+    status: 'alpha'
   },
   {
     title: 'Processes',
     caption: 'Process Monitor',
     icon: 'bi-activity',
     route: '/processmonitor',
-    status: 'experimental'
+    status: 'alpha'
   },
   {
     title: 'Agents',

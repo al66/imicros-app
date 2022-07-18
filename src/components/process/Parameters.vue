@@ -11,151 +11,242 @@
         <q-card-section
           align="left"
         >
-          <q-input
-            :model-value="id"
-            :label="$t('Process.editor.parameters.dialog.label.elementId')"
-            stack-label
-            disable
-          />
-          <!-- Service Task -->
-          <div v-if="type === 'bpmn:ServiceTask'">
-            <q-option-group
-              v-model="local.prepFunction"
-              :options="optionsPreparation"
-              inline
-              @update:model-value="update"
-            />
-            <q-select
-              v-if="local.prepFunction && local.prepFunction !== ''"
-              v-model="contextKeys"
-              :label="$t('Process.editor.parameters.dialog.label.contextKeyPreparation')"
-              stack-label
-              use-input
-              use-chips
-              multiple
-              hide-dropdown-icon
-              input-debounce="5"
-              new-value-mode="add-unique"
-              @update:model-value="update"
-            />
-            <q-input
-              v-if="local.prepFunction === 'template'"
-              v-model="local.template"
-              label="Template for mapping of parameters"
-              stack-label
-              readonly
-              @change="update"
+          <q-expansion-item
+            dense
+            dense-toggle
+            expand-separator
+            default-opened
+            label="General"
+          >
+            <q-card-section :key="triggerRendering">
+              <q-input
+                :model-value="id"
+                :label="$t('Process.editor.parameters.dialog.label.elementId')"
+                stack-label
+                disable
+              />
+              <q-input
+                v-model="local.elementName"
+                label="Name"
+                stack-label
+                @change="update"
+              />
+            </q-card-section>
+          </q-expansion-item>
+          <!-- Sequence Flow -->
+          <div v-if="type === 'SequenceFlow'">
+            <q-expansion-item
+              dense
+              dense-toggle
+              expand-separator
+              icon="bi-gear-fill"
+              label="Execution"
             >
-              <template #before>
-                <q-btn
-                  v-if="local.prepFunction === 'template'"
-                  class="justify-center"
-                  size="sm"
-                  color="primary"
-                  icon="edit"
-                  @click="editTemplate"
+              <q-card-section :key="triggerRendering">
+                <q-select
+                  v-model="local.contextInMultiple"
+                  label="Context keys (input)"
+                  hint="available context variables for the expression"
+                  hide-hint
+                  stack-label
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
                 />
-              </template>
-            </q-input>
-            <q-input
-              v-if="local.prepFunction === 'ruleset'"
-              v-model="local.ruleset"
-              :label="$t('Process.editor.parameters.dialog.label.rulesetPreparation')"
-              stack-label
-              @change="update"
-            />
-            <q-select
-              v-model="local.paramsKey"
-              :label="$t('Process.editor.parameters.dialog.label.contextKeyTask')"
-              stack-label
-              use-input
-              use-chips
-              hide-dropdown-icon
-              input-debounce="0"
-              new-value-mode="add-unique"
-              @update:model-value="update"
-            />
-            <q-input
-              v-model="local.action"
-              :label="$t('Process.editor.parameters.dialog.label.action')"
-              stack-label
-              clearable
-              @change="update"
-            />
-            <q-select
-              v-model="local.serviceId"
-              :options="optionsAgents"
-              :label="$t('Process.editor.parameters.dialog.label.agent')"
-              stack-label
-              clearable
-              emit-value
-              map-options
-              @update:model-value="update"
-            />
-            <q-select
-              v-model="local.resultKey"
-              :label="$t('Process.editor.parameters.dialog.label.contextKeyResult')"
-              stack-label
-              use-input
-              use-chips
-              hide-dropdown-icon
-              input-debounce="0"
-              new-value-mode="add-unique"
-              @update:model-value="update"
-            />
+                <q-input
+                  v-model="local.condition"
+                  label="Condition (FEEL expression)"
+                  stack-label
+                  @change="update"
+                />
+              </q-card-section>
+            </q-expansion-item>
+          </div>
+          <!-- Service Task -->
+          <div v-if="type === 'ServiceTask'">
+            <q-expansion-item
+              dense
+              dense-toggle
+              expand-separator
+              icon="bi-braces"
+              label="Preparation"
+            >
+              <q-card-section :key="triggerRendering">
+                <q-select
+                  v-model="local.contextInMultiple"
+                  :label="$t('Process.editor.parameters.dialog.label.contextKeyPreparation')"
+                  stack-label
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="5"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                />
+                <q-input
+                  v-model="local.template"
+                  label="Template for mapping of parameters"
+                  stack-label
+                  readonly
+                  @change="update"
+                >
+                  <template #before>
+                    <q-btn
+                      class="justify-center"
+                      size="sm"
+                      color="primary"
+                      icon="edit"
+                      @click="editTemplate"
+                    />
+                  </template>
+                </q-input>
+              </q-card-section>
+            </q-expansion-item>
+            <q-expansion-item
+              dense
+              dense-toggle
+              expand-separator
+              default-opened
+              icon="bi-gear-fill"
+              label="Execution"
+            >
+              <q-card-section :key="triggerRendering">
+                <q-select
+                  v-model="local.contextIn"
+                  :label="$t('Process.editor.parameters.dialog.label.contextKeyTask')"
+                  stack-label
+                  use-input
+                  use-chips
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                />
+                <q-input
+                  v-model="local.action"
+                  :label="$t('Process.editor.parameters.dialog.label.action')"
+                  stack-label
+                  clearable
+                  @change="update"
+                />
+                <q-select
+                  v-model="local.serviceId"
+                  :options="optionsAgents"
+                  :label="$t('Process.editor.parameters.dialog.label.agent')"
+                  stack-label
+                  clearable
+                  emit-value
+                  map-options
+                  @update:model-value="update"
+                />
+                <q-select
+                  v-model="local.contextOut"
+                  :label="$t('Process.editor.parameters.dialog.label.contextKeyResult')"
+                  stack-label
+                  use-input
+                  use-chips
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                />
+              </q-card-section>
+            </q-expansion-item>
           </div>
           <!-- Business Rule Task -->
-          <div v-if="type === 'bpmn:BusinessRuleTask'">
-            <q-input
-              v-model="local.ruleset"
-              :label="$t('Process.editor.parameters.dialog.label.ruleset')"
-              label-color="orange"
-              stack-label
-              @change="update"
-            />
-            <q-select
-              v-model="contextKeys"
-              label="context keys (input)"
-              stack-label
-              use-input
-              use-chips
-              multiple
-              hide-dropdown-icon
-              input-debounce="0"
-              new-value-mode="add-unique"
-              @update:model-value="update"
-            />
-            <q-select
-              v-model="local.contextKey"
-              :label="$t('Process.editor.parameters.dialog.label.contextKeyResult')"
-              stack-label
-              use-input
-              use-chips
-              hide-dropdown-icon
-              input-debounce="0"
-              new-value-mode="add-unique"
-              @update:model-value="update"
-            />
+          <div v-if="type === 'BusinessRuleTask'">
+            <q-expansion-item
+              dense
+              dense-toggle
+              expand-separator
+              default-opened
+              icon="bi-gear-fill"
+              label="Execution"
+            >
+              <q-card-section :key="triggerRendering">
+                <q-input
+                  v-model="local.objectName"
+                  :label="$t('Process.editor.parameters.dialog.label.ruleset')"
+                  label-color="orange"
+                  hint="object name and path in files"
+                  hide-hint
+                  stack-label
+                  @change="update"
+                />
+                <q-select
+                  v-model="local.contextInMultiple"
+                  label="Context keys (input)"
+                  stack-label
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                />
+                <q-select
+                  v-model="local.contextOut"
+                  :label="$t('Process.editor.parameters.dialog.label.contextKeyResult')"
+                  stack-label
+                  use-input
+                  use-chips
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                />
+              </q-card-section>
+            </q-expansion-item>
           </div>
-          <!-- Start Event: Signal Event -->
-          <div v-if="type === 'bpmn:StartEvent' && subtype['bpmn:SignalEventDefinition']">
-            <q-input
-              v-model="local.event"
-              label="internal event"
-              stack-label
-              @change="update"
-            />
-            <q-select
-              v-model="local.contextKey"
-              label="context key (payload/metadata)"
-              stack-label
-              use-input
-              use-chips
-              hide-dropdown-icon
-              input-debounce="0"
-              new-value-mode="add-unique"
-              @update:model-value="update"
-            />
+          <!-- Start Event -->
+          <!-- <div v-if="type === 'bpmn:StartEvent' && subtype['bpmn:SignalEventDefinition']"> -->
+          <div v-if="type === 'StartEvent'">
+            <q-expansion-item
+              dense
+              dense-toggle
+              expand-separator
+              default-opened
+              icon="bi-gear-fill"
+              label="Execution"
+            >
+              <q-card-section :key="triggerRendering">
+                <q-input
+                  v-model="local.eventName"
+                  label="Event name"
+                  hint="technical event name"
+                  hide-hint
+                  stack-label
+                  @change="update"
+                />
+                <q-input
+                  v-model="local.condition"
+                  label="Process start condition (FEEL expression)"
+                  hint="variables: event data -> data, environment data -> env"
+                  hide-hint
+                  stack-label
+                  @change="update"
+                />
+                <q-select
+                  v-model="local.contextOut"
+                  label="Context key"
+                  hint="stores payload and meta data under this key"
+                  hide-hint
+                  stack-label
+                  use-input
+                  use-chips
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                />
+              </q-card-section>
+            </q-expansion-item>
           </div>
         </q-card-section>
       </q-card>
@@ -209,6 +300,7 @@
 import Editor from 'src/components/global/Editor.vue'
 // vuex store
 import { mapGetters } from 'vuex'
+// import { toRaw } from 'vue'
 
 export default {
   props: {
@@ -239,14 +331,14 @@ export default {
   },
   data () {
     return {
-      contextKeys: [],
       template: {
         data: '',
         edit: false
       },
       agents: {
         data: []
-      }
+      },
+      triggerRendering: 0
     }
   },
   setup (props) {
@@ -257,21 +349,15 @@ export default {
   watch: {
     parameters: function (newVal) {
       this.local = Object.assign(newVal)
-      this.local.contextKeys && typeof this.local.contextKeys === 'string' ? this.contextKeys = this.local.contextKeys.split(',') : this.contextKeys = []
-      if (this.type === 'bpmn:ServiceTask' && !this.local.prepFunction) this.local.prepFunction = ''
+      // hack - has not updated all q-sections
+      this.triggerRendering += 1
+      // this.$forceUpdate()
     }
   },
   computed: {
     ...mapGetters({
       access: 'access'
     }),
-    optionsPreparation () {
-      return [
-        { label: 'No preparation step', value: '' },
-        { label: 'Map', value: 'template' },
-        { label: 'Ruleset', value: 'ruleset' }
-      ]
-    },
     optionsAgents () {
       return this.agents.data.map(agent => { return { label: agent.label, value: agent.serviceId } })
     }
@@ -281,7 +367,6 @@ export default {
   },
   methods: {
     update () {
-      this.contextKeys && Array.isArray(this.contextKeys) ? this.local.contextKeys = this.contextKeys.join(',') : this.local.contextKeys = null
       this.$emit('update:parameters', this.local)
     },
     editTemplate () {

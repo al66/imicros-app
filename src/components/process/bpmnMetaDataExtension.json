@@ -1,11 +1,62 @@
 {
-  "name": "FlowExecution",
-  "uri": "http://www.imicros.de/schema/bpmn/fe",
-  "prefix": "fe",
+  "name": "Flow",
+  "uri": "http://www.imicros.de/schema/bpmn/flow",
+  "prefix": "flow",
   "xml": {
     "tagAlias": "lowerCase"
   },
   "types": [
+    {
+      "name": "contextKey",
+      "isAttr": true,
+      "type": "String"
+    },
+    {
+      "name": "Context",
+      "properties": [
+        {
+          "name": "io",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "key",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "Preparation",
+      "properties": [
+        {
+          "name": "context",
+          "isAttr": false,
+          "type": "Context",
+          "isMany": true
+        },
+        {
+          "name": "template",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "Expression",
+      "properties": [
+        {
+          "name": "language",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "body",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
     {
       "name": "AnalyzedNode",
       "extends": [
@@ -19,54 +70,83 @@
         }
       ]
     },
-    {
-      "name": "ExecutionParameter",
+    { "name": "StartEvent",
       "extends": [
-        "bpmn:ServiceTask",
-        "bpmn:BusinessRuleTask",
         "bpmn:StartEvent"
       ],
       "superClass": [ "Element" ],
       "properties": [
         {
-          "name": "comments",
-          "isMany": true,
-          "type": "Comment"
-        },
-        {
-          "name": "uid",
+          "name": "eventName",
           "isAttr": true,
           "type": "String"
         },
         {
-          "name": "prepFunction",
+          "name": "context",
+          "isAttr": false,
+          "type": "Context"
+        },
+        {
+          "name": "condition",
+          "isAttr": false,
+          "type": "Expression"
+        }
+      ]
+    },
+    { "name": "SequenceFlow",
+      "extends": [
+        "bpmn:SequenceFlow"
+      ],
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "context",
+          "isAttr": false,
+          "type": "Context",
+          "isMany": true
+        },
+        {
+          "name": "condition",
+          "isAttr": false,
+          "type": "Expression"
+        }
+      ]
+    },
+    { "name": "DecisionModel",
+      "extends": [
+        "bpmn:BusinessRuleTask"
+      ],
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "objectName",
           "isAttr": true,
           "type": "String"
         },
         {
-          "name": "template",
-          "isAttr": true,
-          "type": "String"
+          "name": "context",
+          "type": "Context",
+          "isMany": true
+        }
+      ]
+    },
+    {
+      "name": "ServiceTask",
+      "extends": [
+        "bpmn:ServiceTask"
+      ],
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "preparation",
+          "isAttr": false,
+          "type": "Preparation"
         },
         {
-          "name": "ruleset",
-          "isAttr": true,
-          "type": "String"
-        },
-        {
-          "name": "contextKeys",
-          "isAttr": true,
-          "type": "String"
-        },
-        {
-          "name": "contextKey",
-          "isAttr": true,
-          "type": "String"
-        },
-        {
-          "name": "event",
-          "isAttr": true,
-          "type": "String"
+          "name": "context",
+          "isAttr": false,
+          "type": "Context",
+          "isMany": true
         },
         {
           "name": "action",
@@ -75,16 +155,6 @@
         },
         {
           "name": "serviceId",
-          "isAttr": true,
-          "type": "String"
-        },
-        {
-          "name": "paramsKey",
-          "isAttr": true,
-          "type": "String"
-        },
-        {
-          "name": "resultKey",
           "isAttr": true,
           "type": "String"
         }
