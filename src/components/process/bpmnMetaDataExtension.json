@@ -37,7 +37,7 @@
         },
         {
           "name": "template",
-          "isAttr": true,
+          "isBody": true,
           "type": "String"
         }
       ]
@@ -52,8 +52,60 @@
         },
         {
           "name": "body",
+          "isBody": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "Timer",
+      "properties": [
+        {
+          "name": "cycle",
           "isAttr": true,
           "type": "String"
+        },
+        {
+          "name": "duration",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "Error",
+      "properties": [
+        {
+          "name": "code",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "text",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "Source",
+      "isAbstract": true
+    },
+    {
+      "name": "Object",
+      "superClass": [
+        "Source"
+      ],
+      "properties": [
+        {
+          "name": "objectName",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "embedded",
+          "isAttr": true,
+          "type": "Boolean"
         }
       ]
     },
@@ -90,6 +142,99 @@
           "name": "condition",
           "isAttr": false,
           "type": "Expression"
+        },
+        {
+          "name": "timer",
+          "isAttr": false,
+          "type": "Timer"
+        }
+      ]
+    },
+    { "name": "IntermediateEvent",
+      "extends": [
+        "bpmn:IntermediateCatchEvent",
+        "bpmn:IntermediateThrowEvent",
+        "bpmn:BoundaryEvent"
+      ],
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "preparation",
+          "isAttr": false,
+          "type": "Preparation"
+        },
+        {
+          "name": "eventName",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "messageName",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "action",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "context",
+          "isAttr": false,
+          "type": "Context"
+        },
+        {
+          "name": "condition",
+          "isAttr": false,
+          "type": "Expression"
+        },
+        {
+          "name": "timer",
+          "isAttr": false,
+          "type": "Timer"
+        },
+        {
+          "name": "error",
+          "isAttr": false,
+          "type": "Error"
+        }
+      ]
+    },
+    { "name": "EndEvent",
+      "extends": [
+        "bpmn:EndEvent"
+      ],
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "preparation",
+          "isAttr": false,
+          "type": "Preparation"
+        },
+        {
+          "name": "eventName",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "messageName",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "action",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
+          "name": "context",
+          "isAttr": false,
+          "type": "Context"
+        },
+        {
+          "name": "error",
+          "isAttr": false,
+          "type": "Error"
         }
       ]
     },
@@ -112,16 +257,16 @@
         }
       ]
     },
-    { "name": "DecisionModel",
+    { "name": "BusinessRuleTask",
       "extends": [
         "bpmn:BusinessRuleTask"
       ],
       "superClass": [ "Element" ],
       "properties": [
         {
-          "name": "objectName",
-          "isAttr": true,
-          "type": "String"
+          "name": "source",
+          "isAttr": false,
+          "type": "Source"
         },
         {
           "name": "context",
