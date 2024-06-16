@@ -88,6 +88,16 @@
       ]
     },
     {
+      "name": "Message",
+      "properties": [
+        {
+          "name": "name",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
       "name": "Source",
       "isAbstract": true
     },
@@ -134,6 +144,12 @@
           "type": "String"
         },
         {
+          "name": "receives",
+          "isAttr": false,
+          "type": "Message",
+          "isMany": true
+        },
+        {
           "name": "context",
           "isAttr": false,
           "type": "Context"
@@ -169,9 +185,15 @@
           "type": "String"
         },
         {
-          "name": "messageName",
-          "isAttr": true,
-          "type": "String"
+          "name": "send",
+          "isAttr": false,
+          "type": "Message"
+        },
+        {
+          "name": "receives",
+          "isAttr": false,
+          "type": "Message",
+          "isMany": true
         },
         {
           "name": "action",
@@ -196,7 +218,8 @@
         {
           "name": "error",
           "isAttr": false,
-          "type": "Error"
+          "type": "Error",
+          "isMany": true
         }
       ]
     },
@@ -217,9 +240,9 @@
           "type": "String"
         },
         {
-          "name": "messageName",
-          "isAttr": true,
-          "type": "String"
+          "name": "send",
+          "isAttr": false,
+          "type": "Message"
         },
         {
           "name": "action",
@@ -300,6 +323,36 @@
         },
         {
           "name": "serviceId",
+          "isAttr": true,
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "name": "SendTask",
+      "extends": [
+        "bpmn:SendTask"
+      ],
+      "superClass": [ "Element" ],
+      "properties": [
+        {
+          "name": "preparation",
+          "isAttr": false,
+          "type": "Preparation"
+        },
+        {
+          "name": "send",
+          "isAttr": false,
+          "type": "Message"
+        },
+        {
+          "name": "context",
+          "isAttr": false,
+          "type": "Context",
+          "isMany": true
+        },
+        {
+          "name": "action",
           "isAttr": true,
           "type": "String"
         }

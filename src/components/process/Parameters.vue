@@ -53,16 +53,23 @@
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.startevent.eventName.tooltip" />
                 </q-input>
-                <q-input
+                <q-select
                   v-if="subtype === 'MessageEventDefinition'"
-                  v-model="local.messageName"
+                  v-model="local.messageNames"
                   :label="$t('Process.editor.parameters.dialog.startevent.messageName.label')"
                   :hint="$t('Process.editor.parameters.dialog.startevent.messageName.hint')"
+                  hide-hint
                   stack-label
-                  @change="update"
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.startevent.messageName.tooltip" />
-                </q-input>
+                </q-select>
                 <q-input
                   v-if="subtype === 'TimerEventDefinition'"
                   v-model="local.cycle"
@@ -196,6 +203,28 @@
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.throwing.action.tooltip" />
                 </q-input>
+                <q-input
+                  v-if="subtype === 'ErrorEventDefinition'"
+                  v-model="local.errorCode"
+                  :label="$t('Process.editor.parameters.dialog.intermediateevent.throwing.errorCode.label')"
+                  :hint="$t('Process.editor.parameters.dialog.intermediateevent.throwing.errorCode.hint')"
+                  hide-hint
+                  stack-label
+                  @change="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.throwing.errorCode.tooltip" />
+                </q-input>
+                <q-input
+                  v-if="subtype === 'ErrorEventDefinition'"
+                  v-model="local.errorText"
+                  :label="$t('Process.editor.parameters.dialog.intermediateevent.throwing.errorText.label')"
+                  :hint="$t('Process.editor.parameters.dialog.intermediateevent.throwing.errorText.hint')"
+                  hide-hint
+                  stack-label
+                  @change="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.throwing.errorText.tooltip" />
+                </q-input>
               </q-card-section>
             </Expansion>
           </div>
@@ -226,16 +255,23 @@
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.catching.duration.tooltip" />
                 </q-input>
-                <q-input
+                <q-select
                   v-if="subtype === 'MessageEventDefinition'"
-                  v-model="local.messageName"
+                  v-model="local.messageNames"
                   :label="$t('Process.editor.parameters.dialog.intermediateevent.catching.messageName.label')"
                   :hint="$t('Process.editor.parameters.dialog.intermediateevent.catching.messageName.hint')"
                   stack-label
-                  @change="update"
+                  hide-hint
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="5"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.catching.messageName.tooltip" />
-                </q-input>
+                </q-select>
                 <q-select
                   v-if="subtype !== 'TimerEventDefinition'"
                   v-model="local.contextInMultiple"
@@ -280,6 +316,23 @@
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.catching.contextOut.tooltip" />
                 </q-select>
+                <q-select
+                  v-if="subtype === 'ErrorEventDefinition'"
+                  v-model="local.errors"
+                  :label="$t('Process.editor.parameters.dialog.intermediateevent.catching.errorCode.label')"
+                  :hint="$t('Process.editor.parameters.dialog.intermediateevent.catching.errorCode.hint')"
+                  hide-hint
+                  stack-label
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="5"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.catching.errorCode.tooltip" />
+                </q-select>
               </q-card-section>
             </Expansion>
           </div>
@@ -300,6 +353,23 @@
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.boundaryevent.eventName.tooltip" />
                 </q-input>
+                <q-select
+                  v-if="subtype === 'MessageEventDefinition'"
+                  v-model="local.messageNames"
+                  :label="$t('Process.editor.parameters.dialog.boundaryevent.catching.messageName.label')"
+                  :hint="$t('Process.editor.parameters.dialog.boundaryevent.catching.messageName.hint')"
+                  stack-label
+                  hide-hint
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="5"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.boundaryevent.catching.messageName.tooltip" />
+                </q-select>
                 <q-input
                   v-if="subtype === 'TimerEventDefinition'"
                   v-model="local.duration"
@@ -310,6 +380,23 @@
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.boundaryevent.duration.tooltip" />
                 </q-input>
+                <q-select
+                  v-if="subtype === 'ErrorEventDefinition'"
+                  v-model="local.errors"
+                  :label="$t('Process.editor.parameters.dialog.intermediateevent.catching.errorCode.label')"
+                  :hint="$t('Process.editor.parameters.dialog.intermediateevent.catching.errorCode.hint')"
+                  hide-hint
+                  stack-label
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="5"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.intermediateevent.catching.errorCode.tooltip" />
+                </q-select>
               </q-card-section>
             </Expansion>
           </div>
@@ -405,6 +492,28 @@
                   @change="update"
                 >
                   <TooltipMultiline keypath="Process.editor.parameters.dialog.endevent.action.tooltip" />
+                </q-input>
+                <q-input
+                  v-if="subtype === 'ErrorEventDefinition'"
+                  v-model="local.errors"
+                  :label="$t('Process.editor.parameters.dialog.endevent.errorCode.label')"
+                  :hint="$t('Process.editor.parameters.dialog.endevent.errorCode.hint')"
+                  hide-hint
+                  stack-label
+                  @change="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.endevent.errorCode.tooltip" />
+                </q-input>
+                <q-input
+                  v-if="subtype === 'ErrorEventDefinition'"
+                  v-model="local.errorText"
+                  :label="$t('Process.editor.parameters.dialog.endevent.errorText.label')"
+                  :hint="$t('Process.editor.parameters.dialog.endevent.errorText.hint')"
+                  hide-hint
+                  stack-label
+                  @change="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.endevent.errorText.tooltip" />
                 </q-input>
               </q-card-section>
             </Expansion>
@@ -649,6 +758,15 @@
               expanded
             >
               <q-card-section :key="triggerRendering">
+                <q-input
+                  v-model="local.messageName"
+                  :label="$t('Process.editor.parameters.dialog.sendtask.messageName.label')"
+                  :hint="$t('Process.editor.parameters.dialog.sendtask.messageName.hint')"
+                  stack-label
+                  @change="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.sendtask.messageName.tooltip" />
+                </q-input>
                 <q-select
                   v-model="local.contextIn"
                   :label="$t('Process.editor.parameters.dialog.sendtask.contextIn.label')"
@@ -689,6 +807,46 @@
               </q-card-section>
             </Expansion>
           </div>
+          <!-- Receive Task -->
+          <div v-if="type === 'ReceiveTask'">
+            <Expansion
+              execution
+              expanded
+            >
+              <q-card-section :key="triggerRendering">
+                <q-select
+                  v-model="local.messageNames"
+                  :label="$t('Process.editor.parameters.dialog.receivetask.messageName.label')"
+                  :hint="$t('Process.editor.parameters.dialog.receivetask.messageName.hint')"
+                  stack-label
+                  hide-hint
+                  use-input
+                  use-chips
+                  multiple
+                  hide-dropdown-icon
+                  input-debounce="5"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.receivetask.messageName.tooltip" />
+                </q-select>
+                <q-select
+                  v-model="local.contextOut"
+                  :label="$t('Process.editor.parameters.dialog.receivetask.contextOut.label')"
+                  :hint="$t('Process.editor.parameters.dialog.receivetask.contextOut.hint')"
+                  stack-label
+                  use-input
+                  use-chips
+                  hide-dropdown-icon
+                  input-debounce="0"
+                  new-value-mode="add-unique"
+                  @update:model-value="update"
+                >
+                  <TooltipMultiline keypath="Process.editor.parameters.dialog.receivetask.contextOut.tooltip" />
+                </q-select>
+              </q-card-section>
+            </Expansion>
+          </div>
         </q-card-section>
       </q-card>
     </q-scroll-area>
@@ -716,7 +874,7 @@
         <q-card-section>
           <editor
             v-model:content="template.data"
-            lang="json"
+            lang="text"
             width="100%"
           />
         </q-card-section>
@@ -850,6 +1008,7 @@ export default {
     saveTemplate () {
       // this.selected.parameterObject.template = this.template.data
       // this.local.template = Buffer.from(this.template.data).toString('base64')
+      console.log(this.template.data)
       this.local.template = this.template.data
       this.template.edit = false
       this.update()

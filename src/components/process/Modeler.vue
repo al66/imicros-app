@@ -255,7 +255,6 @@ export default {
           this.selected.subtype = ''
           // determine event sub type
           if (bo.eventDefinitions) {
-            console.log(toRaw(bo.eventDefinitions))
             bo.eventDefinitions.forEach((e) => {
               this.selected.subtype = e.$type.toString().replace(deletePrefix, '$1$2')
               console.log(this.selected.subtype)
@@ -306,17 +305,46 @@ export default {
               })
             }
           }
+          if (element.$instanceOf('flow:SendTask')) {
+            parameters.action = element.action
+            parameters.messageName = element.send.name
+            if (Array.isArray(element.context)) {
+              element.context.forEach(e => {
+                if (e.io === 'in') parameters.contextIn = e.key
+                if (e.io === 'out') parameters.contextOut = e.key
+              })
+            }
+            if (element.preparation) {
+              parameters.template = element.preparation.template
+              if (element.preparation.context) {
+                element.preparation.context.forEach(e => {
+                  if (e.io === 'in') parameters.contextInMultiple.push(e.key)
+                })
+              }
+            }
+          }
           if (element.$instanceOf('flow:StartEvent')) {
             parameters.eventName = element.eventName
-            parameters.messageName = element.messageName
+            if (element.receives) {
+              parameters.messageNames = []
+              element.receives.forEach(e => {
+                parameters.messageNames.push(e.name)
+              })
+            }
             if (element.condition) parameters.condition = element.condition.body
             if (element.context) parameters.contextOut = element.context.key
             if (element.timer) parameters.cycle = element.timer.cycle
           }
           if (element.$instanceOf('flow:IntermediateEvent')) {
             parameters.eventName = element.eventName
-            if (element.messageName) {
-              parameters.messageName = element.messageName
+            if (element.receives) {
+              parameters.messageNames = []
+              element.receives.forEach(e => {
+                parameters.messageNames.push(e.name)
+              })
+            }
+            if (element.send) {
+              parameters.messageName = element.send.name
               parameters.action = element.action
             }
             if (element.preparation) {
@@ -332,14 +360,18 @@ export default {
             if (element.condition) parameters.condition = element.condition.body
             if (element.timer) parameters.duration = element.timer.duration
             if (element.error) {
-              parameters.errorCode = element.error.code
-              parameters.errorText = element.error.text
+              parameters.errors = []
+              if (Array.isArray(element.error)) {
+                element.error.forEach(e => {
+                  parameters.errors.push(e.code)
+                })
+              }
             }
           }
           if (element.$instanceOf('flow:EndEvent')) {
             parameters.eventName = element.eventName
-            if (element.messageName) {
-              parameters.messageName = element.messageName
+            if (element.send) {
+              parameters.messageName = element.send.name
               parameters.action = element.action
             }
             if (element.preparation) {
@@ -458,11 +490,58 @@ export default {
             updated.values.push(ruleset)
           }
             break
+          case 'SendTask': {
+            const task = moddle.create('flow:SendTask', {
+              action: parameters.action,
+              serviceId: parameters.serviceId,
+              context: []
+            })
+            if (parameters.template) {
+              task.preparation = moddle.create('flow:Preparation', {
+                template: parameters.template,
+                context: []
+              })
+              if (parameters.contextInMultiple) {
+                parameters.contextInMultiple.forEach(key => {
+                  task.preparation.context.push(moddle.create('flow:Context', {
+                    io: 'in',
+                    key
+                  }))
+                })
+              }
+            }
+            if (parameters.messageName) {
+              task.send = moddle.create('flow:Message', {
+                name: parameters.messageName
+              })
+            }
+            if (parameters.contextIn) {
+              task.context.push(moddle.create('flow:Context', {
+                io: 'in',
+                key: parameters.contextIn
+              }))
+            }
+            if (parameters.contextOut) {
+              task.context.push(moddle.create('flow:Context', {
+                io: 'out',
+                key: parameters.contextOut
+              }))
+            }
+            updated.values.push(task)
+          }
+            break
           case 'StartEvent': {
             const event = moddle.create('flow:StartEvent', {
               eventName: parameters.eventName
             })
-            if (parameters.messageName) event.messageName = parameters.messageName
+            if (parameters.messageNames) {
+              event.receives = []
+              parameters.messageNames.forEach(name => {
+                event.receives.push(moddle.create('flow:Message', {
+                  name
+                }))
+              })
+            }
             if (parameters.condition) {
               event.condition = moddle.create('flow:Expression', {
                 language: 'FEEL',
@@ -501,7 +580,11 @@ export default {
                 })
               }
             }
-            if (parameters.messageName) event.messageName = parameters.messageName
+            if (parameters.messageName) {
+              event.send = moddle.create('flow:Message', {
+                name: parameters.messageName
+              })
+            }
             if (parameters.action) event.action = parameters.action
             if (parameters.contextOut) {
               event.context = moddle.create('flow:Context', {
@@ -517,7 +600,14 @@ export default {
             const event = moddle.create('flow:IntermediateEvent', {
               eventName: parameters.eventName
             })
-            if (parameters.messageName) event.messageName = parameters.messageName
+            if (parameters.messageNames) {
+              event.receives = []
+              parameters.messageNames.forEach(name => {
+                event.receives.push(moddle.create('flow:Message', {
+                  name
+                }))
+              })
+            }
             if (parameters.condition) {
               event.condition = moddle.create('flow:Expression', {
                 language: 'FEEL',
@@ -543,10 +633,12 @@ export default {
                 key: parameters.contextOut
               })
             }
-            if (parameters.errorCode) {
-              event.error = moddle.create('flow:Error', {
-                code: parameters.errorCode,
-                text: parameters.errorText || ''
+            if (parameters.errors) {
+              event.error = []
+              parameters.errors.forEach(code => {
+                event.error.push(moddle.create('flow:Error', {
+                  code
+                }))
               })
             }
             updated.values.push(event)
@@ -570,7 +662,11 @@ export default {
                 })
               }
             }
-            if (parameters.messageName) event.messageName = parameters.messageName
+            if (parameters.messageName) {
+              event.send = moddle.create('flow:Message', {
+                name: parameters.messageName
+              })
+            }
             if (parameters.action) event.action = parameters.action
             if (parameters.contextOut) {
               event.context = moddle.create('flow:Context', {
